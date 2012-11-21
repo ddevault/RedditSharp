@@ -8,6 +8,8 @@ namespace RedditSharp
 {
     public class Subreddit
     {
+        private const string SubredditPostUrl = "http://reddit.com/r/{0}.json";
+
         private Reddit Reddit { get; set; }
 
         public DateTime Created { get; set; }
@@ -22,8 +24,13 @@ namespace RedditSharp
         public int ActiveUsers { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
+        public string Name { get; set; }
 
-        protected internal Subreddit(Reddit reddit, JObject json)
+        private Subreddit()
+        {
+        }
+
+        protected internal Subreddit(Reddit reddit, JToken json)
         {
             Reddit = reddit;
             var data = json["data"];
@@ -38,11 +45,39 @@ namespace RedditSharp
             Subscribers = data["subscribers"].Value<int>();
             Title = data["title"].Value<string>();
             Url = data["url"].Value<string>();
+            ActiveUsers = data["accounts_active"].Value<int>();
+            Name = Url;
+            if (Name.StartsWith("/r/"))
+                Name = Name.Substring(3);
+            if (Name.StartsWith("r/"))
+                Name = Name.Substring(2);
+            Name = Name.TrimEnd('/');
         }
 
-        public Post[] GetPosts(int page = 0)
+        public static Subreddit GetRSlashAll(Reddit reddit)
         {
-            return null;
+            var rSlashAll = new Subreddit
+            {
+                DisplayName = "/r/all",
+                Title = "/r/all",
+                Url = "/r/all",
+                Name = "all",
+                Reddit = reddit
+            };
+            return rSlashAll;
+        }
+
+        public Post[] GetPosts()
+        {
+            var request = Reddit.CreateGet(string.Format(SubredditPostUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            var posts = new List<Post>();
+            var postJson = json["data"]["children"];
+            foreach (var post in postJson)
+                posts.Add(new Post(post));
+            return posts.ToArray();
         }
     }
 }

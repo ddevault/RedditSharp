@@ -111,7 +111,7 @@ namespace RedditSharp
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;
             request.Method = method;
-            request.UserAgent = "RedditSharp - " + UserAgent;
+            request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
             return request;
         }
 

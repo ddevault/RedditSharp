@@ -10,7 +10,7 @@ namespace RedditSharp
     {
         protected RedditUser() { }
 
-        public RedditUser(JObject json)
+        public RedditUser(JToken json)
         {
             var data = json["data"];
             Name = data["name"].Value<string>();

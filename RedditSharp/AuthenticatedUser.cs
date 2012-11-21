@@ -8,7 +8,7 @@ namespace RedditSharp
 {
     public class AuthenticatedUser : RedditUser
     {
-        public AuthenticatedUser(JObject json) : base(json)
+        public AuthenticatedUser(JToken json) : base(json)
         {
             Modhash = json["data"]["modhash"].Value<string>();
             HasMail = json["data"]["has_mail"].Value<bool>();

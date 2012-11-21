@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using RedditSharp;
 using System.Security.Authentication;
+using System.Threading;
 
 namespace TestRedditSharp
 {
@@ -30,7 +31,6 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            Console.WriteLine();
         }
 
         public static string ReadPassword()
