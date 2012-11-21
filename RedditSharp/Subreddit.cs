@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
@@ -9,6 +10,7 @@ namespace RedditSharp
     public class Subreddit
     {
         private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
+        private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
 
         private Reddit Reddit { get; set; }
 
@@ -78,6 +80,40 @@ namespace RedditSharp
             foreach (var post in postJson)
                 posts.Add(new Post(Reddit, post));
             return posts.ToArray();
+        }
+
+        public void Subscribe()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(SubscribeUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+                {
+                    action = "sub",
+                    uh = Reddit.User.Modhash
+                });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            // Discard results
+        }
+
+        public void Unsubscribe()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(SubscribeUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                action = "unsub",
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            // Discard results
         }
     }
 }
