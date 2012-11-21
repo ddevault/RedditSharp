@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticatedUser.cs" />
+    <Compile Include="Comment.cs" />
     <Compile Include="Post.cs" />
     <Compile Include="Reddit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

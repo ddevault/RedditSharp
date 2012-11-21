@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
@@ -8,8 +9,13 @@ namespace RedditSharp
 {
     public class Post
     {
-        public Post(JToken post)
+        private const string CommentUrl = "http://www.reddit.com/api/comment";
+        private Reddit Reddit { get; set; }
+
+        public Post(Reddit reddit, JToken post)
         {
+            Reddit = reddit;
+
             var data = post["data"];
             Author = data["author"].Value<string>();
             AuthorFlairClass = data["author_flair_css_class"].Value<string>();
@@ -18,7 +24,7 @@ namespace RedditSharp
             Domain = data["domain"].Value<string>();
             Downvotes = data["downs"].Value<int>();
             Edited = data["edited"].Value<bool>();
-            Id = data["id"].Value<string>();
+            Id = data["name"].Value<string>();
             IsSelfPost = data["is_self"].Value<bool>();
             LinkFlairClass = data["link_flair_css_class"].Value<string>();
             LinkFlairText = data["link_flair_text"].Value<string>();
@@ -59,5 +65,25 @@ namespace RedditSharp
         public string Title { get; set; }
         public int Upvotes { get; set; }
         public string Url { get; set; }
+
+        public Comment Comment(string message)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(CommentUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+                {
+                    text = message,
+                    thing_id = Id,
+                    uh = Reddit.User.Modhash
+                });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
+            return RedditSharp.Comment.FromPost(Reddit, comment[3][0][0]);
+        }
     }
 }

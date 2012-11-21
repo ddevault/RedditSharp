@@ -8,7 +8,7 @@ namespace RedditSharp
 {
     public class Subreddit
     {
-        private const string SubredditPostUrl = "http://reddit.com/r/{0}.json";
+        private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
 
         private Reddit Reddit { get; set; }
 
@@ -39,7 +39,7 @@ namespace RedditSharp
             DisplayName = data["display_name"].Value<string>();
             HeaderImage = data["header_img"].Value<string>();
             HeaderTitle = data["header_title"].Value<string>();
-            Id = data["id"].Value<string>();
+            Id = data["name"].Value<string>();
             NSFW = data["over18"].Value<bool>();
             PublicDescription = data["public_description"].Value<string>();
             Subscribers = data["subscribers"].Value<int>();
@@ -76,7 +76,7 @@ namespace RedditSharp
             var posts = new List<Post>();
             var postJson = json["data"]["children"];
             foreach (var post in postJson)
-                posts.Add(new Post(post));
+                posts.Add(new Post(Reddit, post));
             return posts.ToArray();
         }
     }
