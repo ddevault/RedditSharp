@@ -31,6 +31,10 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
+            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
+            var posts = subreddit.GetPosts();
+            var comment = posts[0].Comment("Hello, world!");
+            comment.Reply("...again");
         }
 
         public static string ReadPassword()
