@@ -11,6 +11,7 @@ namespace RedditSharp
     {
         private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
+        private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
 
         private Reddit Reddit { get; set; }
 
@@ -116,6 +117,17 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             // Discard results
+        }
+
+        public SubredditSettings GetSettings()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreateGet(string.Format(GetSettingsUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            return new SubredditSettings(this, Reddit, json);
         }
     }
 }

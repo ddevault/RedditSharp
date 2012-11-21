@@ -32,7 +32,7 @@ namespace TestRedditSharp
                 }
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            subreddit.Unsubscribe();
+            var settings = subreddit.GetSettings();
         }
 
         public static string ReadPassword()
