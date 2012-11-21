@@ -91,6 +91,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
                 {
                     action = "sub",
+                    sr = Id,
                     uh = Reddit.User.Modhash
                 });
             stream.Close();
@@ -108,6 +109,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
             {
                 action = "unsub",
+                sr = Id,
                 uh = Reddit.User.Modhash
             });
             stream.Close();

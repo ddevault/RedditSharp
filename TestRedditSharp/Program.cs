@@ -32,7 +32,6 @@ namespace TestRedditSharp
                 }
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            var posts = subreddit.GetPosts();
             subreddit.Unsubscribe();
         }
 
