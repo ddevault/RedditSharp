@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,73 +40,73 @@ namespace RedditSharp
                 case "anyone":
                     WikiEditMode = WikiEditMode.All;
                     break;
-            }
-            string type = data["subreddit_type"].Value<string>();
-            switch (type)
-            {
-                case "public":
-                    SubredditType = SubredditType.Public;
-                    break;
-                case "private":
-                    SubredditType = SubredditType.Private;
-                    break;
-                case "restricted":
-                    SubredditType = SubredditType.Restricted;
-                    break;
-            }
-            ShowThumbnails = data["show_media"].Value<bool>();
-            WikiEditAge = data["wiki_edit_age"].Value<int>();
-            string contentOptions = data["content_options"].Value<string>();
-            switch (contentOptions)
-            {
-                case "any":
-                    ContentOptions = ContentOptions.All;
-                    break;
-                case "link":
-                    ContentOptions = ContentOptions.LinkOnly;
-                    break;
-                case "self":
-                    ContentOptions = ContentOptions.SelfOnly;
-                    break;
-            }
-        }
+                }
+                string type = data["subreddit_type"].Value<string>();
+                switch (type)
+                {
+                    case "public":
+                        SubredditType = SubredditType.Public;
+                        break;
+                    case "private":
+                        SubredditType = SubredditType.Private;
+                        break;
+                    case "restricted":
+                        SubredditType = SubredditType.Restricted;
+                        break;
+                    }
+                    ShowThumbnails = data["show_media"].Value<bool>();
+                    WikiEditAge = data["wiki_edit_age"].Value<int>();
+                    string contentOptions = data["content_options"].Value<string>();
+                    switch (contentOptions)
+                    {
+                        case "any":
+                            ContentOptions = ContentOptions.All;
+                            break;
+                        case "link":
+                            ContentOptions = ContentOptions.LinkOnly;
+                            break;
+                        case "self":
+                            ContentOptions = ContentOptions.SelfOnly;
+                            break;
+                        }
+                    }
 
-        public bool AllowAsDefault { get; set; }
-        public string Domain { get; set; }
-        public string Description { get; set; }
-        public string Language { get; set; }
-        public string Title { get; set; }
-        public int WikiEditKarma { get; set; }
-        public bool UseDomainCss { get; set; }
-        public bool UseDomainSidebar { get; set; }
-        public string HeaderHoverText { get; set; }
-        public bool NSFW { get; set; }
-        public string PublicDescription { get; set; }
-        public WikiEditMode WikiEditMode { get; set; }
-        public SubredditType SubredditType { get; set; }
-        public bool ShowThumbnails { get; set; }
-        public int WikiEditAge { get; set; }
-        public ContentOptions ContentOptions { get; set; }
-    }
+                    public bool AllowAsDefault { get; set; }
+                    public string Domain { get; set; }
+                    public string Description { get; set; }
+                    public string Language { get; set; }
+                    public string Title { get; set; }
+                    public int WikiEditKarma { get; set; }
+                    public bool UseDomainCss { get; set; }
+                    public bool UseDomainSidebar { get; set; }
+                    public string HeaderHoverText { get; set; }
+                    public bool NSFW { get; set; }
+                    public string PublicDescription { get; set; }
+                    public WikiEditMode WikiEditMode { get; set; }
+                    public SubredditType SubredditType { get; set; }
+                    public bool ShowThumbnails { get; set; }
+                    public int WikiEditAge { get; set; }
+                    public ContentOptions ContentOptions { get; set; }
+                }
 
-    public enum WikiEditMode
-    {
-        None,
-        Moderators,
-        All
-    }
+                public enum WikiEditMode
+                {
+                    None,
+                    Moderators,
+                    All
+                }
 
-    public enum SubredditType
-    {
-        Public,
-        Restricted,
-        Private
-    }
+                public enum SubredditType
+                {
+                    Public,
+                    Restricted,
+                    Private
+                }
 
-    public enum ContentOptions
-    {
-        All,
-        LinkOnly,
-        SelfOnly
-    }
+                public enum ContentOptions
+                {
+                    All,
+                    LinkOnly,
+                    SelfOnly
+                }
 }

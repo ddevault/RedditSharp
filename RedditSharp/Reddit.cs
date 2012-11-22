@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace RedditSharp
         private const string LoginUrl = "https://ssl.reddit.com/api/login";
         private const string UserInfoUrl = "http://www.reddit.com/user/{0}/about.json";
         private const string MeUrl = "http://www.reddit.com/api/me.json";
-        private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json"; 
+        private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json";
 
         #endregion
 
