@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
@@ -80,27 +80,27 @@ namespace RedditSharp
                 default:
                     how = "special";
                     break;
+                }
+                Reddit.WritePostBody(stream, new
+                    {
+                        how = how,
+                        id = Id,
+                        uh = Reddit.User.Modhash
+                    });
+                stream.Close();
+                var response = request.GetResponse();
+                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
+                    throw new AuthenticationException("You are not permitted to distinguish this comment.");
+                }
             }
-            Reddit.WritePostBody(stream, new
-                {
-                    how = how,
-                    id = Id,
-                    uh = Reddit.User.Modhash
-                });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
-                throw new AuthenticationException("You are not permitted to distinguish this comment.");
-        }
-    }
 
-    public enum DistinguishType
-    {
-        Moderator,
-        Admin,
-        Special,
-        None
-    }
+            public enum DistinguishType
+            {
+                Moderator,
+                Admin,
+                Special,
+                None
+            }
 }
