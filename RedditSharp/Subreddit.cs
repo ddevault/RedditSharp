@@ -10,6 +10,7 @@ namespace RedditSharp
     public class Subreddit
     {
         private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
+        private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
 
@@ -73,6 +74,19 @@ namespace RedditSharp
         public Post[] GetPosts()
         {
             var request = Reddit.CreateGet(string.Format(SubredditPostUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            var posts = new List<Post>();
+            var postJson = json["data"]["children"];
+            foreach (var post in postJson)
+                posts.Add(new Post(Reddit, post));
+            return posts.ToArray();
+        }
+
+        public Post[] GetNew()
+        {
+            var request = Reddit.CreateGet(string.Format(SubredditNewUrl, Name));
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
