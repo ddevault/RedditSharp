@@ -65,8 +65,6 @@ namespace RedditSharp
             var json = JObject.Parse(result);
             if (json["jquery"].Count(i => i[0].Value<int>() == 10 && i[1].Value<int>() == 11) != 0)
                 throw new AuthenticationException("Incorrect login.");
-            var cookie = response.Headers.Get("Set-Cookie");
-            AuthCookie = cookie;
             GetMe();
             return User;
         }
@@ -112,6 +110,7 @@ namespace RedditSharp
             lastRequest = DateTime.Now;
 
             var request = (HttpWebRequest)WebRequest.Create(url);
+            request.CookieContainer = Cookies;
             var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
             request.Headers.Set("Cookie", cookieHeader);
             request.Method = method;
