@@ -31,8 +31,9 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            var settings = subreddit.GetSettings();
+            var subreddit = reddit.GetSubreddit("/r/vocaloid");
+            var newPosts = subreddit.GetNew();
+            Console.WriteLine(newPosts[0].Title);
         }
 
         public static string ReadPassword()

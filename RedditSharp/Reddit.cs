@@ -46,9 +46,11 @@ namespace RedditSharp
         public AuthenticatedUser User { get; set; }
 
         private CookieContainer Cookies { get; set; }
+        private string AuthCookie { get; set; }
 
         public AuthenticatedUser LogIn(string username, string password)
         {
+            ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             Cookies = new CookieContainer();
             var request = CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
@@ -63,7 +65,8 @@ namespace RedditSharp
             var json = JObject.Parse(result);
             if (json["jquery"].Count(i => i[0].Value<int>() == 10 && i[1].Value<int>() == 11) != 0)
                 throw new AuthenticationException("Incorrect login.");
-            var cookies = Cookies.GetCookies(new Uri("http://reddit.com"));
+            var cookie = response.Headers.Get("Set-Cookie");
+            AuthCookie = cookie;
             GetMe();
             return User;
         }
@@ -80,7 +83,7 @@ namespace RedditSharp
         public AuthenticatedUser GetMe()
         {
             var request = CreateGet(MeUrl);
-            var response = request.GetResponse();
+            var response = (HttpWebResponse)request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             User = new AuthenticatedUser(json);
@@ -109,7 +112,8 @@ namespace RedditSharp
             lastRequest = DateTime.Now;
 
             var request = (HttpWebRequest)WebRequest.Create(url);
-            request.CookieContainer = Cookies;
+            var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
+            request.Headers.Set("Cookie", cookieHeader);
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
             return request;
