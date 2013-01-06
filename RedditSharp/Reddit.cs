@@ -65,6 +65,7 @@ namespace RedditSharp
             var json = JObject.Parse(result);
             if (json["jquery"].Count(i => i[0].Value<int>() == 10 && i[1].Value<int>() == 11) != 0)
                 throw new AuthenticationException("Incorrect login.");
+            Console.WriteLine(response.Headers.Get("Set-Cookie"));
             GetMe();
             return User;
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
@@ -37,7 +38,7 @@ namespace RedditSharp
             SelfTextHtml = data["selftext_html"].Value<string>();
             Subreddit = data["subreddit"].Value<string>();
             Thumbnail = data["thumbnail"].Value<string>();
-            Title = data["title"].Value<string>();
+            Title = HttpUtility.HtmlDecode(data["title"].Value<string>());
             Upvotes = data["ups"].Value<int>();
             Url = data["url"].Value<string>();
         }
