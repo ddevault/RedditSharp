@@ -10,7 +10,7 @@ namespace RedditSharp
     public class Subreddit
     {
         private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
-        private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json";
+        private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
 
