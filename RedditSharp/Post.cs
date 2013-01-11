@@ -67,6 +67,11 @@ namespace RedditSharp
         public int Upvotes { get; set; }
         public string Url { get; set; }
 
+        public string Shortlink
+        {
+            get { return "http://redd.it/" + Id.Substring(3); }
+        }
+
         public Comment Comment(string message)
         {
             if (Reddit.User == null)
