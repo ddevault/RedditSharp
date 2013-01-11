@@ -112,8 +112,11 @@ namespace RedditSharp
 
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;
-            var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
-            request.Headers.Set("Cookie", cookieHeader);
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
+                request.Headers.Set("Cookie", cookieHeader);
+            }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
             return request;
