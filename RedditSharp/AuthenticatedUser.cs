@@ -8,7 +8,7 @@ namespace RedditSharp
 {
     public class AuthenticatedUser : RedditUser
     {
-        public const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
+        private const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
 
         public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
         {

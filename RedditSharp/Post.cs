@@ -8,12 +8,12 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class Post
+    public class Post : Thing
     {
         private const string CommentUrl = "http://www.reddit.com/api/comment";
         private Reddit Reddit { get; set; }
 
-        public Post(Reddit reddit, JToken post)
+        public Post(Reddit reddit, JToken post) : base(post)
         {
             Reddit = reddit;
 
@@ -25,7 +25,6 @@ namespace RedditSharp
             Domain = data["domain"].Value<string>();
             Downvotes = data["downs"].Value<int>();
             Edited = data["edited"].Value<bool>();
-            Id = data["name"].Value<string>();
             IsSelfPost = data["is_self"].Value<bool>();
             LinkFlairClass = data["link_flair_css_class"].Value<string>();
             LinkFlairText = data["link_flair_text"].Value<string>();
@@ -50,7 +49,6 @@ namespace RedditSharp
         public string Domain { get; set; }
         public int Downvotes { get; set; }
         public bool Edited { get; set; }
-        public string Id { get; set; }
         public bool IsSelfPost { get; set; }
         public string LinkFlairClass { get; set; }
         public string LinkFlairText { get; set; }
@@ -89,7 +87,7 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
-            return RedditSharp.Comment.FromPost(Reddit, comment[3][0][0]);
+            return new Comment(Reddit, comment[3][0][0]);
         }
     }
 }

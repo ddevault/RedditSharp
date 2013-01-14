@@ -7,36 +7,23 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class Comment
+    public class Comment : Thing
     {
         private const string CommentUrl = "http://www.reddit.com/api/comment";
         private const string DistinguishUrl = "http://www.reddit.com/api/distinguish";
         private Reddit Reddit { get; set; }
 
-        internal static Comment FromPost(Reddit reddit, JToken json)
+        public Comment(Reddit reddit, JToken json) : base(json)
         {
-            var comment = new Comment();
             var data = json["data"];
-            comment.Content = data["contentText"].Value<string>();
-            comment.ContentHtml = data["contentHTML"].Value<string>();
-            comment.Id = data["id"].Value<string>();
-            comment.Reddit = reddit;
-            return comment;
-        }
-
-        private Comment()
-        {
-        }
-
-        public Comment(Reddit reddit, JToken json)
-        {
-            // TODO
+            Content = data["contentText"].Value<string>();
+            ContentHtml = data["contentHTML"].Value<string>();
+            Reddit = reddit;
         }
 
         public string Author { get; set; }
         public string Content { get; set; }
         public string ContentHtml { get; set; }
-        public string Id { get; set; }
         public string ParentId { get; set; }
 
         public Comment Reply(string message)
@@ -56,7 +43,7 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 30 && i[1].Value<int>() == 31);
-            return FromPost(Reddit, comment[3][0][0]);
+            return new Comment(Reddit, comment[3][0][0]);
         }
 
         public void Distinguish(DistinguishType distinguishType)

@@ -13,6 +13,7 @@ namespace RedditSharp
         private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
+        private const string ModqueueUrl = "http://www.reddit.com/r/Vocaloid/about/modqueue.json";
 
         private Reddit Reddit { get; set; }
 

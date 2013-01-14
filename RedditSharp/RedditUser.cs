@@ -8,8 +8,6 @@ namespace RedditSharp
 {
     public class RedditUser
     {
-        protected RedditUser() { }
-
         public RedditUser(Reddit reddit, JToken json)
         {
             var data = json["data"];
