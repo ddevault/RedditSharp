@@ -65,7 +65,6 @@ namespace RedditSharp
             var json = JObject.Parse(result);
             if (json["jquery"].Count(i => i[0].Value<int>() == 10 && i[1].Value<int>() == 11) != 0)
                 throw new AuthenticationException("Incorrect login.");
-            Console.WriteLine(response.Headers.Get("Set-Cookie"));
             GetMe();
             return User;
         }
@@ -76,7 +75,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            return new RedditUser(json);
+            return new RedditUser(this, json);
         }
 
         public AuthenticatedUser GetMe()
@@ -85,7 +84,7 @@ namespace RedditSharp
             var response = (HttpWebResponse)request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            User = new AuthenticatedUser(json);
+            User = new AuthenticatedUser(this, json);
             return User;
         }
 

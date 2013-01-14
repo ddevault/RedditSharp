@@ -10,7 +10,7 @@ namespace RedditSharp
     {
         protected RedditUser() { }
 
-        public RedditUser(JToken json)
+        public RedditUser(Reddit reddit, JToken json)
         {
             var data = json["data"];
             Name = data["name"].Value<string>();
@@ -20,7 +20,10 @@ namespace RedditSharp
             LinkKarma = data["link_karma"].Value<int>();
             CommentKarma = data["comment_karma"].Value<int>();
             Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
+            Reddit = reddit;
         }
+
+        protected Reddit Reddit { get; set; }
 
         public string Name { get; set; }
         public string Id { get; set; }
