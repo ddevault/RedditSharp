@@ -25,7 +25,7 @@ namespace RedditSharp
         public bool NSFW { get; set; }
         public string PublicDescription { get; set; }
         public int Subscribers { get; set; }
-        public int ActiveUsers { get; set; }
+        public int? ActiveUsers { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
         public string Name { get; set; }
@@ -49,7 +49,7 @@ namespace RedditSharp
             Subscribers = data["subscribers"].Value<int>();
             Title = data["title"].Value<string>();
             Url = data["url"].Value<string>();
-            ActiveUsers = data["accounts_active"].Value<int>();
+            ActiveUsers = data["accounts_active"].Value<int?>();
             Name = Url;
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);
@@ -142,6 +142,11 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             return new SubredditSettings(this, Reddit, json);
+        }
+
+        public override string ToString()
+        {
+            return "/r/" + DisplayName;
         }
     }
 }
