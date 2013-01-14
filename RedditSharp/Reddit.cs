@@ -109,8 +109,12 @@ namespace RedditSharp
             while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2) ; // Rate limiting
             lastRequest = DateTime.Now;
             var request = (HttpWebRequest)WebRequest.Create(url);
-            var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
-            request.Headers.Set("Cookie", cookieHeader);
+            request.CookieContainer = Cookies;
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
+                request.Headers.Set("Cookie", cookieHeader);
+            }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
             return request;
