@@ -67,7 +67,7 @@ namespace RedditSharp
 
         public string Shortlink
         {
-            get { return "http://redd.it/" + Id.Substring(3); }
+            get { return "http://redd.it/" + Id; }
         }
 
         public Comment Comment(string message)
