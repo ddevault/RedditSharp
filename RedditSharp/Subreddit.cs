@@ -15,6 +15,7 @@ namespace RedditSharp
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
         private const string ModqueueUrl = "http://www.reddit.com/r/{0}/about/modqueue.json";
         private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
+        private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
 
         private Reddit Reddit { get; set; }
 
@@ -146,10 +147,24 @@ namespace RedditSharp
             return new SubredditSettings(this, Reddit, json);
         }
 
+        public void ClearFlairTemplates(FlairType flairType)
+        {
+            var request = Reddit.CreatePost(ClearFlairTemplatesUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
         public void AddFlairTemplate(string cssClass, FlairType flairType, string text, bool userEditable)
         {
-            var post = Reddit.CreatePost(FlairTemplateUrl);
-            var stream = post.GetRequestStream();
+            var request = Reddit.CreatePost(FlairTemplateUrl);
+            var stream = request.GetRequestStream();
             Reddit.WritePostBody(stream, new
             {
                 css_class = cssClass,
@@ -160,7 +175,7 @@ namespace RedditSharp
                 r = this.Name
             });
             stream.Close();
-            var response = post.GetResponse();
+            var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
