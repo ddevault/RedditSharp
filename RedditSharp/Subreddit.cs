@@ -154,7 +154,8 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
             {
                 flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
-                uh = Reddit.User.Modhash
+                uh = Reddit.User.Modhash,
+                r = this.Name
             });
             stream.Close();
             var response = request.GetResponse();
