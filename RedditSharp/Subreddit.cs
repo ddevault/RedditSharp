@@ -193,7 +193,8 @@ namespace RedditSharp
                 css_class = cssClass,
                 text = text,
                 uh = Reddit.User.Modhash,
-                r = this.Name
+                r = this.Name,
+                target = user
             });
             stream.Close();
             var response = request.GetResponse();
