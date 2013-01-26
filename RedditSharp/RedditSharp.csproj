@@ -49,6 +49,7 @@
     <Compile Include="Comment.cs" />
     <Compile Include="FlairType.cs" />
     <Compile Include="Post.cs" />
+    <Compile Include="PrivateMessage.cs" />
     <Compile Include="Reddit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedditUser.cs" />
