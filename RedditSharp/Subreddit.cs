@@ -178,6 +178,9 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            if (json["jquery"].Count(j => j[0].Value<int>() == 14 && j[1].Value<int>() == 15) != 0)
+                throw new OutOfMemoryException("Maximum flair templates reached");
         }
 
         public override string ToString()
