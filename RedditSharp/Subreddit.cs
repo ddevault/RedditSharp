@@ -194,7 +194,7 @@ namespace RedditSharp
                 text = text,
                 uh = Reddit.User.Modhash,
                 r = this.Name,
-                target = user
+                name = user
             });
             stream.Close();
             var response = request.GetResponse();
