@@ -16,6 +16,7 @@ namespace RedditSharp
         private const string ModqueueUrl = "http://www.reddit.com/r/{0}/about/modqueue.json";
         private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
         private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
+        private const string SetUserFlairUrl = "http://www.reddit.com/api/flair";
 
         private Reddit Reddit { get; set; }
 
@@ -181,6 +182,22 @@ namespace RedditSharp
             var json = JToken.Parse(data);
             if (json["jquery"].Count(j => j[0].Value<int>() == 14 && j[1].Value<int>() == 15) != 0)
                 throw new OutOfMemoryException("Maximum flair templates reached");
+        }
+
+        public void SetUserFlair(string user, string cssClass, string text)
+        {
+            var request = Reddit.CreatePost(FlairTemplateUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                css_class = cssClass,
+                text = text,
+                uh = Reddit.User.Modhash,
+                r = this.Name
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
         public override string ToString()
