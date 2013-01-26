@@ -8,6 +8,8 @@ namespace RedditSharp
 {
     public class PrivateMessage : Thing
     {
+        private const string SetAsReadUrl = "https://www.reddit.com/api/read_message";
+
         private Reddit Reddit { get; set; }
 
         public string Body { get; set; }
@@ -34,6 +36,18 @@ namespace RedditSharp
             Subreddit = data["subreddit"].Value<string>();
             Unread = data["new"].Value<bool>();
             Subject = data["subject"].Value<string>();
+        }
+
+        public void SetAsRead()
+        {
+            var request = Reddit.CreatePost(SetAsReadUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                id = this.Id,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
     }
 }

@@ -9,7 +9,7 @@ namespace RedditSharp
     public class AuthenticatedUser : RedditUser
     {
         private const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
-        private const string UnreadMessagesUrl = "http://api.reddit.com/message/unread?mark={0}&limit={1}";
+        private const string UnreadMessagesUrl = "http://api.reddit.com/message/unread?mark=true&limit={0}";
 
         public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
         {
@@ -30,10 +30,10 @@ namespace RedditSharp
             return reddits.ToArray();
         }
 
-        public PrivateMessage[] GetUnreadMessages(bool markAsRead, int limit = 25)
+        public PrivateMessage[] GetUnreadMessages(int limit = 25)
         {
             var messages = new List<PrivateMessage>();
-            var request = Reddit.CreateGet(string.Format(UnreadMessagesUrl, markAsRead, limit));
+            var request = Reddit.CreateGet(string.Format(UnreadMessagesUrl, limit));
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);

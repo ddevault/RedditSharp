@@ -31,7 +31,7 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var messages = reddit.User.GetUnreadMessages(false);
+            var messages = reddit.User.GetUnreadMessages();
         }
 
         public static string ReadPassword()
