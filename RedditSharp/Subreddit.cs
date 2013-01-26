@@ -186,7 +186,7 @@ namespace RedditSharp
 
         public void SetUserFlair(string user, string cssClass, string text)
         {
-            var request = Reddit.CreatePost(FlairTemplateUrl);
+            var request = Reddit.CreatePost(SetUserFlairUrl);
             var stream = request.GetRequestStream();
             Reddit.WritePostBody(stream, new
             {
