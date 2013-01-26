@@ -159,6 +159,9 @@ namespace RedditSharp
                 uh = Reddit.User.Modhash,
                 r = this.Name
             });
+            stream.Close();
+            var response = post.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
         public override string ToString()
