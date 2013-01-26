@@ -13,7 +13,8 @@ namespace RedditSharp
         private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
-        private const string ModqueueUrl = "http://www.reddit.com/r/Vocaloid/about/modqueue.json";
+        private const string ModqueueUrl = "http://www.reddit.com/r/{0}/about/modqueue.json";
+        private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
 
         private Reddit Reddit { get; set; }
 
@@ -143,6 +144,21 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             return new SubredditSettings(this, Reddit, json);
+        }
+
+        public void AddFlairTemplate(string cssClass, FlairType flairType, string text, bool userEditable)
+        {
+            var post = Reddit.CreatePost(FlairTemplateUrl);
+            var stream = post.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                css_class = cssClass,
+                flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
+                text = text,
+                text_editable = userEditable,
+                uh = Reddit.User.Modhash,
+                r = this.Name
+            });
         }
 
         public override string ToString()
