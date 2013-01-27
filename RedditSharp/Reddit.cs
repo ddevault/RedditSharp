@@ -50,7 +50,8 @@ namespace RedditSharp
 
         public AuthenticatedUser LogIn(string username, string password)
         {
-            ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
+            if (Type.GetType("Mono.Runtime") != null)
+                ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             Cookies = new CookieContainer();
             var request = CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
