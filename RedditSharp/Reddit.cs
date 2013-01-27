@@ -58,13 +58,14 @@ namespace RedditSharp
             WritePostBody(stream, new
                 {
                     user = username,
-                    passwd = password
+                    passwd = password,
+                    api_type = "json"
                 });
             stream.Close();
             var response = request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            if (json["jquery"].Count(i => i[0].Value<int>() == 10 && i[1].Value<int>() == 11) != 0)
+            var json = JObject.Parse(result)["json"];
+            if (json["jquery"]["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
             GetMe();
             return User;

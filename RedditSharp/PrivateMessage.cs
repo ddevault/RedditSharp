@@ -44,7 +44,8 @@ namespace RedditSharp
             Reddit.WritePostBody(request.GetRequestStream(), new
             {
                 id = this.Id,
-                uh = Reddit.User.Modhash
+                uh = Reddit.User.Modhash,
+                api_type = "json"
             });
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
