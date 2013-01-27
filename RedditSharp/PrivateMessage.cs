@@ -8,7 +8,7 @@ namespace RedditSharp
 {
     public class PrivateMessage : Thing
     {
-        private const string SetAsReadUrl = "https://www.reddit.com/api/read_message";
+        private const string SetAsReadUrl = "http://www.reddit.com/api/read_message";
 
         private Reddit Reddit { get; set; }
 
