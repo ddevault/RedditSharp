@@ -16,7 +16,7 @@ namespace RedditSharp
         private const string LoginUrl = "https://ssl.reddit.com/api/login";
         private const string UserInfoUrl = "http://www.reddit.com/user/{0}/about.json";
         private const string MeUrl = "http://www.reddit.com/api/me.json";
-        private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json"; 
+        private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json";
 
         #endregion
 
@@ -56,13 +56,13 @@ namespace RedditSharp
             var request = CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
             WritePostBody(stream, new
-                {
-                    user = username,
-                    passwd = password,
-                    api_type = "json"
-                });
+            {
+                user = username,
+                passwd = password,
+                api_type = "json"
+            });
             stream.Close();
-            var response = request.GetResponse();
+            var response = (HttpWebResponse)request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result)["json"];
             if (json["errors"].Count() != 0)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
@@ -11,7 +12,8 @@ namespace RedditSharp
         private const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
         private const string UnreadMessagesUrl = "http://api.reddit.com/message/unread?mark=true&limit={0}";
 
-        public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
+        public AuthenticatedUser(Reddit reddit, JToken json)
+            : base(reddit, json)
         {
             Modhash = json["data"]["modhash"].Value<string>();
             HasMail = json["data"]["has_mail"].Value<bool>();
@@ -34,7 +36,7 @@ namespace RedditSharp
         {
             var messages = new List<PrivateMessage>();
             var request = Reddit.CreateGet(string.Format(UnreadMessagesUrl, limit));
-            var response = request.GetResponse();
+            var response = (HttpWebResponse)request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
             foreach (var message in json["data"]["children"])

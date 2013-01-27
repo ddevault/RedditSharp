@@ -32,6 +32,8 @@ namespace TestRedditSharp
                 }
             }
             var messages = reddit.User.GetUnreadMessages();
+            foreach (var message in messages)
+                Console.WriteLine(message.Subject);
         }
 
         public static string ReadPassword()
