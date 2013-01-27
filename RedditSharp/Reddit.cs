@@ -65,7 +65,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result)["json"];
-            if (json["jquery"]["errors"].Count() != 0)
+            if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
             GetMe();
             return User;
