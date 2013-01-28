@@ -17,7 +17,6 @@ namespace RedditSharp
         private const string UserInfoUrl = "http://www.reddit.com/user/{0}/about.json";
         private const string MeUrl = "http://www.reddit.com/api/me.json";
         private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json";
-
         #endregion
 
         #region Static Variables

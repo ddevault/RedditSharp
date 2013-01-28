@@ -11,6 +11,8 @@ namespace RedditSharp
     public class Post : Thing
     {
         private const string CommentUrl = "http://www.reddit.com/api/comment";
+        private const string RemoveUrl = "http://www.reddit.com/api/remove";
+
         private Reddit Reddit { get; set; }
 
         public Post(Reddit reddit, JToken post) : base(post)
@@ -88,6 +90,21 @@ namespace RedditSharp
             var json = JObject.Parse(data);
             var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
             return new Comment(Reddit, comment[3][0][0]);
+        }
+
+        public void Remove(bool spam)
+        {
+            var request = Reddit.CreatePost(RemoveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = this.Name,
+                spam = spam,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
     }
 }
