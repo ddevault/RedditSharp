@@ -12,14 +12,19 @@ namespace RedditSharp
         {
             var data = json["data"];
             if (data["name"] != null)
-                Name = data["name"].Value<string>();
+                FullName = data["name"].Value<string>();
             Id = data["id"].Value<string>();
             if (data["kind"] != null)
                 Kind = data["kind"].Value<string>();
         }
+
+        public string Shortlink
+        {
+            get { return "http://redd.it/" + Id; }
+        }
         
         public string Id { get; set; }
-        public string Name { get; set; }
+        public string FullName { get; set; }
         public string Kind { get; set; }
     }
 }

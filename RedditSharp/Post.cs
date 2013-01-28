@@ -67,11 +67,6 @@ namespace RedditSharp
         public int Upvotes { get; set; }
         public string Url { get; set; }
 
-        public string Shortlink
-        {
-            get { return "http://redd.it/" + Id; }
-        }
-
         public Comment Comment(string message)
         {
             if (Reddit.User == null)
@@ -81,7 +76,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
                 {
                     text = message,
-                    thing_id = Name,
+                    thing_id = FullName,
                     uh = Reddit.User.Modhash
                 });
             stream.Close();
@@ -98,7 +93,7 @@ namespace RedditSharp
             var stream = request.GetRequestStream();
             Reddit.WritePostBody(stream, new
             {
-                id = Name,
+                id = FullName,
                 spam = spam,
                 uh = Reddit.User.Modhash
             });

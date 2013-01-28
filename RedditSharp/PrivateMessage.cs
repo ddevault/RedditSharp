@@ -43,7 +43,7 @@ namespace RedditSharp
             var request = Reddit.CreatePost(SetAsReadUrl);
             Reddit.WritePostBody(request.GetRequestStream(), new
             {
-                id = this.Name,
+                id = this.FullName,
                 uh = Reddit.User.Modhash,
                 api_type = "json"
             });
