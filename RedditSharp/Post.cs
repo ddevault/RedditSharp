@@ -81,7 +81,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
                 {
                     text = message,
-                    thing_id = Id,
+                    thing_id = Name,
                     uh = Reddit.User.Modhash
                 });
             stream.Close();
@@ -98,7 +98,7 @@ namespace RedditSharp
             var stream = request.GetRequestStream();
             Reddit.WritePostBody(stream, new
             {
-                id = this.Name,
+                id = Name,
                 spam = spam,
                 uh = Reddit.User.Modhash
             });
