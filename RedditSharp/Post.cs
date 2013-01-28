@@ -8,19 +8,19 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class Post : Thing
+    public class Post : VotableThing
     {
         private const string CommentUrl = "http://www.reddit.com/api/comment";
         private const string RemoveUrl = "http://www.reddit.com/api/remove";
 
         private Reddit Reddit { get; set; }
 
-        public Post(Reddit reddit, JToken post) : base(post)
+        public Post(Reddit reddit, JToken post) : base(reddit, post)
         {
             Reddit = reddit;
 
             var data = post["data"];
-            Author = data["author"].Value<string>();
+            AuthorName = data["author"].Value<string>();
             AuthorFlairClass = data["author_flair_css_class"].Value<string>();
             AuthorFlairText = data["author_flair_text"].Value<string>();
             Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
@@ -44,7 +44,15 @@ namespace RedditSharp
             Url = data["url"].Value<string>();
         }
 
-        public string Author { get; set; }
+        public string AuthorName { get; set; }
+        public RedditUser Author
+        {
+            get
+            {
+                return Reddit.GetUser(AuthorName);
+            }
+        }
+
         public string AuthorFlairClass { get; set; }
         public string AuthorFlairText { get; set; }
         public DateTime Created { get; set; }

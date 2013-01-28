@@ -31,12 +31,8 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var messages = reddit.User.GetUnreadMessages();
-            foreach (var message in messages)
-            {
-                Console.WriteLine(message.Subject);
-                message.SetAsRead();
-            }
+            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
+            var newPosts = subreddit.GetNew();
         }
 
         public static string ReadPassword()

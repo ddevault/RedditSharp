@@ -7,13 +7,13 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class Comment : Thing
+    public class Comment : VotableThing
     {
         private const string CommentUrl = "http://www.reddit.com/api/comment";
         private const string DistinguishUrl = "http://www.reddit.com/api/distinguish";
         private Reddit Reddit { get; set; }
 
-        public Comment(Reddit reddit, JToken json) : base(json)
+        public Comment(Reddit reddit, JToken json) : base(reddit, json)
         {
             var data = json["data"];
             Content = data["contentText"].Value<string>();

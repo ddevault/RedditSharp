@@ -54,6 +54,7 @@
     <Compile Include="Subreddit.cs" />
     <Compile Include="SubredditSettings.cs" />
     <Compile Include="Thing.cs" />
+    <Compile Include="VotableThing.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
