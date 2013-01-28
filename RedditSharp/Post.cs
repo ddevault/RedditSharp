@@ -95,14 +95,29 @@ namespace RedditSharp
             return new Comment(Reddit, comment[3][0][0]);
         }
 
-        public void Remove(bool spam)
+        public void Remove()
         {
             var request = Reddit.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();
             Reddit.WritePostBody(stream, new
             {
                 id = FullName,
-                spam = spam,
+                spam = false,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void RemoveSpam()
+        {
+            var request = Reddit.CreatePost(RemoveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                spam = true,
                 uh = Reddit.User.Modhash
             });
             stream.Close();

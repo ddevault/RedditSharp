@@ -69,11 +69,11 @@ namespace RedditSharp
                     break;
             }
             Reddit.WritePostBody(stream, new
-                {
-                    how = how,
-                    id = Id,
-                    uh = Reddit.User.Modhash
-                });
+            {
+                how = how,
+                id = Id,
+                uh = Reddit.User.Modhash
+            });
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
