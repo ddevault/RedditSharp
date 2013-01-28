@@ -1,10 +1,23 @@
 # RedditSharp
 
-A work-in-progress implementation of the [Reddit](http://reddit.com) API.
+A partial implementation of the [Reddit](http://reddit.com) API.
 
-    var reddit = new Reddit();
-    var user = reddit.Login("username", "password");
-    Console.WriteLine("You have " + user.LinkKarma + " link karma!");
-    var subreddit = reddit.GetSubreddit("/r/test");
-    foreach (var post in subreddit.GetPosts())
-        Console.WriteLine(post.Title);
+```csharp
+var reddit = new Reddit();
+var user = reddit.Login("username", "password");
+var subreddit = reddit.GetSubreddit("/r/example");
+subreddit.Subscribe();
+var posts = subreddit.GetNew();
+foreach (var post in posts)
+{
+    if (post.Title == "What is my karma?")
+    {
+        // Note: This is an example. Bots are not permitted to cast votes automatically.
+        post.Upvote();
+        var comment = post.Comment(string.Format("You have {0} link karma!", post.Author.LinkKarma));
+        comment.Distinguish(DistinguishType.Moderator);
+    }
+}
+```
+
+This gets improved every time I need it to have new features.
