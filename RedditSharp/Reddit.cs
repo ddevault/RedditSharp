@@ -154,6 +154,7 @@ namespace RedditSharp
             value = value.Remove(value.Length - 1); // Remove trailing &
             var raw = Encoding.UTF8.GetBytes(value);
             stream.Write(raw, 0, raw.Length);
+            stream.Close();
         }
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
