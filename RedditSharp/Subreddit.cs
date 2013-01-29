@@ -17,6 +17,7 @@ namespace RedditSharp
         private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
         private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
         private const string SetUserFlairUrl = "http://www.reddit.com/api/flair";
+        private const string StylesheetUrl = "http://www.reddit.com/r/{0}/about/stylesheet.json";
 
         private Reddit Reddit { get; set; }
 
@@ -199,6 +200,15 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public SubredditStyle GetStylesheet()
+        {
+            var request = Reddit.CreateGet(string.Format(StylesheetUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return new SubredditStyle(Reddit, this, json);
         }
 
         public override string ToString()

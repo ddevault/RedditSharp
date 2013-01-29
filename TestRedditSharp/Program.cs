@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using RedditSharp;
 using System.Security.Authentication;
 using System.Threading;
+using System.IO;
 
 namespace TestRedditSharp
 {
@@ -32,7 +33,9 @@ namespace TestRedditSharp
                 }
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            var newPosts = subreddit.GetNew();
+            var style = subreddit.GetStylesheet();
+            var image = File.ReadAllBytes("test_image.jpg");
+            style.UploadImage("test-image", SubredditStyle.ImageType.JPEG, image);
         }
 
         public static string ReadPassword()
