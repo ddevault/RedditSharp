@@ -13,18 +13,37 @@ namespace RedditSharp
         private const string DistinguishUrl = "http://www.reddit.com/api/distinguish";
         private Reddit Reddit { get; set; }
 
-        public Comment(Reddit reddit, JToken json) : base(reddit, json)
+        public Comment(Reddit reddit, JToken json)
+            : base(reddit, json)
         {
             var data = json["data"];
-            Content = data["contentText"].Value<string>();
-            ContentHtml = data["contentHTML"].Value<string>();
+
+            Author = data["author"].Value<string>();
+            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
+            Content = data["body"].Value<string>();
+            ContentHtml = data["body_html"].Value<string>();
+            Downvotes = data["downs"].Value<int>();
+            Upvotes = data["ups"].Value<int>();
             Reddit = reddit;
+
+            //Parse sub comments
+            Comments = new List<Comment>();
+            if (!string.IsNullOrEmpty(data["replies"].ToString()))
+                foreach (var comment in data["replies"]["data"]["children"])
+                    Comments.Add(new Comment(reddit, comment));
+
         }
 
         public string Author { get; set; }
         public string Content { get; set; }
         public string ContentHtml { get; set; }
         public string ParentId { get; set; }
+        public DateTime Created { get; set; }
+        public int Downvotes { get; set; }
+        public int Upvotes { get; set; }
+
+        public List<Comment> Comments { get; set; }
+
 
         public Comment Reply(string message)
         {
