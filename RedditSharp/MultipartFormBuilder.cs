@@ -20,10 +20,21 @@ namespace RedditSharp
             // TODO: See about regenerating the boundary when needed
             Request = request;
             var random = new Random();
-            Boundary = "----------" + Convert.ToBase64String(BitConverter.GetBytes(random.NextDouble()));
+            Boundary = "----------" + CreateRandomBoundary();
             request.ContentType = "multipart/form-data; boundary=" + Boundary;
             Buffer = new MemoryStream();
             TextBuffer = new StreamWriter(Buffer);
+        }
+
+        private string CreateRandomBoundary()
+        {
+            // TODO: There's probably a better way to go about this
+            const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            string value = "";
+            var random = new Random();
+            for (int i = 0; i < 10; i++)
+                value += characters[random.Next(characters.Length)];
+            return value;
         }
 
         public void AddDynamic(object data)
