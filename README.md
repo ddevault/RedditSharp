@@ -4,7 +4,7 @@ A partial implementation of the [Reddit](http://reddit.com) API.
 
 ```csharp
 var reddit = new Reddit();
-var user = reddit.Login("username", "password");
+var user = reddit.LogIn("username", "password");
 var subreddit = reddit.GetSubreddit("/r/example");
 subreddit.Subscribe();
 var posts = subreddit.GetNew();
