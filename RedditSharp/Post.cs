@@ -16,8 +16,7 @@ namespace RedditSharp
 
         private Reddit Reddit { get; set; }
 
-        public Post(Reddit reddit, JToken post)
-            : base(reddit, post)
+        public Post(Reddit reddit, JToken post) : base(reddit, post)
         {
             Reddit = reddit;
 
@@ -44,7 +43,6 @@ namespace RedditSharp
             Title = HttpUtility.HtmlDecode(data["title"].Value<string>());
             Upvotes = data["ups"].Value<int>();
             Url = data["url"].Value<string>();
-            Name = data["name"].Value<string>().Replace("t3_", "");
         }
 
         public string AuthorName { get; set; }
@@ -77,7 +75,6 @@ namespace RedditSharp
         public string Title { get; set; }
         public int Upvotes { get; set; }
         public string Url { get; set; }
-        public string Name { get; set; }
 
         public Comment Comment(string message)
         {
@@ -133,7 +130,7 @@ namespace RedditSharp
         {
             var comments = new List<Comment>();
 
-            var request = Reddit.CreateGet(string.Format(GetCommentsUrl, Name));
+            var request = Reddit.CreateGet(string.Format(GetCommentsUrl, Id));
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JArray.Parse(data);

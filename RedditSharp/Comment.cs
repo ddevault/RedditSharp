@@ -13,8 +13,7 @@ namespace RedditSharp
         private const string DistinguishUrl = "http://www.reddit.com/api/distinguish";
         private Reddit Reddit { get; set; }
 
-        public Comment(Reddit reddit, JToken json)
-            : base(reddit, json)
+        public Comment(Reddit reddit, JToken json) : base(reddit, json)
         {
             var data = json["data"];
 
@@ -28,10 +27,11 @@ namespace RedditSharp
 
             //Parse sub comments
             Comments = new List<Comment>();
-            if (!string.IsNullOrEmpty(data["replies"].ToString()))
+            if (data["replies"] != null && data["replies"].Any())
+            {
                 foreach (var comment in data["replies"]["data"]["children"])
                     Comments.Add(new Comment(reddit, comment));
-
+            }
         }
 
         public string Author { get; set; }
@@ -43,7 +43,6 @@ namespace RedditSharp
         public int Upvotes { get; set; }
 
         public List<Comment> Comments { get; set; }
-
 
         public Comment Reply(string message)
         {
@@ -89,7 +88,7 @@ namespace RedditSharp
             }
             Reddit.WritePostBody(stream, new
             {
-                how = how,
+                how,
                 id = Id,
                 uh = Reddit.User.Modhash
             });
