@@ -71,11 +71,11 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
         }
+    }
 
-        public enum ImageType
-        {
-            PNG,
-            JPEG
-        }
+    public enum ImageType
+    {
+        PNG,
+        JPEG
     }
 }

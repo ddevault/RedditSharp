@@ -19,6 +19,7 @@ namespace RedditSharp
         private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
         private const string SetUserFlairUrl = "http://www.reddit.com/api/flair";
         private const string StylesheetUrl = "http://www.reddit.com/r/{0}/about/stylesheet.json";
+        private const string UploadImageUrl = "http://www.reddit.com/api/upload_sr_img";
 
         private Reddit Reddit { get; set; }
 
@@ -211,6 +212,27 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
+        {
+            var request = Reddit.CreatePost(UploadImageUrl);
+            var formData = new MultipartFormBuilder(request);
+            formData.AddDynamic(new
+            {
+                name,
+                uh = Reddit.User.Modhash,
+                r = Name,
+                formid = "image-upload",
+                img_type = imageType == ImageType.PNG ? "png" : "jpg",
+                upload = "",
+                header = true
+            });
+            formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
+            formData.Finish();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            // TODO: Detect errors
         }
 
         public SubredditStyle GetStylesheet()
