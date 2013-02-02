@@ -148,7 +148,7 @@ namespace RedditSharp
             foreach (var property in properties)
             {
                 var entry = Convert.ToString(property.GetValue(data, null));
-                value += property.Name + "=" + Uri.EscapeDataString(entry) + "&";
+                value += property.Name + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B") + "&";
             }
             value = value.Remove(value.Length - 1); // Remove trailing &
             var raw = Encoding.UTF8.GetBytes(value);

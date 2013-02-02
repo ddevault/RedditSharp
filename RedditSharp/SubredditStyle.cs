@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Web;
 
 namespace RedditSharp
 {
     public class SubredditStyle
     {
         private const string UploadImageUrl = "http://www.reddit.com/api/upload_sr_img";
+        private const string UpdateCssUrl = "http://www.reddit.com/api/subreddit_stylesheet";
 
         private Reddit Reddit { get; set; }
 
@@ -19,7 +21,7 @@ namespace RedditSharp
             Subreddit = subreddit;
             Images = new List<SubredditImage>();
             var data = json["data"];
-            CSS = data["stylesheet"].Value<string>();
+            CSS = HttpUtility.HtmlDecode(data["stylesheet"].Value<string>());
             foreach (var image in data["images"])
             {
                 Images.Add(new SubredditImage(
@@ -31,6 +33,24 @@ namespace RedditSharp
         public string CSS { get; set; }
         public List<SubredditImage> Images { get; set; }
         public Subreddit Subreddit { get; set; }
+
+        public void UpdateCss()
+        {
+            var request = Reddit.CreatePost(UpdateCssUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                op = "save",
+                stylesheet_contents = CSS,
+                uh = Reddit.User.Modhash,
+                api_type = "json",
+                r = Subreddit.Name
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+        }
 
         public void UploadImage(string name, ImageType imageType, byte[] file)
         {
@@ -47,16 +67,9 @@ namespace RedditSharp
                 });
             formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
             formData.Finish();
-            try
-            {
-                var response = request.GetResponse();
-                var data = Reddit.GetResponseString(response.GetResponseStream());
-            }
-            catch (WebException ex)
-            {
-                var data = Reddit.GetResponseString(ex.Response.GetResponseStream());
-                throw;
-            }
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            // TODO: Detect errors
         }
 
         public enum ImageType
