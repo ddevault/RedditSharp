@@ -226,7 +226,7 @@ namespace RedditSharp
                 formid = "image-upload",
                 img_type = imageType == ImageType.PNG ? "png" : "jpg",
                 upload = "",
-                header = true
+                header = 1
             });
             formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
             formData.Finish();
