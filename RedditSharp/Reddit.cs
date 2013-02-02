@@ -153,6 +153,8 @@ namespace RedditSharp
             for (int i = 0; i < additionalFields.Length; i += 2)
             {
                 var entry = Convert.ToString(additionalFields[i + 1]);
+                if (entry == null)
+                    entry = string.Empty;
                 value += additionalFields[i] + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             value = value.Remove(value.Length - 1); // Remove trailing &
