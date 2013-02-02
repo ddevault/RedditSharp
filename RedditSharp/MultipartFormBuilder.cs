@@ -51,14 +51,14 @@ namespace RedditSharp
         public void AddString(string name, string value)
         {
             TextBuffer.Write("{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}\r\n",
-                Boundary, name, value);
+                "--" + Boundary, name, value);
             TextBuffer.Flush();
         }
 
         public void AddFile(string name, string filename, byte[] value, string contentType)
         {
             TextBuffer.Write("{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
-                Boundary, name, filename, contentType);
+                "--" + Boundary, name, filename, contentType);
             TextBuffer.Flush();
             Buffer.Write(value, 0, value.Length);
             Buffer.Flush();
@@ -68,7 +68,7 @@ namespace RedditSharp
 
         public void Finish()
         {
-            TextBuffer.Write(Boundary + "--");
+            TextBuffer.Write("--" + Boundary + "--");
             TextBuffer.Flush();
             var stream = Request.GetRequestStream();
             Buffer.Seek(0, SeekOrigin.Begin);
