@@ -32,8 +32,8 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            subreddit.GetSettings().ResetHeaderImage();
+            var subreddit = reddit.GetSubreddit("/r/funny");
+            var style = subreddit.GetStylesheet();
         }
 
         public static string ReadPassword()

@@ -25,6 +25,11 @@ namespace RedditSharp
             : this(reddit, subreddit, cssLink, name)
         {
             Url = url;
+            // Handle legacy image urls
+            // http://thumbs.reddit.com/FULLNAME_NUMBER.png
+            int discarded;
+            if (int.TryParse(url, out discarded))
+                Url = string.Format("http://thumbs.reddit.com/{0}_{1}.png", subreddit.Subreddit.FullName, url);
         }
 
         public string CssLink { get; set; }
