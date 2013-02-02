@@ -36,6 +36,8 @@ namespace TestRedditSharp
             var style = subreddit.GetStylesheet();
             style.CSS += "/*Test*/";
             style.UpdateCss();
+            var settings = subreddit.GetSettings();
+            settings.UpdateSettings();
         }
 
         public static string ReadPassword()

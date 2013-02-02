@@ -10,6 +10,8 @@ namespace RedditSharp
     {
         public Thing(JToken json)
         {
+            if (json == null)
+                return;
             var data = json["data"];
             if (data["name"] != null)
                 FullName = data["name"].Value<string>();

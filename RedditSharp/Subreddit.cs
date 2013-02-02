@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class Subreddit
+    public class Subreddit : Thing
     {
         private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
         private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
@@ -26,7 +26,6 @@ namespace RedditSharp
         public string DisplayName { get; set; }
         public string HeaderImage { get; set; }
         public string HeaderTitle { get; set; }
-        public string Id { get; set; }
         public bool NSFW { get; set; }
         public string PublicDescription { get; set; }
         public int Subscribers { get; set; }
@@ -35,11 +34,11 @@ namespace RedditSharp
         public string Url { get; set; }
         public string Name { get; set; }
 
-        private Subreddit()
+        private Subreddit() : base(null)
         {
         }
 
-        protected internal Subreddit(Reddit reddit, JToken json)
+        protected internal Subreddit(Reddit reddit, JToken json) : base(json)
         {
             Reddit = reddit;
             var data = json["data"];
@@ -48,7 +47,6 @@ namespace RedditSharp
             DisplayName = data["display_name"].Value<string>();
             HeaderImage = data["header_img"].Value<string>();
             HeaderTitle = data["header_title"].Value<string>();
-            Id = data["name"].Value<string>();
             NSFW = data["over18"].Value<bool>();
             PublicDescription = data["public_description"].Value<string>();
             Subscribers = data["subscribers"].Value<int>();
@@ -111,7 +109,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
                 {
                     action = "sub",
-                    sr = Id,
+                    sr = FullName,
                     uh = Reddit.User.Modhash
                 });
             stream.Close();
@@ -129,7 +127,7 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
             {
                 action = "unsub",
-                sr = Id,
+                sr = FullName,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
@@ -157,7 +155,7 @@ namespace RedditSharp
             {
                 flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
                 uh = Reddit.User.Modhash,
-                r = this.Name
+                r = Name
             });
             stream.Close();
             var response = request.GetResponse();
@@ -175,7 +173,7 @@ namespace RedditSharp
                 text = text,
                 text_editable = userEditable,
                 uh = Reddit.User.Modhash,
-                r = this.Name
+                r = Name
             });
             stream.Close();
             var response = request.GetResponse();
@@ -194,7 +192,7 @@ namespace RedditSharp
                 css_class = cssClass,
                 text = text,
                 uh = Reddit.User.Modhash,
-                r = this.Name,
+                r = Name,
                 name = user
             });
             stream.Close();

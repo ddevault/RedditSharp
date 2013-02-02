@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
     public class SubredditSettings
     {
+        private const string SiteAdminUrl = "http://www.reddit.com/api/site_admin";
+
         private Reddit Reddit { get; set; }
 
         public Subreddit Subreddit { get; set; }
@@ -19,7 +22,7 @@ namespace RedditSharp
             var data = json["data"];
             AllowAsDefault = data["default_set"].Value<bool>();
             Domain = data["domain"].Value<string>();
-            Description = data["description"].Value<string>();
+            Sidebar = HttpUtility.HtmlDecode(data["description"].Value<string>());
             Language = data["language"].Value<string>();
             Title = data["title"].Value<string>();
             WikiEditKarma = data["wiki_edit_karma"].Value<int>();
@@ -27,7 +30,7 @@ namespace RedditSharp
             UseDomainSidebar = data["domain_sidebar"].Value<bool>();
             HeaderHoverText = data["header_hover_text"].Value<string>();
             NSFW = data["over_18"].Value<bool>();
-            PublicDescription = data["public_description"].Value<string>();
+            PublicDescription = HttpUtility.HtmlDecode(data["public_description"].Value<string>());
             string wikiMode = data["wikimode"].Value<string>();
             switch (wikiMode)
             {
@@ -73,7 +76,7 @@ namespace RedditSharp
 
         public bool AllowAsDefault { get; set; }
         public string Domain { get; set; }
-        public string Description { get; set; }
+        public string Sidebar { get; set; }
         public string Language { get; set; }
         public string Title { get; set; }
         public int WikiEditKarma { get; set; }
@@ -87,6 +90,73 @@ namespace RedditSharp
         public bool ShowThumbnails { get; set; }
         public int WikiEditAge { get; set; }
         public ContentOptions ContentOptions { get; set; }
+
+        public void UpdateSettings()
+        {
+            var request = Reddit.CreatePost(SiteAdminUrl);
+            var stream = request.GetRequestStream();
+            string link_type;
+            string type;
+            string wikimode;
+            switch (ContentOptions)
+            {
+                case RedditSharp.ContentOptions.All:
+                    link_type = "any";
+                    break;
+                case RedditSharp.ContentOptions.LinkOnly:
+                    link_type = "link";
+                    break;
+                default:
+                    link_type = "self";
+                    break;
+            }
+            switch (SubredditType)
+            {
+                case SubredditType.Public:
+                    type = "public";
+                    break;
+                case SubredditType.Private:
+                    type = "private";
+                    break;
+                default:
+                    type = "restricted";
+                    break;
+            }
+            switch (WikiEditMode)
+            {
+                case WikiEditMode.All:
+                    wikimode = "anyone";
+                    break;
+                case WikiEditMode.Moderators:
+                    wikimode = "modonly";
+                    break;
+                default:
+                    wikimode = "disabled";
+                    break;
+            }
+            Reddit.WritePostBody(stream, new
+            {
+                allow_top = AllowAsDefault,
+                description = Sidebar,
+                domain = Domain,
+                lang = Language,
+                link_type,
+                over_18 = NSFW,
+                public_description = PublicDescription,
+                show_media = ShowThumbnails,
+                sr = Subreddit.FullName,
+                title = Title,
+                type,
+                uh = Reddit.User.Modhash,
+                wiki_edit_age = WikiEditAge,
+                wiki_edit_karma = WikiEditKarma,
+                wikimode,
+                api_type = "json"
+            }, "header-title", HeaderHoverText);
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
     }
 
     public enum WikiEditMode

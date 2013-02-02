@@ -140,7 +140,7 @@ namespace RedditSharp
             return data;
         }
 
-        protected internal void WritePostBody(Stream stream, object data)
+        protected internal void WritePostBody(Stream stream, object data, params string[] additionalFields)
         {
             var type = data.GetType();
             var properties = type.GetProperties();
@@ -148,7 +148,12 @@ namespace RedditSharp
             foreach (var property in properties)
             {
                 var entry = Convert.ToString(property.GetValue(data, null));
-                value += property.Name + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B") + "&";
+                value += property.Name + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
+            }
+            for (int i = 0; i < additionalFields.Length; i += 2)
+            {
+                var entry = Convert.ToString(additionalFields[i + 1]);
+                value += additionalFields[i] + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             value = value.Remove(value.Length - 1); // Remove trailing &
             var raw = Encoding.UTF8.GetBytes(value);
