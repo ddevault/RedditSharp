@@ -34,10 +34,7 @@ namespace TestRedditSharp
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
             var style = subreddit.GetStylesheet();
-            style.CSS += "/*Test*/";
-            style.UpdateCss();
-            var settings = subreddit.GetSettings();
-            settings.UpdateSettings();
+            style.Images.First().Delete();
         }
 
         public static string ReadPassword()

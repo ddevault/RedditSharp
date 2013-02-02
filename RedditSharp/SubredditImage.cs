@@ -39,8 +39,12 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
             {
                 img_name = Name,
-                uh = Reddit.User.Modhash
+                uh = Reddit.User.Modhash,
+                r = SubredditStyle.Subreddit.Name
             });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
             SubredditStyle.Images.Remove(this);
         }
     }
