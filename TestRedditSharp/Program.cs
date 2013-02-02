@@ -33,8 +33,7 @@ namespace TestRedditSharp
                 }
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            var style = subreddit.GetStylesheet();
-            style.Images.First().Delete();
+            subreddit.GetSettings().ResetHeaderImage();
         }
 
         public static string ReadPassword()

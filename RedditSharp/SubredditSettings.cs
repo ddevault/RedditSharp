@@ -10,6 +10,7 @@ namespace RedditSharp
     public class SubredditSettings
     {
         private const string SiteAdminUrl = "http://www.reddit.com/api/site_admin";
+        private const string DeleteHeaderImageUrl = "http://www.reddit.com/api/delete_sr_header";
 
         private Reddit Reddit { get; set; }
 
@@ -153,6 +154,23 @@ namespace RedditSharp
                 wikimode,
                 api_type = "json"
             }, "header-title", HeaderHoverText);
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        /// <summary>
+        /// Resets the subreddit's header image to the Reddit logo
+        /// </summary>
+        public void ResetHeaderImage()
+        {
+            var request = Reddit.CreatePost(DeleteHeaderImageUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                uh = Reddit.User.Modhash,
+                r = Subreddit.Name
+            });
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
