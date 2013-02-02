@@ -16,62 +16,105 @@ namespace RedditSharp
 
         public Subreddit Subreddit { get; set; }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json)
+        private SubredditSettings(Subreddit subreddit, Reddit reddit)
         {
             Subreddit = subreddit;
             Reddit = reddit;
+            // Default settings, for use when reduced information is given
+            AllowAsDefault = true;
+            Domain = null;
+            Sidebar = string.Empty;
+            Language = "en";
+            Title = Subreddit.DisplayName;
+            WikiEditKarma = 100;
+            WikiEditAge = 10;
+            UseDomainCss = false;
+            UseDomainSidebar = false;
+            HeaderHoverText = string.Empty;
+            NSFW = false;
+            PublicDescription = string.Empty;
+            WikiEditMode = WikiEditMode.None;
+            SubredditType = SubredditType.Public;
+            ShowThumbnails = true;
+            ContentOptions = ContentOptions.All;
+        }
+
+        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json) : this(subreddit, reddit)
+        {
             var data = json["data"];
-            AllowAsDefault = data["default_set"].Value<bool>();
-            Domain = data["domain"].Value<string>();
-            Sidebar = HttpUtility.HtmlDecode(data["description"].Value<string>());
-            Language = data["language"].Value<string>();
-            Title = data["title"].Value<string>();
-            WikiEditKarma = data["wiki_edit_karma"].Value<int>();
-            UseDomainCss = data["domain_css"].Value<bool>();
-            UseDomainSidebar = data["domain_sidebar"].Value<bool>();
-            HeaderHoverText = data["header_hover_text"].Value<string>();
-            NSFW = data["over_18"].Value<bool>();
-            PublicDescription = HttpUtility.HtmlDecode(data["public_description"].Value<string>());
-            string wikiMode = data["wikimode"].Value<string>();
-            switch (wikiMode)
+            if (data["default_set"] != null)
+                AllowAsDefault = data["default_set"].Value<bool>();
+            if (data["domain"] != null)
+                Domain = data["domain"].Value<string>();
+            if (data["description"] != null)
+                Sidebar = HttpUtility.HtmlDecode(data["description"].Value<string>());
+            if (data["language"] != null)
+                Language = data["language"].Value<string>();
+            if (data["title"] != null)
+                Title = data["title"].Value<string>();
+            if (data["wiki_edit_karma"] != null)
+                WikiEditKarma = data["wiki_edit_karma"].Value<int>();
+            if (data["domain_css"] != null)
+                UseDomainCss = data["domain_css"].Value<bool>();
+            if (data["domain_sidebar"] != null)
+                UseDomainSidebar = data["domain_sidebar"].Value<bool>();
+            if (data["header_hover_text"] != null)
+                HeaderHoverText = data["header_hover_text"].Value<string>();
+            if (data["over_18"] != null)
+                NSFW = data["over_18"].Value<bool>();
+            if (data["public_description"] != null)
+                PublicDescription = HttpUtility.HtmlDecode(data["public_description"].Value<string>());
+            if (data["wikimode"] != null)
             {
-                case "disabled":
-                    WikiEditMode = WikiEditMode.None;
-                    break;
-                case "modonly":
-                    WikiEditMode = WikiEditMode.Moderators;
-                    break;
-                case "anyone":
-                    WikiEditMode = WikiEditMode.All;
-                    break;
+                string wikiMode = data["wikimode"].Value<string>();
+                switch (wikiMode)
+                {
+                    case "disabled":
+                        WikiEditMode = WikiEditMode.None;
+                        break;
+                    case "modonly":
+                        WikiEditMode = WikiEditMode.Moderators;
+                        break;
+                    case "anyone":
+                        WikiEditMode = WikiEditMode.All;
+                        break;
+                }
             }
-            string type = data["subreddit_type"].Value<string>();
-            switch (type)
+            if (data["subreddit_type"] != null)
             {
-                case "public":
-                    SubredditType = SubredditType.Public;
-                    break;
-                case "private":
-                    SubredditType = SubredditType.Private;
-                    break;
-                case "restricted":
-                    SubredditType = SubredditType.Restricted;
-                    break;
+                string type = data["subreddit_type"].Value<string>();
+                switch (type)
+                {
+                    case "public":
+                        SubredditType = SubredditType.Public;
+                        break;
+                    case "private":
+                        SubredditType = SubredditType.Private;
+                        break;
+                    case "restricted":
+                        SubredditType = SubredditType.Restricted;
+                        break;
+                }
             }
-            ShowThumbnails = data["show_media"].Value<bool>();
-            WikiEditAge = data["wiki_edit_age"].Value<int>();
-            string contentOptions = data["content_options"].Value<string>();
-            switch (contentOptions)
+            if (data["show_media"] != null)
+                ShowThumbnails = data["show_media"].Value<bool>();
+            if (data["wiki_edit_age"] != null)
+                WikiEditAge = data["wiki_edit_age"].Value<int>();
+            if (data["content_options"] != null)
             {
-                case "any":
-                    ContentOptions = ContentOptions.All;
-                    break;
-                case "link":
-                    ContentOptions = ContentOptions.LinkOnly;
-                    break;
-                case "self":
-                    ContentOptions = ContentOptions.SelfOnly;
-                    break;
+                string contentOptions = data["content_options"].Value<string>();
+                switch (contentOptions)
+                {
+                    case "any":
+                        ContentOptions = ContentOptions.All;
+                        break;
+                    case "link":
+                        ContentOptions = ContentOptions.LinkOnly;
+                        break;
+                    case "self":
+                        ContentOptions = ContentOptions.SelfOnly;
+                        break;
+                }
             }
         }
 

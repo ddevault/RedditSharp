@@ -13,6 +13,7 @@ namespace RedditSharp
         private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
         private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
         private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
+        private const string GetReducedSettingsUrl = "http://www.reddit.com/r/{0}/about.json";
         private const string ModqueueUrl = "http://www.reddit.com/r/{0}/about/modqueue.json";
         private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
         private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
@@ -140,11 +141,23 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = Reddit.CreateGet(string.Format(GetSettingsUrl, Name));
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            return new SubredditSettings(this, Reddit, json);
+            try
+            {
+                var request = Reddit.CreateGet(string.Format(GetSettingsUrl, Name));
+                var response = request.GetResponse();
+                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                return new SubredditSettings(this, Reddit, json);
+            }
+            catch // TODO: More specific catch
+            {
+                // Do it unauthed
+                var request = Reddit.CreateGet(string.Format(GetReducedSettingsUrl, Name));
+                var response = request.GetResponse();
+                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                return new SubredditSettings(this, Reddit, json);
+            }
         }
 
         public void ClearFlairTemplates(FlairType flairType)
