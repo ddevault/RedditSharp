@@ -32,8 +32,8 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("/r/funny");
-            var style = subreddit.GetStylesheet();
+            var subreddit = reddit.GetSubreddit("/r/vocaloid");
+            subreddit.GetUserFlairTemplates();
         }
 
         public static string ReadPassword()

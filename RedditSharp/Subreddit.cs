@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
+using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
@@ -20,6 +21,7 @@ namespace RedditSharp
         private const string SetUserFlairUrl = "http://www.reddit.com/api/flair";
         private const string StylesheetUrl = "http://www.reddit.com/r/{0}/about/stylesheet.json";
         private const string UploadImageUrl = "http://www.reddit.com/api/upload_sr_img";
+        private const string FlairSelectorUrl = "http://www.reddit.com/api/flairselector";
 
         private Reddit Reddit { get; set; }
 
@@ -212,6 +214,34 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public UserFlairTemplate[] GetUserFlairTemplates() // Hacky, there isn't a proper endpoint for this
+        {
+            var request = Reddit.CreatePost(FlairSelectorUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                name = Reddit.User.Name,
+                r = Name,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var document = new HtmlDocument();
+            document.LoadHtml(data);
+            var templateNodes = document.DocumentNode.Descendants("li");
+            var list = new List<UserFlairTemplate>();
+            foreach (var node in templateNodes)
+            {
+                list.Add(new UserFlairTemplate
+                {
+                    CssClass = node.Descendants("span").First().Attributes["class"].Value.Split(' ')[1],
+                    Text = node.Descendants("span").First().InnerText
+                });
+            }
+            return list.ToArray();
         }
 
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
