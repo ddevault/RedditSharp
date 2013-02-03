@@ -231,6 +231,8 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var document = new HtmlDocument();
             document.LoadHtml(data);
+            if (document.DocumentNode.Descendants("div").First().Attributes["error"] != null)
+                throw new InvalidOperationException("This subreddit does not allow users to select flair.");
             var templateNodes = document.DocumentNode.Descendants("li");
             var list = new List<UserFlairTemplate>();
             foreach (var node in templateNodes)
