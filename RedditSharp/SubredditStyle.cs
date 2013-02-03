@@ -15,10 +15,14 @@ namespace RedditSharp
 
         private Reddit Reddit { get; set; }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json)
+        public SubredditStyle(Reddit reddit, Subreddit subreddit)
         {
             Reddit = reddit;
             Subreddit = subreddit;
+        }
+
+        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json) : this(reddit, subreddit)
+        {
             Images = new List<SubredditImage>();
             var data = json["data"];
             CSS = HttpUtility.HtmlDecode(data["stylesheet"].Value<string>());

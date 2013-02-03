@@ -17,11 +17,7 @@ namespace RedditSharp
 
         public Subreddit Subreddit { get; set; }
 
-        public SubredditSettings()
-        {
-        }
-
-        private SubredditSettings(Subreddit subreddit, Reddit reddit)
+        public SubredditSettings(Subreddit subreddit, Reddit reddit)
         {
             Subreddit = subreddit;
             Reddit = reddit;
