@@ -17,7 +17,7 @@ namespace RedditSharp
 
         public Subreddit Subreddit { get; set; }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit)
+        public SubredditSettings(Reddit reddit, Subreddit subreddit)
         {
             Subreddit = subreddit;
             Reddit = reddit;
@@ -40,7 +40,8 @@ namespace RedditSharp
             ContentOptions = ContentOptions.All;
         }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json) : this(subreddit, reddit)
+        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json)
+            : this(reddit, subreddit)
         {
             var data = json["data"];
             if (data["default_set"] != null)
