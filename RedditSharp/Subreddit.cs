@@ -193,14 +193,13 @@ namespace RedditSharp
                 text = text,
                 text_editable = userEditable,
                 uh = Reddit.User.Modhash,
-                r = Name
+                r = Name,
+                api_type = "json"
             });
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            if (json["jquery"].Count(j => j[0].Value<int>() == 14 && j[1].Value<int>() == 15) != 0)
-                throw new OutOfMemoryException("Maximum flair templates reached");
         }
 
         public void SetUserFlair(string user, string cssClass, string text)

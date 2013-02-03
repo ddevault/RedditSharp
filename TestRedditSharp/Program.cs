@@ -32,8 +32,8 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("/r/programming");
-            var templates = subreddit.GetUserFlairTemplates();
+            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
+            subreddit.AddFlairTemplate("test", FlairType.User, "", true);
         }
 
         public static string ReadPassword()
