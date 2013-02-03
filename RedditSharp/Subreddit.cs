@@ -38,7 +38,11 @@ namespace RedditSharp
         public string Url { get; set; }
         public string Name { get; set; }
 
-        private Subreddit() : base(null)
+        /// <summary>
+        /// This constructor only exists for internal use and serialization.
+        /// You would be wise not to use it.
+        /// </summary>
+        public Subreddit() : base(null)
         {
         }
 
