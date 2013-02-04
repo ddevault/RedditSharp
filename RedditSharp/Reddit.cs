@@ -6,6 +6,7 @@ using System.Security.Authentication;
 using System.Text;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using System.Web;
 
 namespace RedditSharp
 {
@@ -17,6 +18,7 @@ namespace RedditSharp
         private const string UserInfoUrl = "http://www.reddit.com/user/{0}/about.json";
         private const string MeUrl = "http://www.reddit.com/api/me.json";
         private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json";
+
         #endregion
 
         #region Static Variables
@@ -148,14 +150,14 @@ namespace RedditSharp
             foreach (var property in properties)
             {
                 var entry = Convert.ToString(property.GetValue(data, null));
-                value += property.Name + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
+                value += property.Name + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             for (int i = 0; i < additionalFields.Length; i += 2)
             {
                 var entry = Convert.ToString(additionalFields[i + 1]);
                 if (entry == null)
                     entry = string.Empty;
-                value += additionalFields[i] + "=" + Uri.EscapeUriString(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
+                value += additionalFields[i] + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             value = value.Remove(value.Length - 1); // Remove trailing &
             var raw = Encoding.UTF8.GetBytes(value);
