@@ -40,6 +40,9 @@ namespace RedditSharp
             Thumbnail = data["thumbnail"].Value<string>();
             Title = HttpUtility.HtmlDecode(data["title"].Value<string>());
             Url = data["url"].Value<string>();
+
+            if (data["num_reports"] != null)
+                Reports = data["num_reports"].Value<int>();
         }
 
         public string AuthorName { get; set; }
@@ -69,6 +72,8 @@ namespace RedditSharp
         public string Thumbnail { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
+
+        public int Reports { get; set; }
 
         public Comment Comment(string message)
         {
