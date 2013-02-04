@@ -32,8 +32,7 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("/r/sircmpwn");
-            subreddit.AddFlairTemplate("test", FlairType.User, "", true);
+            var modqueue = reddit.User.GetModerationQueue();
         }
 
         public static string ReadPassword()

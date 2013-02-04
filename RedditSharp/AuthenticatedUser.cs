@@ -11,6 +11,7 @@ namespace RedditSharp
     {
         private const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
         private const string UnreadMessagesUrl = "http://api.reddit.com/message/unread?mark=true&limit={0}";
+        private const string ModQueueUrl = "http://www.reddit.com/r/mod/about/modqueue.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json)
             : base(reddit, json)
@@ -42,6 +43,23 @@ namespace RedditSharp
             foreach (var message in json["data"]["children"])
                 messages.Add(new PrivateMessage(Reddit, message));
             return messages.ToArray();
+        }
+
+        public VotableThing[] GetModerationQueue()
+        {
+            var request = Reddit.CreateGet(ModQueueUrl);
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            var items = new List<VotableThing>();
+            foreach (var item in json["data"]["children"])
+            {
+                if (item["kind"].Value<string>() == "t3") // TODO: Maybe add a method to parse Things based on the kind?
+                    items.Add(new Post(Reddit, item));
+                else if (item["kind"].Value<string>() == "t1")
+                    items.Add(new Comment(Reddit, item));
+            }
+            return items.ToArray();
         }
 
         public string Modhash { get; set; }
