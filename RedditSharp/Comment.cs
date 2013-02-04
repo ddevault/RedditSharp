@@ -18,11 +18,8 @@ namespace RedditSharp
             var data = json["data"];
 
             Author = data["author"].Value<string>();
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
             Content = data["body"].Value<string>();
             ContentHtml = data["body_html"].Value<string>();
-            Downvotes = data["downs"].Value<int>();
-            Upvotes = data["ups"].Value<int>();
             Reddit = reddit;
 
             //Parse sub comments
@@ -38,9 +35,6 @@ namespace RedditSharp
         public string Content { get; set; }
         public string ContentHtml { get; set; }
         public string ParentId { get; set; }
-        public DateTime Created { get; set; }
-        public int Downvotes { get; set; }
-        public int Upvotes { get; set; }
 
         public List<Comment> Comments { get; set; }
 

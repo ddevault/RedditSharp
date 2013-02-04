@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public class VotableThing : Thing
+    public class VotableThing : CreatedThing
     {
         public enum VoteType
         {
@@ -19,10 +19,25 @@ namespace RedditSharp
 
         private Reddit Reddit { get; set; }
 
-        public VotableThing(Reddit reddit, JToken json) : base(json)
+        public VotableThing(Reddit reddit, JToken json) : base(reddit, json)
         {
             Reddit = reddit;
+
+            var data = json["data"];
+            Upvotes = data["ups"].Value<int>();
+            Downvotes = data["downs"].Value<int>();
+            if (data["likes"] != null)
+                Liked = data["likes"].Value<bool?>();
         }
+
+        public int Downvotes { get; set; }
+        public int Upvotes { get; set; }
+        /// <summary>
+        /// True if the logged in user has upvoted this.
+        /// False if they have not.
+        /// Null if they have not cast a vote.
+        /// </summary>
+        public bool? Liked { get; set; }
 
         public void Upvote()
         {
@@ -37,6 +52,7 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+            Liked = true;
         }
 
         public void Downvote()
@@ -52,6 +68,7 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+            Liked = false;
         }
 
         public void ClearVote()
@@ -82,6 +99,7 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+            Liked = null;
         }
     }
 }

@@ -24,9 +24,7 @@ namespace RedditSharp
             AuthorName = data["author"].Value<string>();
             AuthorFlairClass = data["author_flair_css_class"].Value<string>();
             AuthorFlairText = data["author_flair_text"].Value<string>();
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
             Domain = data["domain"].Value<string>();
-            Downvotes = data["downs"].Value<int>();
             Edited = data["edited"].Value<bool>();
             IsSelfPost = data["is_self"].Value<bool>();
             LinkFlairClass = data["link_flair_css_class"].Value<string>();
@@ -41,7 +39,6 @@ namespace RedditSharp
             Subreddit = data["subreddit"].Value<string>();
             Thumbnail = data["thumbnail"].Value<string>();
             Title = HttpUtility.HtmlDecode(data["title"].Value<string>());
-            Upvotes = data["ups"].Value<int>();
             Url = data["url"].Value<string>();
         }
 
@@ -56,9 +53,7 @@ namespace RedditSharp
 
         public string AuthorFlairClass { get; set; }
         public string AuthorFlairText { get; set; }
-        public DateTime Created { get; set; }
         public string Domain { get; set; }
-        public int Downvotes { get; set; }
         public bool Edited { get; set; }
         public bool IsSelfPost { get; set; }
         public string LinkFlairClass { get; set; }
@@ -73,7 +68,6 @@ namespace RedditSharp
         public string Subreddit { get; set; }
         public string Thumbnail { get; set; }
         public string Title { get; set; }
-        public int Upvotes { get; set; }
         public string Url { get; set; }
 
         public Comment Comment(string message)
