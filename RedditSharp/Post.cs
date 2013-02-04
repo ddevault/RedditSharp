@@ -13,6 +13,7 @@ namespace RedditSharp
         private const string CommentUrl = "http://www.reddit.com/api/comment";
         private const string RemoveUrl = "http://www.reddit.com/api/remove";
         private const string GetCommentsUrl = "http://www.reddit.com/comments/{0}.json";
+        private const string ApproveUrl = "http://www.reddit.com/api/approve";
 
         private Reddit Reddit { get; set; }
 
@@ -93,6 +94,20 @@ namespace RedditSharp
             var json = JObject.Parse(data);
             var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
             return new Comment(Reddit, comment[3][0][0]);
+        }
+
+        public void Approve()
+        {
+            var request = Reddit.CreatePost(ApproveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
         public void Remove()
