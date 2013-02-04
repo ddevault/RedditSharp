@@ -15,6 +15,7 @@ namespace RedditSharp
 
         private Reddit Reddit { get; set; }
 
+        [JsonIgnore]
         public Subreddit Subreddit { get; set; }
 
         public SubredditSettings(Reddit reddit, Subreddit subreddit)
