@@ -10,10 +10,10 @@ namespace RedditSharp
 {
     public class Post : VotableThing
     {
-        private const string CommentUrl = "http://www.reddit.com/api/comment";
-        private const string RemoveUrl = "http://www.reddit.com/api/remove";
-        private const string GetCommentsUrl = "http://www.reddit.com/comments/{0}.json";
-        private const string ApproveUrl = "http://www.reddit.com/api/approve";
+        private const string CommentUrl = "/api/comment";
+        private const string RemoveUrl = "/api/remove";
+        private const string GetCommentsUrl = "/comments/{0}.json";
+        private const string ApproveUrl = "/api/approve";
 
         private Reddit Reddit { get; set; }
 

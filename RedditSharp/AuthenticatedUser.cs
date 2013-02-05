@@ -9,9 +9,9 @@ namespace RedditSharp
 {
     public class AuthenticatedUser : RedditUser
     {
-        private const string ModeratorUrl = "http://api.reddit.com/reddits/mine/moderator";
-        private const string UnreadMessagesUrl = "http://api.reddit.com/message/unread?mark=true&limit={0}";
-        private const string ModQueueUrl = "http://www.reddit.com/r/mod/about/modqueue.json";
+        private const string ModeratorUrl = "/reddits/mine/moderator";
+        private const string UnreadMessagesUrl = "/message/unread?mark=true&limit={0}";
+        private const string ModQueueUrl = "/r/mod/about/modqueue.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json)
             : base(reddit, json)

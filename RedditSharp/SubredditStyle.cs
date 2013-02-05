@@ -10,8 +10,8 @@ namespace RedditSharp
 {
     public class SubredditStyle
     {
-        private const string UploadImageUrl = "http://www.reddit.com/api/upload_sr_img";
-        private const string UpdateCssUrl = "http://www.reddit.com/api/subreddit_stylesheet";
+        private const string UploadImageUrl = "/api/upload_sr_img";
+        private const string UpdateCssUrl = "/api/subreddit_stylesheet";
 
         private Reddit Reddit { get; set; }
 

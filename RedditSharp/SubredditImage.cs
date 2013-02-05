@@ -7,7 +7,7 @@ namespace RedditSharp
 {
     public class SubredditImage
     {
-        private const string DeleteImageUrl = "http://www.reddit.com/api/delete_sr_img";
+        private const string DeleteImageUrl = "/api/delete_sr_img";
 
         private Reddit Reddit { get; set; }
 

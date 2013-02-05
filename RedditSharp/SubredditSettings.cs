@@ -10,8 +10,8 @@ namespace RedditSharp
 {
     public class SubredditSettings
     {
-        private const string SiteAdminUrl = "http://www.reddit.com/api/site_admin";
-        private const string DeleteHeaderImageUrl = "http://www.reddit.com/api/delete_sr_header";
+        private const string SiteAdminUrl = "/api/site_admin";
+        private const string DeleteHeaderImageUrl = "/api/delete_sr_header";
 
         private Reddit Reddit { get; set; }
 

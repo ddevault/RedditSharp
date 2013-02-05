@@ -10,18 +10,18 @@ namespace RedditSharp
 {
     public class Subreddit : Thing
     {
-        private const string SubredditPostUrl = "http://www.reddit.com/r/{0}.json";
-        private const string SubredditNewUrl = "http://www.reddit.com/r/{0}/new.json?sort=new";
-        private const string SubscribeUrl = "http://www.reddit.com/api/subscribe";
-        private const string GetSettingsUrl = "http://www.reddit.com/r/{0}/about/edit.json";
-        private const string GetReducedSettingsUrl = "http://www.reddit.com/r/{0}/about.json";
-        private const string ModqueueUrl = "http://www.reddit.com/r/{0}/about/modqueue.json";
-        private const string FlairTemplateUrl = "http://www.reddit.com/api/flairtemplate";
-        private const string ClearFlairTemplatesUrl = "http://www.reddit.com/api/clearflairtemplates";
-        private const string SetUserFlairUrl = "http://www.reddit.com/api/flair";
-        private const string StylesheetUrl = "http://www.reddit.com/r/{0}/about/stylesheet.json";
-        private const string UploadImageUrl = "http://www.reddit.com/api/upload_sr_img";
-        private const string FlairSelectorUrl = "http://www.reddit.com/api/flairselector";
+        private const string SubredditPostUrl = "/r/{0}.json";
+        private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
+        private const string SubscribeUrl = "/api/subscribe";
+        private const string GetSettingsUrl = "/r/{0}/about/edit.json";
+        private const string GetReducedSettingsUrl = "/r/{0}/about.json";
+        private const string ModqueueUrl = "/r/{0}/about/modqueue.json";
+        private const string FlairTemplateUrl = "/api/flairtemplate";
+        private const string ClearFlairTemplatesUrl = "/api/clearflairtemplates";
+        private const string SetUserFlairUrl = "/api/flair";
+        private const string StylesheetUrl = "/r/{0}/about/stylesheet.json";
+        private const string UploadImageUrl = "/api/upload_sr_img";
+        private const string FlairSelectorUrl = "/api/flairselector";
 
         private Reddit Reddit { get; set; }
 

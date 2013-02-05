@@ -15,7 +15,7 @@ namespace RedditSharp
             Downvote = -1
         }
 
-        private const string VoteUrl = "";
+        private const string VoteUrl = "/api/vote";
 
         private Reddit Reddit { get; set; }
 

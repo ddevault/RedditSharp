@@ -14,10 +14,11 @@ namespace RedditSharp
     {
         #region Constant Urls
 
-        private const string LoginUrl = "https://ssl.reddit.com/api/login";
-        private const string UserInfoUrl = "http://www.reddit.com/user/{0}/about.json";
-        private const string MeUrl = "http://www.reddit.com/api/me.json";
-        private const string SubredditAboutUrl = "http://www.reddit.com/r/{0}/about.json";
+        private const string SslLoginUrl = "https://ssl.reddit.com/api/login";
+        private const string LoginUrl = "/api/login/username";
+        private const string UserInfoUrl = "/user/{0}/about.json";
+        private const string MeUrl = "/api/me.json";
+        private const string SubredditAboutUrl = "/r/{0}/about.json";
 
         #endregion
 
@@ -27,6 +28,7 @@ namespace RedditSharp
         {
             UserAgent = "";
             EnableRateLimit = true;
+            RootDomain = "www.reddit.com";
         }
 
         /// <summary>
@@ -38,6 +40,11 @@ namespace RedditSharp
         /// requests with extreme predjudice.
         /// </summary>
         public static bool EnableRateLimit { get; set; }
+        /// <summary>
+        /// The root domain RedditSharp uses to address Reddit.
+        /// www.reddit.com by default
+        /// </summary>
+        public static string RootDomain { get; set; }
 
         #endregion
 
@@ -49,19 +56,36 @@ namespace RedditSharp
         private CookieContainer Cookies { get; set; }
         private string AuthCookie { get; set; }
 
-        public AuthenticatedUser LogIn(string username, string password)
+        public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
             if (Type.GetType("Mono.Runtime") != null)
                 ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             Cookies = new CookieContainer();
-            var request = CreatePost(LoginUrl);
+            HttpWebRequest request;
+            if (useSsl)
+                request = CreatePost(SslLoginUrl, false);
+            else
+                request = CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
-            WritePostBody(stream, new
+            if (useSsl)
             {
-                user = username,
-                passwd = password,
-                api_type = "json"
-            });
+                WritePostBody(stream, new
+                {
+                    user = username,
+                    passwd = password,
+                    api_type = "json"
+                });
+            }
+            else
+            {
+                WritePostBody(stream, new
+                {
+                    user = username,
+                    passwd = password,
+                    api_type = "json",
+                    op = "login"
+                });
+            }
             stream.Close();
             var response = (HttpWebResponse)request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
@@ -107,11 +131,15 @@ namespace RedditSharp
         #region Helpers
 
         private static DateTime lastRequest = DateTime.MinValue;
-        protected internal HttpWebRequest CreateRequest(string url, string method)
+        protected internal HttpWebRequest CreateRequest(string url, string method, bool prependDomain = true)
         {
             while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2) ; // Rate limiting
             lastRequest = DateTime.Now;
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebRequest request;
+            if (prependDomain)
+                request = (HttpWebRequest)WebRequest.Create(string.Format("http://{0}{1}", RootDomain, url));
+            else
+                request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;
             if (Type.GetType("Mono.Runtime") != null)
             {
@@ -123,14 +151,14 @@ namespace RedditSharp
             return request;
         }
 
-        protected internal HttpWebRequest CreateGet(string url)
+        protected internal HttpWebRequest CreateGet(string url, bool prependDomain = true)
         {
-            return CreateRequest(url, "GET");
+            return CreateRequest(url, "GET", prependDomain);
         }
 
-        protected internal HttpWebRequest CreatePost(string url)
+        protected internal HttpWebRequest CreatePost(string url, bool prependDomain = true)
         {
-            var request = CreateRequest(url, "POST");
+            var request = CreateRequest(url, "POST", prependDomain);
             request.ContentType = "application/x-www-form-urlencoded";
             return request;
         }

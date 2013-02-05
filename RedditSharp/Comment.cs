@@ -9,8 +9,8 @@ namespace RedditSharp
 {
     public class Comment : VotableThing
     {
-        private const string CommentUrl = "http://www.reddit.com/api/comment";
-        private const string DistinguishUrl = "http://www.reddit.com/api/distinguish";
+        private const string CommentUrl = "/api/comment";
+        private const string DistinguishUrl = "/api/distinguish";
         private Reddit Reddit { get; set; }
 
         public Comment(Reddit reddit, JToken json) : base(reddit, json)
