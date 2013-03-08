@@ -30,5 +30,10 @@ namespace RedditSharp
         public int LinkKarma { get; set; }
         public int CommentKarma { get; set; }
         public DateTime Created { get; set; }
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }
