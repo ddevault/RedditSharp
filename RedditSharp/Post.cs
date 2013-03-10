@@ -43,7 +43,15 @@ namespace RedditSharp
             Url = data["url"].Value<string>();
 
             if (data["num_reports"] != null)
-                Reports = data["num_reports"].Value<int>();
+            {
+                var reports = data["num_reports"].Value<string>();
+                int value;
+                if (reports != null)
+                {
+                    if (int.TryParse(reports, out value))
+                        Reports = value;
+                }
+            }
         }
 
         public string AuthorName { get; set; }

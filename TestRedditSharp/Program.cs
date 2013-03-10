@@ -27,12 +27,13 @@ namespace TestRedditSharp
                     Console.WriteLine("Logging in...");
                     reddit.LogIn(username, password);
                 }
-                catch (AuthenticationException e)
+                catch (AuthenticationException)
                 {
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var modqueue = reddit.User.GetModerationQueue();
+            var sr = reddit.GetSubreddit("/r/nba");
+            sr.GetNew();
         }
 
         public static string ReadPassword()
