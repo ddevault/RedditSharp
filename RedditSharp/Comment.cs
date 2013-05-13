@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Net;
+using System.IO;
 
 namespace RedditSharp
 {
@@ -13,13 +15,15 @@ namespace RedditSharp
         private const string DistinguishUrl = "/api/distinguish";
         private Reddit Reddit { get; set; }
 
-        public Comment(Reddit reddit, JToken json) : base(reddit, json)
+        public Comment(Reddit reddit, JToken json)
+            : base(reddit, json)
         {
             var data = json["data"];
 
             Author = data["author"].Value<string>();
             Content = data["body"].Value<string>();
             ContentHtml = data["body_html"].Value<string>();
+            Subreddit = data["subreddit"].Value<string>();
             Reddit = reddit;
 
             //Parse sub comments
@@ -35,6 +39,7 @@ namespace RedditSharp
         public string Content { get; set; }
         public string ContentHtml { get; set; }
         public string ParentId { get; set; }
+        public string Subreddit { get; set; }
 
         public List<Comment> Comments { get; set; }
 
@@ -47,15 +52,24 @@ namespace RedditSharp
             Reddit.WritePostBody(stream, new
             {
                 text = message,
-                thing_id = Id,
-                uh = Reddit.User.Modhash
+                thing_id = FullName,
+                uh = Reddit.User.Modhash,
+                //r = Subreddit
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 30 && i[1].Value<int>() == 31);
-            return new Comment(Reddit, comment[3][0][0]);
+            try
+            {
+                var response = request.GetResponse();
+                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 30 && i[1].Value<int>() == 31);
+                return new Comment(Reddit, comment[3][0][0]);
+            }
+            catch (WebException ex)
+            {
+                var error = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                return null;
+            }
         }
 
         public void Distinguish(DistinguishType distinguishType)

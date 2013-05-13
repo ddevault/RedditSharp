@@ -15,7 +15,8 @@ namespace RedditSharp
             Reddit = reddit;
 
             var data = json["data"];
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
+            if (data["created"] != null)
+                Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
         }
 
         public DateTime Created { get; set; }
