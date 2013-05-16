@@ -32,7 +32,6 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var message = reddit.ComposePrivateMessage("Test", "hello world", "pokemon-flair");
         }
 
         public static string ReadPassword()

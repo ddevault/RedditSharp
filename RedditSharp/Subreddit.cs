@@ -22,6 +22,7 @@ namespace RedditSharp
         private const string StylesheetUrl = "/r/{0}/about/stylesheet.json";
         private const string UploadImageUrl = "/api/upload_sr_img";
         private const string FlairSelectorUrl = "/api/flairselector";
+        private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
 
         private Reddit Reddit { get; set; }
 
@@ -277,6 +278,19 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
             return new SubredditStyle(Reddit, this, json);
+        }
+
+        public void AcceptModeratorInvite()
+        {
+            var request = Reddit.CreatePost(AcceptModeratorInviteUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
         }
 
         public override string ToString()
