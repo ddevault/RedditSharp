@@ -23,6 +23,7 @@ namespace RedditSharp
         private const string UploadImageUrl = "/api/upload_sr_img";
         private const string FlairSelectorUrl = "/api/flairselector";
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
+        private const string LeaveModerationUrl = "/api/leavemoderator";
 
         private Reddit Reddit { get; set; }
 
@@ -283,6 +284,19 @@ namespace RedditSharp
         public void AcceptModeratorInvite()
         {
             var request = Reddit.CreatePost(AcceptModeratorInviteUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void LeaveModeration()
+        {
+            var request = Reddit.CreatePost(LeaveModerationUrl);
             Reddit.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
