@@ -49,6 +49,7 @@
     <Compile Include="AuthenticatedUser.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="CreatedThing.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FlairTemplate.cs" />
     <Compile Include="MultipartFormBuilder.cs" />
     <Compile Include="FlairType.cs" />

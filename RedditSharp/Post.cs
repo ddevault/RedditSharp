@@ -22,29 +22,29 @@ namespace RedditSharp
             Reddit = reddit;
 
             var data = post["data"];
-            AuthorName = data["author"].Value<string>();
-            AuthorFlairClass = data["author_flair_css_class"].Value<string>();
-            AuthorFlairText = data["author_flair_text"].Value<string>();
-            Domain = data["domain"].Value<string>();
-            Edited = data["edited"].Value<bool>();
-            IsSelfPost = data["is_self"].Value<bool>();
-            LinkFlairClass = data["link_flair_css_class"].Value<string>();
-            LinkFlairText = data["link_flair_text"].Value<string>();
-            CommentCount = data["num_comments"].Value<int>();
-            NSFW = data["over_18"].Value<bool>();
-            Permalink = data["permalink"].Value<string>();
-            Saved = data["saved"].Value<bool>();
-            Score = data["score"].Value<int>();
-            SelfText = data["selftext"].Value<string>();
-            SelfTextHtml = data["selftext_html"].Value<string>();
-            Subreddit = data["subreddit"].Value<string>();
-            Thumbnail = data["thumbnail"].Value<string>();
-            Title = HttpUtility.HtmlDecode(data["title"].Value<string>());
-            Url = data["url"].Value<string>();
+            AuthorName = data["author"].ValueOrDefault<string>();
+            AuthorFlairClass = data["author_flair_css_class"].ValueOrDefault<string>();
+            AuthorFlairText = data["author_flair_text"].ValueOrDefault<string>();
+            Domain = data["domain"].ValueOrDefault<string>();
+            Edited = data["edited"].ValueOrDefault<bool>();
+            IsSelfPost = data["is_self"].ValueOrDefault<bool>();
+            LinkFlairClass = data["link_flair_css_class"].ValueOrDefault<string>();
+            LinkFlairText = data["link_flair_text"].ValueOrDefault<string>();
+            CommentCount = data["num_comments"].ValueOrDefault<int>();
+            NSFW = data["over_18"].ValueOrDefault<bool>();
+            Permalink = data["permalink"].ValueOrDefault<string>();
+            Saved = data["saved"].ValueOrDefault<bool>();
+            Score = data["score"].ValueOrDefault<int>();
+            SelfText = data["selftext"].ValueOrDefault<string>();
+            SelfTextHtml = data["selftext_html"].ValueOrDefault<string>();
+            Subreddit = data["subreddit"].ValueOrDefault<string>();
+            Thumbnail = data["thumbnail"].ValueOrDefault<string>();
+            Title = HttpUtility.HtmlDecode(data["title"].ValueOrDefault<string>() ?? string.Empty);
+            Url = data["url"].ValueOrDefault<string>();
 
             if (data["num_reports"] != null)
             {
-                var reports = data["num_reports"].Value<string>();
+                var reports = data["num_reports"].ValueOrDefault<string>();
                 int value;
                 if (reports != null)
                 {

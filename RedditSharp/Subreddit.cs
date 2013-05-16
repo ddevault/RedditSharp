@@ -50,17 +50,17 @@ namespace RedditSharp
         {
             Reddit = reddit;
             var data = json["data"];
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
-            Description = data["description"].Value<string>();
-            DisplayName = data["display_name"].Value<string>();
-            HeaderImage = data["header_img"].Value<string>();
-            HeaderTitle = data["header_title"].Value<string>();
-            NSFW = data["over18"].Value<bool>();
-            PublicDescription = data["public_description"].Value<string>();
-            Subscribers = data["subscribers"].Value<int>();
-            Title = data["title"].Value<string>();
-            Url = data["url"].Value<string>();
-            ActiveUsers = data["accounts_active"].Value<int?>();
+            Created = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
+            Description = data["description"].ValueOrDefault<string>();
+            DisplayName = data["display_name"].ValueOrDefault<string>();
+            HeaderImage = data["header_img"].ValueOrDefault<string>();
+            HeaderTitle = data["header_title"].ValueOrDefault<string>();
+            NSFW = data["over18"].ValueOrDefault<bool>();
+            PublicDescription = data["public_description"].ValueOrDefault<string>();
+            Subscribers = data["subscribers"].ValueOrDefault<int>();
+            Title = data["title"].ValueOrDefault<string>();
+            Url = data["url"].ValueOrDefault<string>();
+            ActiveUsers = data["accounts_active"].ValueOrDefault<int?>();
             Name = Url;
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);

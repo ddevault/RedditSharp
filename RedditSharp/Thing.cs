@@ -13,11 +13,9 @@ namespace RedditSharp
             if (json == null)
                 return;
             var data = json["data"];
-            if (data["name"] != null)
-                FullName = data["name"].Value<string>();
-            Id = data["id"].Value<string>();
-            if (data["kind"] != null)
-                Kind = data["kind"].Value<string>();
+            FullName = data["name"].ValueOrDefault<string>();
+            Id = data["id"].ValueOrDefault<string>();
+            Kind = data["kind"].ValueOrDefault<string>();
         }
 
         public string Shortlink

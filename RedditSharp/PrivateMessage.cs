@@ -30,15 +30,15 @@ namespace RedditSharp
             Reddit = reddit;
             var data = json["data"];
 
-            Body = data["body"].Value<string>();
-            IsComment = data["was_comment"].Value<bool>();
-            Sent = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
-            Destination = data["dest"].Value<string>();
-            Author = data["author"].Value<string>();
-            BodyHtml = data["body_html"].Value<string>();
-            Subreddit = data["subreddit"].Value<string>();
-            Unread = data["new"].Value<bool>();
-            Subject = data["subject"].Value<string>();
+            Body = data["body"].ValueOrDefault<string>();
+            IsComment = data["was_comment"].ValueOrDefault<bool>();
+            Sent = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
+            Destination = data["dest"].ValueOrDefault<string>();
+            Author = data["author"].ValueOrDefault<string>();
+            BodyHtml = data["body_html"].ValueOrDefault<string>();
+            Subreddit = data["subreddit"].ValueOrDefault<string>();
+            Unread = data["new"].ValueOrDefault<bool>();
+            Subject = data["subject"].ValueOrDefault<string>();
         }
 
         public void SetAsRead()

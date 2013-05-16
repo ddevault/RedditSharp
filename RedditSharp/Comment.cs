@@ -20,10 +20,10 @@ namespace RedditSharp
         {
             var data = json["data"];
 
-            Author = data["author"].Value<string>();
-            Content = data["body"].Value<string>();
-            ContentHtml = data["body_html"].Value<string>();
-            Subreddit = data["subreddit"].Value<string>();
+            Author = data["author"].ValueOrDefault<string>();
+            Content = data["body"].ValueOrDefault<string>();
+            ContentHtml = data["body_html"].ValueOrDefault<string>();
+            Subreddit = data["subreddit"].ValueOrDefault<string>();
             Reddit = reddit;
 
             //Parse sub comments

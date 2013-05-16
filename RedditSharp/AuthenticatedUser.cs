@@ -16,9 +16,9 @@ namespace RedditSharp
         public AuthenticatedUser(Reddit reddit, JToken json)
             : base(reddit, json)
         {
-            Modhash = json["data"]["modhash"].Value<string>();
-            HasMail = json["data"]["has_mail"].Value<bool>();
-            HasModMail = json["data"]["has_mod_mail"].Value<bool>();
+            Modhash = json["data"]["modhash"].ValueOrDefault<string>();
+            HasMail = json["data"]["has_mail"].ValueOrDefault<bool>();
+            HasModMail = json["data"]["has_mod_mail"].ValueOrDefault<bool>();
         }
 
         public Subreddit[] GetModeratorReddits()

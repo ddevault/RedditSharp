@@ -45,31 +45,20 @@ namespace RedditSharp
             : this(reddit, subreddit)
         {
             var data = json["data"];
-            if (data["default_set"] != null)
-                AllowAsDefault = data["default_set"].Value<bool>();
-            if (data["domain"] != null)
-                Domain = data["domain"].Value<string>();
-            if (data["description"] != null)
-                Sidebar = HttpUtility.HtmlDecode(data["description"].Value<string>());
-            if (data["language"] != null)
-                Language = data["language"].Value<string>();
-            if (data["title"] != null)
-                Title = data["title"].Value<string>();
-            if (data["wiki_edit_karma"] != null)
-                WikiEditKarma = data["wiki_edit_karma"].Value<int>();
-            if (data["domain_css"] != null)
-                UseDomainCss = data["domain_css"].Value<bool>();
-            if (data["domain_sidebar"] != null)
-                UseDomainSidebar = data["domain_sidebar"].Value<bool>();
-            if (data["header_hover_text"] != null)
-                HeaderHoverText = data["header_hover_text"].Value<string>();
-            if (data["over_18"] != null)
-                NSFW = data["over_18"].Value<bool>();
-            if (data["public_description"] != null)
-                PublicDescription = HttpUtility.HtmlDecode(data["public_description"].Value<string>());
+            AllowAsDefault = data["default_set"].ValueOrDefault<bool>();
+            Domain = data["domain"].ValueOrDefault<string>();
+            Sidebar = HttpUtility.HtmlDecode(data["description"].ValueOrDefault<string>() ?? string.Empty);
+            Language = data["language"].ValueOrDefault<string>();
+            Title = data["title"].ValueOrDefault<string>();
+            WikiEditKarma = data["wiki_edit_karma"].ValueOrDefault<int>();
+            UseDomainCss = data["domain_css"].ValueOrDefault<bool>();
+            UseDomainSidebar = data["domain_sidebar"].ValueOrDefault<bool>();
+            HeaderHoverText = data["header_hover_text"].ValueOrDefault<string>();
+            NSFW = data["over_18"].ValueOrDefault<bool>();
+            PublicDescription = HttpUtility.HtmlDecode(data["public_description"].ValueOrDefault<string>() ?? string.Empty);
             if (data["wikimode"] != null)
             {
-                string wikiMode = data["wikimode"].Value<string>();
+                string wikiMode = data["wikimode"].ValueOrDefault<string>();
                 switch (wikiMode)
                 {
                     case "disabled":
@@ -85,7 +74,7 @@ namespace RedditSharp
             }
             if (data["subreddit_type"] != null)
             {
-                string type = data["subreddit_type"].Value<string>();
+                string type = data["subreddit_type"].ValueOrDefault<string>();
                 switch (type)
                 {
                     case "public":
@@ -99,13 +88,11 @@ namespace RedditSharp
                         break;
                 }
             }
-            if (data["show_media"] != null)
-                ShowThumbnails = data["show_media"].Value<bool>();
-            if (data["wiki_edit_age"] != null)
-                WikiEditAge = data["wiki_edit_age"].Value<int>();
+            ShowThumbnails = data["show_media"].ValueOrDefault<bool>();
+            WikiEditAge = data["wiki_edit_age"].ValueOrDefault<int>();
             if (data["content_options"] != null)
             {
-                string contentOptions = data["content_options"].Value<string>();
+                string contentOptions = data["content_options"].ValueOrDefault<string>();
                 switch (contentOptions)
                 {
                     case "any":

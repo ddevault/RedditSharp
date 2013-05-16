@@ -11,13 +11,13 @@ namespace RedditSharp
         public RedditUser(Reddit reddit, JToken json)
         {
             var data = json["data"];
-            Name = data["name"].Value<string>();
-            Id = data["id"].Value<string>();
-            HasGold = data["is_gold"].Value<bool>();
-            IsModerator = data["is_mod"].Value<bool>();
-            LinkKarma = data["link_karma"].Value<int>();
-            CommentKarma = data["comment_karma"].Value<int>();
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].Value<double>());
+            Name = data["name"].ValueOrDefault<string>();
+            Id = data["id"].ValueOrDefault<string>();
+            HasGold = data["is_gold"].ValueOrDefault<bool>();
+            IsModerator = data["is_mod"].ValueOrDefault<bool>();
+            LinkKarma = data["link_karma"].ValueOrDefault<int>();
+            CommentKarma = data["comment_karma"].ValueOrDefault<int>();
+            Created = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
             Reddit = reddit;
         }
 

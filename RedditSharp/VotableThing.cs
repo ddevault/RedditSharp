@@ -24,10 +24,9 @@ namespace RedditSharp
             Reddit = reddit;
 
             var data = json["data"];
-            Upvotes = data["ups"].Value<int>();
-            Downvotes = data["downs"].Value<int>();
-            if (data["likes"] != null)
-                Liked = data["likes"].Value<bool?>();
+            Upvotes = data["ups"].ValueOrDefault<int>();
+            Downvotes = data["downs"].ValueOrDefault<int>();
+            Liked = data["likes"].ValueOrDefault<bool?>();
         }
 
         public int Downvotes { get; set; }
