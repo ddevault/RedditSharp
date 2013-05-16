@@ -294,7 +294,7 @@ namespace RedditSharp
             var result = Reddit.GetResponseString(response.GetResponseStream());
         }
 
-        public void LeaveModeration()
+        public void RemoveModerator(string id)
         {
             var request = Reddit.CreatePost(LeaveModerationUrl);
             Reddit.WritePostBody(request.GetRequestStream(), new
@@ -303,7 +303,7 @@ namespace RedditSharp
                 uh = Reddit.User.Modhash,
                 r = Name,
                 type = "moderator",
-                id = FullName
+                id
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
