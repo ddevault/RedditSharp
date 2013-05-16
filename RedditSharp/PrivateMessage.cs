@@ -24,6 +24,7 @@ namespace RedditSharp
         public string Subreddit { get; set; }
         public bool Unread { get; set; }
         public string Subject { get; set; }
+        public PrivateMessage[] Replies { get; set; }
 
         public PrivateMessage(Reddit reddit, JToken json) : base(json)
         {
@@ -39,6 +40,13 @@ namespace RedditSharp
             Subreddit = data["subreddit"].ValueOrDefault<string>();
             Unread = data["new"].ValueOrDefault<bool>();
             Subject = data["subject"].ValueOrDefault<string>();
+            if (data["replies"] != null)
+            {
+                var replies = new List<PrivateMessage>();
+                foreach (var reply in data["replies"]["data"]["children"])
+                    replies.Add(new PrivateMessage(reddit, reply));
+                Replies = replies.ToArray();
+            }
         }
 
         public void SetAsRead()

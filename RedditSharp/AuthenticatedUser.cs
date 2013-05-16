@@ -12,6 +12,7 @@ namespace RedditSharp
         private const string ModeratorUrl = "/reddits/mine/moderator.json";
         private const string UnreadMessagesUrl = "/message/unread.json?mark=true&limit={0}";
         private const string ModQueueUrl = "/r/mod/about/modqueue.json";
+        private const string ModMailUrl = "/message/moderator.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json)
             : base(reddit, json)
@@ -59,6 +60,18 @@ namespace RedditSharp
                 else if (item["kind"].Value<string>() == "t1")
                     items.Add(new Comment(Reddit, item));
             }
+            return items.ToArray();
+        }
+
+        public PrivateMessage[] GetModMail()
+        {
+            var request = Reddit.CreateGet(ModMailUrl);
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            var items = new List<PrivateMessage>();
+            foreach (var item in json["data"]["children"])
+                items.Add(new PrivateMessage(Reddit, item));
             return items.ToArray();
         }
 
