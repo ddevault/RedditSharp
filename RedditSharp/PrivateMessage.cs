@@ -40,12 +40,18 @@ namespace RedditSharp
             Subreddit = data["subreddit"].ValueOrDefault<string>();
             Unread = data["new"].ValueOrDefault<bool>();
             Subject = data["subject"].ValueOrDefault<string>();
-            if (data["replies"] != null && data["replies"]["data"] != null && data["replies"]["data"]["children"] != null)
+            if (data["replies"] != null)
             {
-                var replies = new List<PrivateMessage>();
-                foreach (var reply in data["replies"]["data"]["children"])
-                    replies.Add(new PrivateMessage(reddit, reply));
-                Replies = replies.ToArray();
+                if (data["replies"]["data"] != null)
+                {
+                    if (data["replies"]["data"]["children"] != null)
+                    {
+                        var replies = new List<PrivateMessage>();
+                        foreach (var reply in data["replies"]["data"]["children"])
+                            replies.Add(new PrivateMessage(reddit, reply));
+                        Replies = replies.ToArray();
+                    }
+                }
             }
         }
 
