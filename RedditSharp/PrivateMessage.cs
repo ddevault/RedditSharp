@@ -40,7 +40,7 @@ namespace RedditSharp
             Subreddit = data["subreddit"].ValueOrDefault<string>();
             Unread = data["new"].ValueOrDefault<bool>();
             Subject = data["subject"].ValueOrDefault<string>();
-            if (data["replies"] != null)
+            if (data["replies"] != null && data["replies"].Any())
             {
                 if (data["replies"]["data"] != null)
                 {
