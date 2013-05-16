@@ -32,6 +32,7 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
+            reddit.User.GetUnreadMessages();
 
             var r = reddit.GetSubreddit("/r/sircmpwn");
             r.Subscribe();
