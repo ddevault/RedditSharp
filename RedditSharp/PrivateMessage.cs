@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Security.Authentication;
+using System.Net;
 
 namespace RedditSharp
 {
     public class PrivateMessage : Thing
     {
         private const string SetAsReadUrl = "/api/read_message";
+        private const string CommentUrl = "/api/comment";
 
         private Reddit Reddit { get; set; }
 
@@ -49,6 +52,24 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void Reply(string message)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(CommentUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                text = message,
+                thing_id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
         }
     }
 }
