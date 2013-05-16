@@ -32,22 +32,7 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            reddit.User.GetUnreadMessages();
-
-            var r = reddit.GetSubreddit("/r/sircmpwn");
-            r.Subscribe();
-            var posts = r.GetPosts();
-            foreach (var post in posts)
-            {
-                var comments = post.GetComments();
-                foreach (var c in comments)
-                {
-                    if (c.Content.Contains("Test lkhflkjase"))
-                    {
-                        c.Reply("Hello, world!");
-                    }
-                }
-            }
+            var message = reddit.ComposePrivateMessage("Test", "hello world", "pokemon-flair");
         }
 
         public static string ReadPassword()

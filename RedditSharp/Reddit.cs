@@ -19,6 +19,7 @@ namespace RedditSharp
         private const string UserInfoUrl = "/user/{0}/about.json";
         private const string MeUrl = "/api/me.json";
         private const string SubredditAboutUrl = "/r/{0}/about.json";
+        private const string ComposeMessageUrl = "/api/compose";
 
         #endregion
 
@@ -126,6 +127,22 @@ namespace RedditSharp
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             return new Subreddit(this, json);
+        }
+
+        public void ComposePrivateMessage(string subject, string body, string to)
+        {
+            var request = CreatePost(ComposeMessageUrl);
+            WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                subject,
+                text = body,
+                to,
+                uh = User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = GetResponseString(response.GetResponseStream());
+            // TODO: Error
         }
 
         #region Helpers
