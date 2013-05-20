@@ -54,6 +54,7 @@ namespace RedditSharp
                 text = message,
                 thing_id = FullName,
                 uh = Reddit.User.Modhash,
+                api_type = "json"
                 //r = Subreddit
             });
             stream.Close();
@@ -62,8 +63,7 @@ namespace RedditSharp
                 var response = request.GetResponse();
                 var data = Reddit.GetResponseString(response.GetResponseStream());
                 var json = JObject.Parse(data);
-                var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 30 && i[1].Value<int>() == 31);
-                return new Comment(Reddit, comment[3][0][0]);
+                return new Comment(Reddit, json["json"]["data"]["things"][0]);
             }
             catch (WebException ex)
             {
