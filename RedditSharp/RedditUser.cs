@@ -45,9 +45,9 @@ namespace RedditSharp
             foreach (var item in json["data"]["children"])
             {
                 if (item["kind"].Value<string>() == "t1")
-                    items.Add(new Comment(Reddit, item["data"]));
+                    items.Add(new Comment(Reddit, item));
                 else
-                    items.Add(new Post(Reddit, item["data"]));
+                    items.Add(new Post(Reddit, item));
             }
             return items.ToArray();
         }
@@ -60,7 +60,7 @@ namespace RedditSharp
             var json = JToken.Parse(data);
             var items = new List<Comment>();
             foreach (var item in json["data"]["children"])
-                items.Add(new Comment(Reddit, item["data"]));
+                items.Add(new Comment(Reddit, item));
             return items.ToArray();
         }
 
@@ -72,7 +72,7 @@ namespace RedditSharp
             var json = JToken.Parse(data);
             var items = new List<Post>();
             foreach (var item in json["data"]["children"])
-                items.Add(new Post(Reddit, item["data"]));
+                items.Add(new Post(Reddit, item));
             return items.ToArray();
         }
 
