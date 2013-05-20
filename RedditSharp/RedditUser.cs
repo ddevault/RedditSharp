@@ -8,6 +8,10 @@ namespace RedditSharp
 {
     public class RedditUser
     {
+        private const string OverviewUrl = "/user/{0}.json";
+        private const string CommentsUrl = "/user/{0}/comments.json";
+        private const string LinksUrl = "/user/{0}/submitted.json";
+
         public RedditUser(Reddit reddit, JToken json)
         {
             var data = json["data"];
@@ -30,6 +34,47 @@ namespace RedditSharp
         public int LinkKarma { get; set; }
         public int CommentKarma { get; set; }
         public DateTime Created { get; set; }
+
+        public VotableThing[] GetOverview()
+        {
+            var request = Reddit.CreateGet(string.Format(OverviewUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            var items = new List<VotableThing>();
+            foreach (var item in json["data"]["children"])
+            {
+                if (item["kind"].Value<string>() == "t1")
+                    items.Add(new Comment(Reddit, item["data"]));
+                else
+                    items.Add(new Post(Reddit, item["data"]));
+            }
+            return items.ToArray();
+        }
+
+        public Comment[] GetComments()
+        {
+            var request = Reddit.CreateGet(string.Format(CommentsUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            var items = new List<Comment>();
+            foreach (var item in json["data"]["children"])
+                items.Add(new Comment(Reddit, item["data"]));
+            return items.ToArray();
+        }
+
+        public Post[] GetPosts()
+        {
+            var request = Reddit.CreateGet(string.Format(LinksUrl, Name));
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            var items = new List<Post>();
+            foreach (var item in json["data"]["children"])
+                items.Add(new Post(Reddit, item["data"]));
+            return items.ToArray();
+        }
 
         public override string ToString()
         {
