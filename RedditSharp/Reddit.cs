@@ -122,11 +122,12 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            var request = CreateGet(string.Format(SubredditAboutUrl, name));
-            var response = request.GetResponse();
-            var result = GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            return new Subreddit(this, json);
+            //var request = CreateGet(string.Format(SubredditAboutUrl, name));
+            //var response = request.GetResponse();
+            //var result = GetResponseString(response.GetResponseStream());
+            //var json = JObject.Parse(result);
+            //return new Subreddit(this, json);
+            return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
         }
 
         public void ComposePrivateMessage(string subject, string body, string to)
@@ -187,6 +188,15 @@ namespace RedditSharp
             return data;
         }
 
+        protected internal Thing GetThing(string url, bool prependDomain = true)
+        {
+            var request = CreateGet(url, prependDomain);
+            var response = request.GetResponse();
+            var data = GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return Thing.Parse(this, json);
+        }
+
         protected internal void WritePostBody(Stream stream, object data, params string[] additionalFields)
         {
             var type = data.GetType();
@@ -210,7 +220,7 @@ namespace RedditSharp
             stream.Close();
         }
 
-        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        protected internal static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
