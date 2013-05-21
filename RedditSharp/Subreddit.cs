@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Text;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
@@ -25,19 +26,35 @@ namespace RedditSharp
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
 
+        [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        public DateTime Created { get; set; }
+        [JsonProperty("created")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
+        public DateTime? Created { get; set; }
+        [JsonProperty("description")]
         public string Description { get; set; }
+        [JsonProperty("description_html")]
+        public string DescriptionHTML { get; set; }
+        [JsonProperty("display_name")]
         public string DisplayName { get; set; }
+        [JsonProperty("header_img")]
         public string HeaderImage { get; set; }
+        [JsonProperty("header_title")]
         public string HeaderTitle { get; set; }
-        public bool NSFW { get; set; }
+        [JsonProperty("over18")]
+        public bool? NSFW { get; set; }
+        [JsonProperty("public_description")]
         public string PublicDescription { get; set; }
-        public int Subscribers { get; set; }
+        [JsonProperty("subscribers")]
+        public int? Subscribers { get; set; }
+        [JsonProperty("accounts_active")]
         public int? ActiveUsers { get; set; }
+        [JsonProperty("title")]
         public string Title { get; set; }
+        [JsonProperty("url")]
         public string Url { get; set; }
+        [JsonIgnore]
         public string Name { get; set; }
 
         /// <summary>
@@ -51,18 +68,7 @@ namespace RedditSharp
         protected internal Subreddit(Reddit reddit, JToken json) : base(json)
         {
             Reddit = reddit;
-            var data = json["data"];
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
-            Description = data["description"].ValueOrDefault<string>();
-            DisplayName = data["display_name"].ValueOrDefault<string>();
-            HeaderImage = data["header_img"].ValueOrDefault<string>();
-            HeaderTitle = data["header_title"].ValueOrDefault<string>();
-            NSFW = data["over18"].ValueOrDefault<bool>();
-            PublicDescription = data["public_description"].ValueOrDefault<string>();
-            Subscribers = data["subscribers"].ValueOrDefault<int>();
-            Title = data["title"].ValueOrDefault<string>();
-            Url = data["url"].ValueOrDefault<string>();
-            ActiveUsers = data["accounts_active"].ValueOrDefault<int?>();
+            JsonConvert.PopulateObject(json["data"].ToString(), this);
             Name = Url;
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);
