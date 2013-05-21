@@ -68,7 +68,7 @@ namespace RedditSharp
         protected internal Subreddit(Reddit reddit, JToken json) : base(json)
         {
             Reddit = reddit;
-            JsonConvert.PopulateObject(json["data"].ToString(), this);
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             Name = Url;
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);

@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -13,17 +14,14 @@ namespace RedditSharp
     {
         private const string CommentUrl = "/api/comment";
         private const string DistinguishUrl = "/api/distinguish";
+        [JsonIgnore]
         private Reddit Reddit { get; set; }
 
         public Comment(Reddit reddit, JToken json)
             : base(reddit, json)
         {
             var data = json["data"];
-
-            Author = data["author"].ValueOrDefault<string>();
-            Content = data["body"].ValueOrDefault<string>();
-            ContentHtml = data["body_html"].ValueOrDefault<string>();
-            Subreddit = data["subreddit"].ValueOrDefault<string>();
+            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             Reddit = reddit;
 
             //Parse sub comments
@@ -35,11 +33,35 @@ namespace RedditSharp
             }
         }
 
+        [JsonProperty("author")]
         public string Author { get; set; }
+        [JsonProperty("body")]
         public string Content { get; set; }
+        [JsonProperty("body_html")]
         public string ContentHtml { get; set; }
+        [JsonProperty("parent_id")]
         public string ParentId { get; set; }
+        [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
+        [JsonProperty("approved_by")]
+        public string ApprovedBy { get; set; }
+        [JsonProperty("author_flair_css_class")]
+        public string AuthorFlairCssClass { get; set; }
+        [JsonProperty("author_flair_text")]
+        public string AuthorFlairText { get; set; }
+        [JsonProperty("banned_by")]
+        public string RemovedBy { get; set; }
+        [JsonProperty("gilded")]
+        public int Gilded { get; set; }
+        [JsonProperty("link_id")]
+        public string LinkId { get; set; }
+        [JsonProperty("link_title")]
+        public string LinkTitle { get; set; }
+        [JsonProperty("num_reports")]
+        public int NumReports { get; set; }
+        [JsonProperty("distinguished")]
+        [JsonConverter(typeof(DistinguishConverter))]
+        public DistinguishType Distinguished { get; set; }
 
         public List<Comment> Comments { get; set; }
 
@@ -116,4 +138,39 @@ namespace RedditSharp
         Special,
         None
     }
+
+    internal class DistinguishConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(DistinguishType) || objectType == typeof(string);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var token = JToken.Load(reader);
+            var value = token.Value<string>();
+            if (value == null)
+                return DistinguishType.None;
+            switch (value)
+            {
+                case "moderator": return DistinguishType.Moderator;
+                case "admin": return DistinguishType.Admin;
+                case "special": return DistinguishType.Special;
+                default: return DistinguishType.None;
+            }
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var d = (DistinguishType)value;
+            if (d == DistinguishType.None)
+            {
+                writer.WriteNull();
+                return;
+            }
+            writer.WriteValue(d.ToString().ToLower());
+        }
+    }
+
 }

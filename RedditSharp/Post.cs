@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Text;
 using System.Web;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -15,6 +16,7 @@ namespace RedditSharp
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
 
+        [JsonIgnore]
         private Reddit Reddit { get; set; }
 
         public Post(Reddit reddit, JToken post) : base(reddit, post)
@@ -22,39 +24,12 @@ namespace RedditSharp
             Reddit = reddit;
 
             var data = post["data"];
-            AuthorName = data["author"].ValueOrDefault<string>();
-            AuthorFlairClass = data["author_flair_css_class"].ValueOrDefault<string>();
-            AuthorFlairText = data["author_flair_text"].ValueOrDefault<string>();
-            Domain = data["domain"].ValueOrDefault<string>();
-            Edited = data["edited"].ValueOrDefault<bool>();
-            IsSelfPost = data["is_self"].ValueOrDefault<bool>();
-            LinkFlairClass = data["link_flair_css_class"].ValueOrDefault<string>();
-            LinkFlairText = data["link_flair_text"].ValueOrDefault<string>();
-            CommentCount = data["num_comments"].ValueOrDefault<int>();
-            NSFW = data["over_18"].ValueOrDefault<bool>();
-            Permalink = data["permalink"].ValueOrDefault<string>();
-            Saved = data["saved"].ValueOrDefault<bool>();
-            Score = data["score"].ValueOrDefault<int>();
-            SelfText = data["selftext"].ValueOrDefault<string>();
-            SelfTextHtml = data["selftext_html"].ValueOrDefault<string>();
-            Subreddit = data["subreddit"].ValueOrDefault<string>();
-            Thumbnail = data["thumbnail"].ValueOrDefault<string>();
-            Title = HttpUtility.HtmlDecode(data["title"].ValueOrDefault<string>() ?? string.Empty);
-            Url = data["url"].ValueOrDefault<string>();
-
-            if (data["num_reports"] != null)
-            {
-                var reports = data["num_reports"].ValueOrDefault<string>();
-                int value;
-                if (reports != null)
-                {
-                    if (int.TryParse(reports, out value))
-                        Reports = value;
-                }
-            }
+            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
         }
 
+        [JsonProperty("author")]
         public string AuthorName { get; set; }
+        [JsonIgnore]
         public RedditUser Author
         {
             get
@@ -62,26 +37,43 @@ namespace RedditSharp
                 return Reddit.GetUser(AuthorName);
             }
         }
-
-        public string AuthorFlairClass { get; set; }
+        [JsonProperty("author_flair_css_class")]
+        public string AuthorFlairCssClass { get; set; }
+        [JsonProperty("author_flair_text")]
         public string AuthorFlairText { get; set; }
+        [JsonProperty("domain")]
         public string Domain { get; set; }
+        [JsonProperty("edited")]
         public bool Edited { get; set; }
+        [JsonProperty("is_self")]
         public bool IsSelfPost { get; set; }
-        public string LinkFlairClass { get; set; }
+        [JsonProperty("link_flair_css_class")]
+        public string LinkFlairCssClass { get; set; }
+        [JsonProperty("link_flair_text")]
         public string LinkFlairText { get; set; }
+        [JsonProperty("num_comments")]
         public int CommentCount { get; set; }
+        [JsonProperty("over_18")]
         public bool NSFW { get; set; }
+        [JsonProperty("permalink")]
         public string Permalink { get; set; }
+        [JsonProperty("saved")]
         public bool Saved { get; set; }
+        [JsonProperty("score")]
         public int Score { get; set; }
+        [JsonProperty("selftext")]
         public string SelfText { get; set; }
+        [JsonProperty("selftext_html")]
         public string SelfTextHtml { get; set; }
+        [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
+        [JsonProperty("thumbnail")]
         public string Thumbnail { get; set; }
+        [JsonProperty("title")]
         public string Title { get; set; }
+        [JsonProperty("url")]
         public string Url { get; set; }
-
+        [JsonProperty("num_reports")]
         public int Reports { get; set; }
 
         public Comment Comment(string message)
@@ -148,7 +140,7 @@ namespace RedditSharp
             var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
-        public List<Comment> GetComments()
+        public Comment[] GetComments()
         {
             var comments = new List<Comment>();
 
@@ -161,7 +153,7 @@ namespace RedditSharp
             foreach (var comment in postJson)
                 comments.Add(new Comment(Reddit, comment));
 
-            return comments;
+            return comments.ToArray();
         }
 
     }

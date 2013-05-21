@@ -33,6 +33,8 @@ namespace TestRedditSharp
                 }
             }
             var subreddit = reddit.GetSubreddit("/r/sircmpwn");
+            var posts = subreddit.GetPosts();
+            var comments = posts.First().GetComments();
         }
 
         public static string ReadPassword()

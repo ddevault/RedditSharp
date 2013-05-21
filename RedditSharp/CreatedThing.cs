@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -13,11 +14,11 @@ namespace RedditSharp
         public CreatedThing(Reddit reddit, JToken json) : base(json)
         {
             Reddit = reddit;
-
-            var data = json["data"];
-            Created = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
+        [JsonProperty("created")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Created { get; set; }
     }
 }

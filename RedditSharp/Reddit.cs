@@ -7,6 +7,7 @@ using System.Text;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using System.Web;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -54,8 +55,17 @@ namespace RedditSharp
         /// </summary>
         public AuthenticatedUser User { get; set; }
 
+        internal JsonSerializerSettings JsonSerializerSettings { get; set; }
+
         private CookieContainer Cookies { get; set; }
         private string AuthCookie { get; set; }
+
+        public Reddit()
+        {
+            JsonSerializerSettings = new JsonSerializerSettings();
+            JsonSerializerSettings.CheckAdditionalContent = false;
+            JsonSerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
+        }
 
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
@@ -122,11 +132,6 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            //var request = CreateGet(string.Format(SubredditAboutUrl, name));
-            //var response = request.GetResponse();
-            //var result = GetResponseString(response.GetResponseStream());
-            //var json = JObject.Parse(result);
-            //return new Subreddit(this, json);
             return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
         }
 

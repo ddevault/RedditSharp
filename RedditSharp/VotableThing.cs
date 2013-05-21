@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -17,25 +18,25 @@ namespace RedditSharp
 
         private const string VoteUrl = "/api/vote";
 
+        [JsonIgnore]
         private Reddit Reddit { get; set; }
 
         public VotableThing(Reddit reddit, JToken json) : base(reddit, json)
         {
             Reddit = reddit;
-
-            var data = json["data"];
-            Upvotes = data["ups"].ValueOrDefault<int>();
-            Downvotes = data["downs"].ValueOrDefault<int>();
-            Liked = data["likes"].ValueOrDefault<bool?>();
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
+        [JsonProperty("ups")]
         public int Downvotes { get; set; }
+        [JsonProperty("downs")]
         public int Upvotes { get; set; }
         /// <summary>
         /// True if the logged in user has upvoted this.
         /// False if they have not.
         /// Null if they have not cast a vote.
         /// </summary>
+        [JsonProperty("likes")]
         public bool? Liked { get; set; }
 
         public void Upvote()
