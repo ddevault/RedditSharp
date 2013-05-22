@@ -24,21 +24,23 @@ namespace RedditSharp
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             Reddit = reddit;
 
-            //Parse sub comments
-            Comments = new List<Comment>();
+            // Parse sub comments
+            // TODO: Consider deserializing this properly
+            var subComments = new List<Comment>();
             if (data["replies"] != null && data["replies"].Any())
             {
                 foreach (var comment in data["replies"]["data"]["children"])
-                    Comments.Add(new Comment(reddit, comment));
+                    subComments.Add(new Comment(reddit, comment));
             }
+            Comments = subComments.ToArray();
         }
 
         [JsonProperty("author")]
         public string Author { get; set; }
         [JsonProperty("body")]
-        public string Content { get; set; }
+        public string Body { get; set; }
         [JsonProperty("body_html")]
-        public string ContentHtml { get; set; }
+        public string BodyHtml { get; set; }
         [JsonProperty("parent_id")]
         public string ParentId { get; set; }
         [JsonProperty("subreddit")]
@@ -63,7 +65,8 @@ namespace RedditSharp
         [JsonConverter(typeof(DistinguishConverter))]
         public DistinguishType Distinguished { get; set; }
 
-        public List<Comment> Comments { get; set; }
+        [JsonIgnore]
+        public Comment[] Comments { get; set; }
 
         public Comment Reply(string message)
         {

@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Security.Authentication;
 using System.Net;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -15,31 +16,33 @@ namespace RedditSharp
 
         private Reddit Reddit { get; set; }
 
+        [JsonProperty("body")]
         public string Body { get; set; }
-        public bool IsComment { get; set; }
-        public DateTime Sent { get; set; }
-        public string Destination { get; set; }
-        public string Author { get; set; }
+        [JsonProperty("body_html")]
         public string BodyHtml { get; set; }
+        [JsonProperty("was_comment")]
+        public bool IsComment { get; set; }
+        [JsonProperty("created")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
+        public DateTime Sent { get; set; }
+        [JsonProperty("dest")]
+        public string Destination { get; set; }
+        [JsonProperty("author")]
+        public string Author { get; set; }
+        [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
+        [JsonProperty("new")]
         public bool Unread { get; set; }
+        [JsonProperty("subject")]
         public string Subject { get; set; }
+        [JsonIgnore]
         public PrivateMessage[] Replies { get; set; }
 
         public PrivateMessage(Reddit reddit, JToken json) : base(json)
         {
             Reddit = reddit;
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             var data = json["data"];
-
-            Body = data["body"].ValueOrDefault<string>();
-            IsComment = data["was_comment"].ValueOrDefault<bool>();
-            Sent = Reddit.UnixTimeStampToDateTime(data["created"].ValueOrDefault<double>());
-            Destination = data["dest"].ValueOrDefault<string>();
-            Author = data["author"].ValueOrDefault<string>();
-            BodyHtml = data["body_html"].ValueOrDefault<string>();
-            Subreddit = data["subreddit"].ValueOrDefault<string>();
-            Unread = data["new"].ValueOrDefault<bool>();
-            Subject = data["subject"].ValueOrDefault<string>();
             if (data["replies"] != null && data["replies"].Any())
             {
                 if (data["replies"]["data"] != null)

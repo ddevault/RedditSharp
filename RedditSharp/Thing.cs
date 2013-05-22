@@ -20,8 +20,8 @@ namespace RedditSharp
                     return new RedditUser(reddit, json);
                 case "t3":
                     return new Post(reddit, json);
-                case "t4": // TODO: Private Message
-                    return null;
+                case "t4":
+                    return new PrivateMessage(reddit, json);
                 case "t5":
                     return new Subreddit(reddit, json);
                 default:
