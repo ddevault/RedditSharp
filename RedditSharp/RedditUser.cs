@@ -39,43 +39,16 @@ namespace RedditSharp
         public Listing<VotableThing> GetOverview()
         {
             return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name));
-            //var request = Reddit.CreateGet(string.Format(OverviewUrl, Name));
-            //var response = request.GetResponse();
-            //var data = Reddit.GetResponseString(response.GetResponseStream());
-            //var json = JToken.Parse(data);
-            //var items = new List<VotableThing>();
-            //foreach (var item in json["data"]["children"])
-            //{
-            //    if (item["kind"].Value<string>() == "t1")
-            //        items.Add(new Comment(Reddit, item));
-            //    else
-            //        items.Add(new Post(Reddit, item));
-            //}
-            //return items.ToArray();
         }
 
-        public Comment[] GetComments()
+        public Listing<Comment> GetComments()
         {
-            var request = Reddit.CreateGet(string.Format(CommentsUrl, Name));
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
-            var items = new List<Comment>();
-            foreach (var item in json["data"]["children"])
-                items.Add(new Comment(Reddit, item));
-            return items.ToArray();
+            return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name));
         }
 
-        public Post[] GetPosts()
+        public Listing<Post> GetPosts()
         {
-            var request = Reddit.CreateGet(string.Format(LinksUrl, Name));
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
-            var items = new List<Post>();
-            foreach (var item in json["data"]["children"])
-                items.Add(new Post(Reddit, item));
-            return items.ToArray();
+            return new Listing<Post>(Reddit, string.Format(LinksUrl, Name));
         }
 
         public override string ToString()

@@ -11,7 +11,7 @@ namespace RedditSharp
     public class AuthenticatedUser : RedditUser
     {
         private const string ModeratorUrl = "/reddits/mine/moderator.json";
-        private const string UnreadMessagesUrl = "/message/unread.json?mark=true&limit={0}";
+        private const string UnreadMessagesUrl = "/message/unread.json?mark=true&limit=25";
         private const string ModQueueUrl = "/r/mod/about/modqueue.json";
         private const string ModMailUrl = "/message/moderator.json";
 
@@ -20,57 +20,24 @@ namespace RedditSharp
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
-        public Subreddit[] GetModeratorReddits()
+        public Listing<Subreddit> GetModeratorReddits()
         {
-            var reddits = new List<Subreddit>();
-            var request = Reddit.CreateGet(ModeratorUrl);
-            var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            foreach (var subreddit in json["data"]["children"])
-                reddits.Add(new Subreddit(Reddit, subreddit));
-            return reddits.ToArray();
+            return new Listing<Subreddit>(Reddit, ModeratorUrl);
         }
 
-        public PrivateMessage[] GetUnreadMessages(int limit = 25)
+        public Listing<PrivateMessage> GetUnreadMessages()
         {
-            var messages = new List<PrivateMessage>();
-            var request = Reddit.CreateGet(string.Format(UnreadMessagesUrl, limit));
-            var response = (HttpWebResponse)request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            foreach (var message in json["data"]["children"])
-                messages.Add(new PrivateMessage(Reddit, message));
-            return messages.ToArray();
+            return new Listing<PrivateMessage>(Reddit, UnreadMessagesUrl);
         }
 
-        public VotableThing[] GetModerationQueue()
+        public Listing<VotableThing> GetModerationQueue()
         {
-            var request = Reddit.CreateGet(ModQueueUrl);
-            var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            var items = new List<VotableThing>();
-            foreach (var item in json["data"]["children"])
-            {
-                if (item["kind"].Value<string>() == "t3") // TODO: Maybe add a method to parse Things based on the kind?
-                    items.Add(new Post(Reddit, item));
-                else if (item["kind"].Value<string>() == "t1")
-                    items.Add(new Comment(Reddit, item));
-            }
-            return items.ToArray();
+            return new Listing<VotableThing>(Reddit, ModQueueUrl);
         }
 
-        public PrivateMessage[] GetModMail()
+        public Listing<PrivateMessage> GetModMail()
         {
-            var request = Reddit.CreateGet(ModMailUrl);
-            var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            var items = new List<PrivateMessage>();
-            foreach (var item in json["data"]["children"])
-                items.Add(new PrivateMessage(Reddit, item));
-            return items.ToArray();
+            return new Listing<PrivateMessage>(Reddit, ModMailUrl);
         }
 
         [JsonProperty("modhash")]

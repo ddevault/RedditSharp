@@ -90,30 +90,14 @@ namespace RedditSharp
             return rSlashAll;
         }
 
-        public Post[] GetPosts()
+        public Listing<Post> GetPosts()
         {
-            var request = Reddit.CreateGet(string.Format(SubredditPostUrl, Name));
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            var posts = new List<Post>();
-            var postJson = json["data"]["children"];
-            foreach (var post in postJson)
-                posts.Add(new Post(Reddit, post));
-            return posts.ToArray();
+            return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name));
         }
 
-        public Post[] GetNew()
+        public Listing<Post> GetNew()
         {
-            var request = Reddit.CreateGet(string.Format(SubredditNewUrl, Name));
-            var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            var posts = new List<Post>();
-            var postJson = json["data"]["children"];
-            foreach (var post in postJson)
-                posts.Add(new Post(Reddit, post));
-            return posts.ToArray();
+            return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name));
         }
 
         public void Subscribe()

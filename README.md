@@ -1,6 +1,7 @@
 # RedditSharp
 
-A partial implementation of the [Reddit](http://reddit.com) API.
+A partial implementation of the [Reddit](http://reddit.com) API. Includes support for many API endpoints, as well as
+LINQ-style paging of results.
 
 ```csharp
 var reddit = new Reddit();
@@ -8,7 +9,7 @@ var user = reddit.LogIn("username", "password");
 var subreddit = reddit.GetSubreddit("/r/example");
 subreddit.Subscribe();
 var posts = subreddit.GetNew();
-foreach (var post in posts)
+foreach (var post in posts.Take(25))
 {
     if (post.Title == "What is my karma?")
     {
@@ -20,14 +21,48 @@ foreach (var post in posts)
 }
 ```
 
+**Important note**: Make sure you use `.Take(int)` when working with pagable content. For example, don't do this:
+
+```csharp
+var all = reddit.GetRSlashAll();
+foreach (var post in all)
+{
+    // ...
+}
+```
+
+This will cause you to page through everything that has ever been posted on Reddit. Better:
+
+var all = reddit.GetRSlashAll();
+foreach (var post in all.Take(25))
+{
+    // ...
+}
+```
+
+Here's another example: you've made a bot to periodically check your subreddit's new page for things to automatically
+remove:
+
+```csharp
+var subreddit = reddit.GetSubreddit("/r/myawesomesubreddit");
+var newPosts = subreddit.GetNew();
+var latest = newPosts.Skip(24).First();
+while (true)
+{
+    // Gets all posts since the last post checked
+    var toCheck = newPosts.TakeWhile(p => p != latest).ToArray();
+    CheckPosts(toCheck);
+    Thread.Sleep(60000);
+}
+```
+
 ## Development
 
-This gets improved every time I need it to have new features. I use it to power my various Reddit projects,
-like the [/r/pokemon flair bot](https://github.com/SirCmpwn/PokemonFlairBot), or
-[srutils](https://github.com/SirCmpwn/srutils), or various other projects. Whenever I need a feature it doesn't
-have, I add it.
+RedditSharp is developed with the following workflow:
 
-So! If you need a feature that it doesn't have, feel free to let me know. If you find bugs, also give me a
-ring. Do this by making a [GitHub issue](https://github.com/SirCmpwn/RedditSharp/issues) or 
-[emailing me](mailto:sir@cmpwn.com). You can also submit pull requests, which I'll happily accept if they're
-of good quality.
+1. Nothing happens for weeks
+2. Someone needs it to do something it doesn't already do
+3. That person implements that something and submits a pull request
+4. Repeat
+
+If it doesn't have a feature that you want it to have, add it! The code isn't that scary.
