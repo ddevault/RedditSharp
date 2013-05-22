@@ -22,9 +22,7 @@ namespace RedditSharp
         public Post(Reddit reddit, JToken post) : base(reddit, post)
         {
             Reddit = reddit;
-
-            var data = post["data"];
-            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
+            JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
         [JsonProperty("author")]

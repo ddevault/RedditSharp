@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace RedditSharp
 {
@@ -14,12 +15,9 @@ namespace RedditSharp
         private const string ModQueueUrl = "/r/mod/about/modqueue.json";
         private const string ModMailUrl = "/message/moderator.json";
 
-        public AuthenticatedUser(Reddit reddit, JToken json)
-            : base(reddit, json)
+        public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
         {
-            Modhash = json["data"]["modhash"].ValueOrDefault<string>();
-            HasMail = json["data"]["has_mail"].ValueOrDefault<bool>();
-            HasModMail = json["data"]["has_mod_mail"].ValueOrDefault<bool>();
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
         public Subreddit[] GetModeratorReddits()
@@ -75,8 +73,11 @@ namespace RedditSharp
             return items.ToArray();
         }
 
+        [JsonProperty("modhash")]
         public string Modhash { get; set; }
+        [JsonProperty("has_mail")]
         public bool HasMail { get; set; }
+        [JsonProperty("has_mod_mail")]
         public bool HasModMail { get; set; }
     }
 }
