@@ -60,7 +60,7 @@ namespace RedditSharp
         [JsonProperty("link_title")]
         public string LinkTitle { get; set; }
         [JsonProperty("num_reports")]
-        public int NumReports { get; set; }
+        public int? NumReports { get; set; }
         [JsonProperty("distinguished")]
         [JsonConverter(typeof(DistinguishConverter))]
         public DistinguishType Distinguished { get; set; }

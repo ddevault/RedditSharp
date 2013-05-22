@@ -72,7 +72,7 @@ namespace RedditSharp
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("num_reports")]
-        public int Reports { get; set; }
+        public int? Reports { get; set; }
 
         public Comment Comment(string message)
         {
