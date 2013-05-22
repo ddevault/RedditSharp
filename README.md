@@ -33,6 +33,7 @@ foreach (var post in all)
 
 This will cause you to page through everything that has ever been posted on Reddit. Better:
 
+```csharp
 var all = reddit.GetRSlashAll();
 foreach (var post in all.Take(25))
 {
