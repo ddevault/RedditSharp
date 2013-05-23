@@ -25,6 +25,7 @@ namespace RedditSharp
         private const string FlairSelectorUrl = "/api/flairselector";
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
+        private const string FrontPageUrl = "/.json";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -90,13 +91,30 @@ namespace RedditSharp
             return rSlashAll;
         }
 
+        public static Subreddit GetFrontPage(Reddit reddit)
+        {
+            var frontPage = new Subreddit
+            {
+                DisplayName = "Front Page",
+                Title = "reddit: the front page of the internet",
+                Url = "/",
+                Name = "/",
+                Reddit = reddit
+            };
+            return frontPage;
+        }
+
         public Listing<Post> GetPosts()
         {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/.json");
             return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name));
         }
 
         public Listing<Post> GetNew()
         {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/new.json");
             return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name));
         }
 
