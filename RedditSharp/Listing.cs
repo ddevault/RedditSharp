@@ -46,12 +46,7 @@ namespace RedditSharp
             {
                 get 
                 {
-                    if (CurrentPage == null || CurrentPageIndex >= CurrentPage.Length)
-                    {
-                        FetchNextPage();
-                        CurrentPageIndex = 0;
-                    }
-                    return (T)CurrentPage[CurrentPageIndex];
+                    return (T)CurrentPage[CurrentPageIndex - 1];
                 }
             }
 
@@ -97,19 +92,21 @@ namespace RedditSharp
             public bool MoveNext()
             {
                 if (CurrentPage == null)
-                {
                     FetchNextPage();
-                    return true;
-                }
                 if (CurrentPageIndex >= CurrentPage.Length)
                 {
                     if (After == null)
                         return false;
                     FetchNextPage();
+                    ResetCurrentPageIndex();
                 }
-                else
-                    CurrentPageIndex++;
+                CurrentPageIndex++;
                 return true;
+            }
+
+            private void ResetCurrentPageIndex()
+            {
+                CurrentPageIndex = 0;
             }
 
             public void Reset()
