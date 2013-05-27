@@ -12,6 +12,7 @@ namespace RedditSharp
         private const string OverviewUrl = "/user/{0}.json";
         private const string CommentsUrl = "/user/{0}/comments.json";
         private const string LinksUrl = "/user/{0}/submitted.json";
+        private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
 
         public RedditUser(Reddit reddit, JToken json) : base(json)
         {
@@ -49,6 +50,11 @@ namespace RedditSharp
         public Listing<Post> GetPosts()
         {
             return new Listing<Post>(Reddit, string.Format(LinksUrl, Name));
+        }
+
+        public Listing<Subreddit> GetSubscribedSubreddits()
+        {
+            return new Listing<Subreddit>(Reddit, SubscribedSubredditsUrl);
         }
 
         public override string ToString()
