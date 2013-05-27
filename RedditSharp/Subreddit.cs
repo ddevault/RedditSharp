@@ -121,15 +121,11 @@ namespace RedditSharp
 
         public Listing<VotableThing> GetModQueue()
         {
-            if (Name == "/")
-                return new Listing<VotableThing>(Reddit, "/r/mod/about/modqueue.json");
             return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name));
         }
 
         public Listing<Post> GetUnmoderatedLinks()
         {
-            if (Name == "/")
-                return new Listing<Post>(Reddit, "/r/mod/about/unmoderated.json");
 			return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name));
         }
 

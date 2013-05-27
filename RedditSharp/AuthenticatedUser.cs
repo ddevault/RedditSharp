@@ -35,6 +35,11 @@ namespace RedditSharp
             return new Listing<VotableThing>(Reddit, ModQueueUrl);
         }
 
+        public Listing<Post> GetUnmoderatedLinks ()
+        {
+            return new Listing<Post>(Reddit, "/r/mod/about/unmoderated.json");
+        }
+
         public Listing<PrivateMessage> GetModMail()
         {
             return new Listing<PrivateMessage>(Reddit, ModMailUrl);
