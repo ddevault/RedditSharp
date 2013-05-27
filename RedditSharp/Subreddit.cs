@@ -17,6 +17,7 @@ namespace RedditSharp
         private const string GetSettingsUrl = "/r/{0}/about/edit.json";
         private const string GetReducedSettingsUrl = "/r/{0}/about.json";
         private const string ModqueueUrl = "/r/{0}/about/modqueue.json";
+		private const string UnmoderatedUrl = "/r/{0}/about/unmoderated.json";
         private const string FlairTemplateUrl = "/api/flairtemplate";
         private const string ClearFlairTemplatesUrl = "/api/clearflairtemplates";
         private const string SetUserFlairUrl = "/api/flair";
@@ -116,6 +117,20 @@ namespace RedditSharp
             if (Name == "/")
                 return new Listing<Post>(Reddit, "/new.json");
             return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name));
+        }
+
+		public Listing<VotableThing> GetModQueue()
+        {
+            if (Name == "/")
+                return new Listing<VotableThing>(Reddit, "/r/mod/about/modqueue.json");
+            return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name));
+        }
+
+		public Listing<Post> GetUnmoderatedLinks()
+        {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/r/mod/about/unmoderated.json");
+			return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name));
         }
 
         public void Subscribe()

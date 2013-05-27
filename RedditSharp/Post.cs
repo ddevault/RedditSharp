@@ -35,6 +35,8 @@ namespace RedditSharp
                 return Reddit.GetUser(AuthorName);
             }
         }
+        [JsonProperty("approved_by")]
+        public string ApprovedBy { get; set; }
         [JsonProperty("author_flair_css_class")]
         public string AuthorFlairCssClass { get; set; }
         [JsonProperty("author_flair_text")]
