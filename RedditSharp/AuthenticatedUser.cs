@@ -13,6 +13,7 @@ namespace RedditSharp
         private const string ModeratorUrl = "/reddits/mine/moderator.json";
         private const string UnreadMessagesUrl = "/message/unread.json?mark=true&limit=25";
         private const string ModQueueUrl = "/r/mod/about/modqueue.json";
+        private const string UnmoderatedUrl = "/r/mod/about/unmoderated.json";
         private const string ModMailUrl = "/message/moderator.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
@@ -33,6 +34,11 @@ namespace RedditSharp
         public Listing<VotableThing> GetModerationQueue()
         {
             return new Listing<VotableThing>(Reddit, ModQueueUrl);
+        }
+
+        public Listing<Post> GetUnmoderatedLinks ()
+        {
+            return new Listing<Post>(Reddit, UnmoderatedUrl);
         }
 
         public Listing<PrivateMessage> GetModMail()
