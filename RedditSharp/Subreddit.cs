@@ -17,7 +17,7 @@ namespace RedditSharp
         private const string GetSettingsUrl = "/r/{0}/about/edit.json";
         private const string GetReducedSettingsUrl = "/r/{0}/about.json";
         private const string ModqueueUrl = "/r/{0}/about/modqueue.json";
-		private const string UnmoderatedUrl = "/r/{0}/about/unmoderated.json";
+        private const string UnmoderatedUrl = "/r/{0}/about/unmoderated.json";
         private const string FlairTemplateUrl = "/api/flairtemplate";
         private const string ClearFlairTemplatesUrl = "/api/clearflairtemplates";
         private const string SetUserFlairUrl = "/api/flair";
