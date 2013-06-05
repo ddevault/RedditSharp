@@ -339,7 +339,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="title">The title of the submission</param>
         /// <param name="text">The raw markdown text of the submission</param>
-        public void SubmitTextPost(string title, string text)
+        public Post SubmitTextPost(string title, string text)
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
@@ -356,6 +356,9 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            Post returnpost = new Post(Reddit, json["json"]);
+            return returnpost;
             // TODO: Error
         }
 
@@ -364,7 +367,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="title">The title of the submission</param>
         /// <param name="url">The url of the submission link</param>
-        public void SubmitPost(string title, string url)
+        public Post SubmitPost(string title, string url)
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
@@ -382,6 +385,9 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            Post returnpost = new Post(Reddit, json["json"]);
+            return returnpost;
             // TODO: Error
         }
     }
