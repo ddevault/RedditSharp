@@ -150,6 +150,26 @@ namespace RedditSharp
             var result = GetResponseString(response.GetResponseStream());
             // TODO: Error
         }
+        
+        public void SubmitTextPost(string title, string text, Subreddit sub)
+        {
+            if (User == null)
+                throw new Exception("A valid AuthenticatedUser must be logged in to create a post.");
+            var request = CreatePost(SubmitLinkUrl);
+
+            WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                kind = "self",
+                sr = sub.Title,
+                text = text,
+                title = title,
+                uh = User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = GetResponseString(response.GetResponseStream());
+            // TODO: Error
+        }
 
         #region Helpers
 
