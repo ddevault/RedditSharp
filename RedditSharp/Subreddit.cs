@@ -357,8 +357,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
-            Post returnpost = new Post(Reddit, json["json"]);
-            return returnpost;
+            return new Post(Reddit, json["json"]);
             // TODO: Error
         }
 
@@ -386,8 +385,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
-            Post returnpost = new Post(Reddit, json["json"]);
-            return returnpost;
+            return new Post(Reddit, json["json"]);
             // TODO: Error
         }
     }
