@@ -27,6 +27,7 @@ namespace RedditSharp
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
         private const string FrontPageUrl = "/.json";
+        private const string SubmitLinkUrl = "/api/submit";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -331,6 +332,61 @@ namespace RedditSharp
         public override string ToString()
         {
             return "/r/" + DisplayName;
+        }
+        
+        /// <summary>
+        /// Submits a text post in the current subreddit using the logged-in user
+        /// </summary>
+        /// <param name="title">The title of the submission</param>
+        /// <param name="text">The raw markdown text of the submission</param>
+        public Post SubmitTextPost(string title, string text)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+            var request = Reddit.CreatePost(SubmitLinkUrl);
+
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                kind = "self",
+                sr = Title,
+                text = text,
+                title = title,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            return new Post(Reddit, json["json"]);
+            // TODO: Error
+        }
+
+        /// <summary>
+        /// Submits a link post in the current subreddit using the logged-in user
+        /// </summary>
+        /// <param name="title">The title of the submission</param>
+        /// <param name="url">The url of the submission link</param>
+        public Post SubmitPost(string title, string url)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+            var request = Reddit.CreatePost(SubmitLinkUrl);
+
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                extension = "json",
+                kind = "link",
+                sr = Title,
+                title = title,
+                uh = Reddit.User.Modhash,
+                url = url
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            return new Post(Reddit, json["json"]);
+            // TODO: Error
         }
     }
 }
