@@ -27,6 +27,7 @@ namespace RedditSharp
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
         private const string FrontPageUrl = "/.json";
+        private const string SubmitLinkUrl = "/api/submit";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -145,6 +146,26 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             // Discard results
+        }        
+          
+        public void SubmitTextPost(string title, string text)
+        {
+            if (Reddit.User == null)
+                throw new Exception("A valid AuthenticatedUser must be logged in to create a post.");
+            var request =Reddit.CreatePost(SubmitLinkUrl);
+
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                kind = "self",
+                sr = Title,
+                text = text,
+                title = title,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            // TODO: Error
         }
 
         public void Unsubscribe()
