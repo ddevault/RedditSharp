@@ -173,8 +173,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            AuthenticatedUser newUser = new AuthenticatedUser(this, json);
-            return newUser;
+            return new AuthenticatedUser(this, json);
             // TODO: Error
         }
 
