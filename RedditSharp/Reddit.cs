@@ -21,6 +21,7 @@ namespace RedditSharp
         private const string MeUrl = "/api/me.json";
         private const string SubredditAboutUrl = "/r/{0}/about.json";
         private const string ComposeMessageUrl = "/api/compose";
+        private const string RegisterAccountUrl = "/api/register";
 
         #endregion
 
@@ -148,6 +149,32 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = GetResponseString(response.GetResponseStream());
+            // TODO: Error
+        }
+        
+        /// <summary>
+        /// Registers a new Reddit user
+        /// </summary>
+        /// <param name="userName">The username for the new account.</param>
+        /// <param name="passwd">The password for the new account.</param>
+        /// <param name="email">The optional recovery email for the new account.</param>
+        /// <returns>The newly created user account</returns>
+        public AuthenticatedUser RegisterAccount(string userName, string passwd, string email = "")
+        {            
+            var request = CreatePost(RegisterAccountUrl);
+            WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                email = email,
+                passwd = passwd,
+                passwd2 = passwd,
+                user = userName
+            });
+            var response = request.GetResponse();
+            var result = GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(result);
+            AuthenticatedUser newUser = new AuthenticatedUser(this, json);
+            return newUser;
             // TODO: Error
         }
 
