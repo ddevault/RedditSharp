@@ -174,7 +174,7 @@ namespace RedditSharp
             {
                 api_type = "json",
                 text = newText,
-                thing_id = "t3_" + this.Id,
+                thing_id = this.FullName,
                 uh = Reddit.User.Modhash
             });
             var response = request.GetResponse();
