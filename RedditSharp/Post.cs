@@ -162,7 +162,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="newText">The text to replace the post's contents</param>
         /// <returns>The edited post</returns>
-        public Post EditText(string newText)
+        public void EditText(string newText)
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
@@ -179,8 +179,11 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            return new Post(Reddit, json["json"]);
+            JToken json = JToken.Parse(result);
+            if (json["json"].ToString().Contains("\"errors\": []"))
+                this.SelfText = newText;
+            else
+                throw new Exception("Error editing text.");
         }
     }
 }
