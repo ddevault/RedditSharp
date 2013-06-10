@@ -132,6 +132,32 @@ namespace RedditSharp
             if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
                 throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
+        
+        /// <summary>
+        /// Replaces the text in this comment with the input text.
+        /// </summary>
+        /// <param name="newText">The text to replace the comment's contents</param>        
+        public void EditText(string newText)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+
+            var request = Reddit.CreatePost(EditUserTextUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                text = newText,
+                thing_id = this.FullName,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            JToken json = JToken.Parse(result);
+            if (json["json"].ToString().Contains("\"errors\": []"))
+                this.Body = newText;
+            else
+                throw new Exception("Error editing text.");
+        }
     }
 
     public enum DistinguishType

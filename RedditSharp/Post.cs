@@ -15,6 +15,7 @@ namespace RedditSharp
         private const string RemoveUrl = "/api/remove";
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
+        private const string EditUserTextUrl = "/api/editusertext";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -156,5 +157,32 @@ namespace RedditSharp
             return comments.ToArray();
         }
 
+        /// <summary>
+        /// Replaces the text in this post with the input text.
+        /// </summary>
+        /// <param name="newText">The text to replace the post's contents</param>
+        public void EditText(string newText)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+            if (!this.IsSelfPost)
+                throw new Exception("Submission to edit is not a self-post.");
+
+            var request = Reddit.CreatePost(EditUserTextUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                text = newText,
+                thing_id = this.FullName,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            JToken json = JToken.Parse(result);
+            if (json["json"].ToString().Contains("\"errors\": []"))
+                this.SelfText = newText;
+            else
+                throw new Exception("Error editing text.");
+        }
     }
 }
