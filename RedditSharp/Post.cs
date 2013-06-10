@@ -161,7 +161,6 @@ namespace RedditSharp
         /// Replaces the text in this post with the input text.
         /// </summary>
         /// <param name="newText">The text to replace the post's contents</param>
-        /// <returns>The edited post</returns>
         public void EditText(string newText)
         {
             if (Reddit.User == null)
