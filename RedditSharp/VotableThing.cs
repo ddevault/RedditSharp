@@ -27,9 +27,9 @@ namespace RedditSharp
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
-        [JsonProperty("ups")]
-        public int Downvotes { get; set; }
         [JsonProperty("downs")]
+        public int Downvotes { get; set; }
+        [JsonProperty("ups")]
         public int Upvotes { get; set; }
         /// <summary>
         /// True if the logged in user has upvoted this.
