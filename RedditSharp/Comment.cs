@@ -14,6 +14,8 @@ namespace RedditSharp
     {
         private const string CommentUrl = "/api/comment";
         private const string DistinguishUrl = "/api/distinguish";
+        private const string EditUserTextUrl = "/api/editusertext";
+
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
