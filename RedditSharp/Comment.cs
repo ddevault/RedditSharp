@@ -15,6 +15,7 @@ namespace RedditSharp
         private const string CommentUrl = "/api/comment";
         private const string DistinguishUrl = "/api/distinguish";
         private const string EditUserTextUrl = "/api/editusertext";
+		private const string RemoveUrl = "/api/remove";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -39,6 +40,8 @@ namespace RedditSharp
 
         [JsonProperty("author")]
         public string Author { get; set; }
+		[JsonProperty("banned_by")]
+		public string BannedBy { get; set; }
         [JsonProperty("body")]
         public string Body { get; set; }
         [JsonProperty("body_html")]
@@ -53,8 +56,6 @@ namespace RedditSharp
         public string AuthorFlairCssClass { get; set; }
         [JsonProperty("author_flair_text")]
         public string AuthorFlairText { get; set; }
-        [JsonProperty("banned_by")]
-        public string RemovedBy { get; set; }
         [JsonProperty("gilded")]
         public int Gilded { get; set; }
         [JsonProperty("link_id")]
@@ -159,6 +160,36 @@ namespace RedditSharp
                 this.Body = newText;
             else
                 throw new Exception("Error editing text.");
+        }
+
+		public void Remove()
+        {
+            var request = Reddit.CreatePost(RemoveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                spam = false,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void RemoveSpam()
+        {
+            var request = Reddit.CreatePost(RemoveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                spam = true,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
     }
 
