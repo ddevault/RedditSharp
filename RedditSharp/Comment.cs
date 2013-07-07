@@ -15,7 +15,7 @@ namespace RedditSharp
         private const string CommentUrl = "/api/comment";
         private const string DistinguishUrl = "/api/distinguish";
         private const string EditUserTextUrl = "/api/editusertext";
-		private const string RemoveUrl = "/api/remove";
+        private const string RemoveUrl = "/api/remove";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -40,8 +40,8 @@ namespace RedditSharp
 
         [JsonProperty("author")]
         public string Author { get; set; }
-		[JsonProperty("banned_by")]
-		public string BannedBy { get; set; }
+        [JsonProperty("banned_by")]
+        public string BannedBy { get; set; }
         [JsonProperty("body")]
         public string Body { get; set; }
         [JsonProperty("body_html")]
@@ -162,7 +162,7 @@ namespace RedditSharp
                 throw new Exception("Error editing text.");
         }
 
-		public void Remove()
+        public void Remove()
         {
             var request = Reddit.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();

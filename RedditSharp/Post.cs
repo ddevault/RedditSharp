@@ -42,8 +42,8 @@ namespace RedditSharp
         public string AuthorFlairCssClass { get; set; }
         [JsonProperty("author_flair_text")]
         public string AuthorFlairText { get; set; }
-		[JsonProperty("banned_by")]
-		public string BannedBy { get; set; }
+        [JsonProperty("banned_by")]
+        public string BannedBy { get; set; }
         [JsonProperty("domain")]
         public string Domain { get; set; }
         [JsonProperty("edited")]
