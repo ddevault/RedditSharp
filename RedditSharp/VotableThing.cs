@@ -17,6 +17,8 @@ namespace RedditSharp
         }
 
         private const string VoteUrl = "/api/vote";
+        private const string SaveUrl = "/api/save";
+        private const string UnsaveUrl = "/api/unsave";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -31,6 +33,9 @@ namespace RedditSharp
         public int Downvotes { get; set; }
         [JsonProperty("ups")]
         public int Upvotes { get; set; }
+        [JsonProperty("saved")]
+        public bool Saved { get; set; }
+
         /// <summary>
         /// True if the logged in user has upvoted this.
         /// False if they have not.
@@ -69,6 +74,36 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
             Liked = false;
+        }
+
+        public void Save()
+        {
+            var request = Reddit.CreatePost(SaveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            Saved = true;
+        }
+
+        public void Unsave()
+        {
+            var request = Reddit.CreatePost(UnsaveUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+            Saved = false;
         }
 
         public void ClearVote()
