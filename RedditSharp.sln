@@ -1,9 +1,12 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditSharp", "RedditSharp\RedditSharp.csproj", "{A368CB75-75F0-4489-904D-B5CEBB0FE624}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRedditSharp", "TestRedditSharp\TestRedditSharp.csproj", "{0101B252-0CCE-4572-8882-D5851FE41E4F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditNotifier", "RedditNotifier\RedditNotifier.csproj", "{0101B252-0CCE-4572-8882-D5851FE41E4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A368CB75-75F0-4489-904D-B5CEBB0FE624} = {A368CB75-75F0-4489-904D-B5CEBB0FE624}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,17 +18,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Any CPU.Build.0 = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|x86.ActiveCfg = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|x86.Build.0 = Debug|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Any CPU.ActiveCfg = Release|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Mixed Platforms.Build.0 = Release|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|x86.ActiveCfg = Release|x86
-		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|x86.Build.0 = Release|x86
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -36,11 +28,21 @@ Global
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A368CB75-75F0-4489-904D-B5CEBB0FE624}.Release|x86.ActiveCfg = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = RedditSharp\RedditSharp.csproj
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|x86.ActiveCfg = Debug|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Debug|x86.Build.0 = Debug|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Any CPU.ActiveCfg = Release|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|Mixed Platforms.Build.0 = Release|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|x86.ActiveCfg = Release|x86
+		{0101B252-0CCE-4572-8882-D5851FE41E4F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = RedditSharp\RedditSharp.csproj
 	EndGlobalSection
 EndGlobal
