@@ -60,8 +60,6 @@ namespace RedditSharp
         public bool NSFW { get; set; }
         [JsonProperty("permalink")]
         public string Permalink { get; set; }
-        [JsonProperty("saved")]
-        public bool Saved { get; set; }
         [JsonProperty("score")]
         public int Score { get; set; }
         [JsonProperty("selftext")]
