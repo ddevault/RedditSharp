@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+        <id>RedditSharp</id>
+        <version>1.0.0</version>
+        <authors>SirCmpwn</authors>
+        <owners>SirCmpwn</owners>
+        <licenseUrl>https://github.com/SirCmpwn/RedditSharp/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/SirCmpwn/RedditSharp</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>C# Implementation of the Reddit API.</description>
+        <tags>Reddit API</tags>
+        <iconUrl>http://i.imgur.com/8ONCXMl.png</iconUrl>
+        <releaseNotes>
+            Initial NuGet release
+        </releaseNotes>
+        <summary>
+            RedditSharp is a .NET library for working with the Reddit API. It is incomplete. If you want
+            more features out of it, you are expected to add them youself and submit a pull request on
+            GitHub. More details are available in the README.
+        </summary>
+        <language>en-US</language>
+    </metadata>
+    <files>
+        <file src="\RedditSharp\bin\Release\RedditSharp.dll" target="lib" />
+    </files>
+</package>
