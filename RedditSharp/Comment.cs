@@ -16,6 +16,7 @@ namespace RedditSharp
         private const string DistinguishUrl = "/api/distinguish";
         private const string EditUserTextUrl = "/api/editusertext";
         private const string RemoveUrl = "/api/remove";
+        private const string SetAsReadUrl = "/api/read_message";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -91,6 +92,8 @@ namespace RedditSharp
                 var response = request.GetResponse();
                 var data = Reddit.GetResponseString(response.GetResponseStream());
                 var json = JObject.Parse(data);
+                if (json["json"]["ratelimit"] != null)
+                    throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
                 return new Comment(Reddit, json["json"]["data"]["things"][0]);
             }
             catch (WebException ex)
@@ -188,6 +191,19 @@ namespace RedditSharp
                 uh = Reddit.User.Modhash
             });
             stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void SetAsRead()
+        {
+            var request = Reddit.CreatePost(SetAsReadUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+                                 {
+                id = this.FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+            });
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
         }

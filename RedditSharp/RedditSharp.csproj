@@ -67,6 +67,7 @@
     <Compile Include="Thing.cs" />
     <Compile Include="UnixTimestampConverter.cs" />
     <Compile Include="VotableThing.cs" />
+    <Compile Include="RateLimitException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
