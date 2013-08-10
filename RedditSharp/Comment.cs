@@ -37,6 +37,13 @@ namespace RedditSharp
                     subComments.Add(new Comment(reddit, comment));
             }
             Comments = subComments.ToArray();
+
+            // Handle Reddit's API being horrible
+            if (data["context"] != null)
+            {
+                var context = data["context"].Value<string>();
+                LinkId = context.Split('/')[4];
+            }
         }
 
         [JsonProperty("author")]
