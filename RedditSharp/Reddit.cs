@@ -138,6 +138,8 @@ namespace RedditSharp
 
         public void ComposePrivateMessage(string subject, string body, string to)
         {
+            if (User == null)
+                throw new Exception("User can not be null.");
             var request = CreatePost(ComposeMessageUrl);
             WritePostBody(request.GetRequestStream(), new
             {
