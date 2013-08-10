@@ -26,9 +26,9 @@ namespace RedditSharp
             return new Listing<Subreddit>(Reddit, ModeratorUrl);
         }
 
-        public Listing<PrivateMessage> GetUnreadMessages()
+        public Listing<Thing> GetUnreadMessages()
         {
-            return new Listing<PrivateMessage>(Reddit, UnreadMessagesUrl);
+            return new Listing<Thing>(Reddit, UnreadMessagesUrl);
         }
 
         public Listing<VotableThing> GetModerationQueue()
