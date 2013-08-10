@@ -22,6 +22,7 @@ namespace RedditSharp
         private const string SubredditAboutUrl = "/r/{0}/about.json";
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
+        private const string GetThingUrl = "/by_id/{0}.json";
 
         #endregion
 
@@ -177,6 +178,15 @@ namespace RedditSharp
             var json = JObject.Parse(result);
             return new AuthenticatedUser(this, json);
             // TODO: Error
+        }
+
+        public Thing GetThingByFullname(string fullname)
+        {
+            var request = CreateGet(string.Format(GetThingUrl, fullname), true);
+            var response = request.GetResponse();
+            var data = GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return Thing.Parse(this, json["data"]["children"][0]);
         }
 
         #region Helpers

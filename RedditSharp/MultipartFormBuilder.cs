@@ -74,9 +74,6 @@ namespace RedditSharp
             Buffer.Seek(0, SeekOrigin.Begin);
             Buffer.WriteTo(stream);
             stream.Close();
-            Buffer.Seek(0, SeekOrigin.Begin);
-            var reader = new StreamReader(Buffer);
-            var data = reader.ReadToEnd();
         }
     }
 }
