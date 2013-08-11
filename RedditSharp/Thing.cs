@@ -17,7 +17,7 @@ namespace RedditSharp
                 case "t1":
                     return new Comment(reddit, json);
                 case "t2":
-                    return new RedditUser(reddit, json);
+                    return new RedditUser(reddit, json); 
                 case "t3":
                     return new Post(reddit, json);
                 case "t4":

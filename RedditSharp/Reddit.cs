@@ -23,6 +23,7 @@ namespace RedditSharp
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
         private const string GetThingUrl = "/by_id/{0}.json";
+        private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}.json";
 
         #endregion
 
@@ -187,6 +188,15 @@ namespace RedditSharp
             var data = GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
             return Thing.Parse(this, json["data"]["children"][0]);
+        }
+
+        public Comment GetComment(string subreddit, string name, string linkName)
+        {
+            var request = CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name), true);
+            var response = request.GetResponse();
+            var data = GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return Thing.Parse(this, json[1]["data"]["children"][0]) as Comment;
         }
 
         #region Helpers
