@@ -192,6 +192,10 @@ namespace RedditSharp
 
         public Comment GetComment(string subreddit, string name, string linkName)
         {
+            if (linkName.StartsWith("t3_"))
+                linkName = linkName.Substring(3);
+            if (name.StartsWith("t1_"))
+                name = name.Substring(3);
             var request = CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name), true);
             var response = request.GetResponse();
             var data = GetResponseString(response.GetResponseStream());
