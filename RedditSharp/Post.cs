@@ -16,6 +16,8 @@ namespace RedditSharp
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
         private const string EditUserTextUrl = "/api/editusertext";
+        private const string HideUrl = "/api/hide";
+        private const string UnhideUrl = "/api/unhide";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -134,6 +136,38 @@ namespace RedditSharp
             {
                 id = FullName,
                 spam = true,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void Hide()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(HideUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void Unhide()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = Reddit.CreatePost(UnhideUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
