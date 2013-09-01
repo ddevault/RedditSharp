@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
@@ -26,6 +27,7 @@ namespace RedditSharp
         private const string FlairSelectorUrl = "/api/flairselector";
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
+        private const string ModeratorsUrl = "/r/{0}/about/moderators.json";
         private const string FrontPageUrl = "/.json";
         private const string SubmitLinkUrl = "/api/submit";
 
@@ -327,6 +329,26 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public IEnumerable<ModeratorUser> GetModerators()
+        {
+            var request = Reddit.CreateGet(string.Format(ModeratorsUrl, Name));
+            var response = request.GetResponse();
+            var responseString = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(responseString);
+            var type = json["kind"].ToString();
+            if (type != "UserList")
+                throw new FormatException("Reddit responded with an object that is not a user listing.");
+            var data = json["data"];
+            var mods = data["children"].ToArray();
+            var result = new ModeratorUser[mods.Length];
+            for (var i = 0; i < mods.Length; i++)
+            {
+                var mod = new ModeratorUser(Reddit, mods[i]);
+                result[i] = mod;
+            }
+            return result;
         }
 
         public override string ToString()
