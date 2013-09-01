@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json.Linq;
 using RedditSharp;
 using System.Security.Authentication;
-using System.Threading;
-using System.IO;
 
 namespace TestRedditSharp
 {
@@ -32,10 +27,13 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("pokemon");
+            var subreddit = reddit.GetSubreddit("PaydayTheHeistOnline");
             var posts = subreddit.GetNew();
             foreach (var post in posts.Take(25))
                 Console.WriteLine("/u/{0}: (+{1}-{2}:{3}) {4}", post.AuthorName, post.Upvotes, post.Downvotes, post.Score, post.Title);
+            var moderators = subreddit.GetModerators();
+            foreach (var mod in moderators)
+                Console.WriteLine("/u/{0} is a moderator of {1}", mod.Name, subreddit);
             Console.ReadKey(true);
         }
 
