@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
@@ -13,8 +14,12 @@ namespace RedditSharp
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
         [JsonProperty("mod_permissions")]
-        public string[] Permissions { get; set; }
+        [JsonConverter(typeof (ModeratorPermissionConverter))]
+        public ModeratorPermission Permissions { get; set; }
 
         public override string ToString()
         {

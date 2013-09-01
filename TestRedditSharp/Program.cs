@@ -33,7 +33,7 @@ namespace TestRedditSharp
                 Console.WriteLine("/u/{0}: (+{1}-{2}:{3}) {4}", post.AuthorName, post.Upvotes, post.Downvotes, post.Score, post.Title);
             var moderators = subreddit.GetModerators();
             foreach (var mod in moderators)
-                Console.WriteLine("/u/{0} is a moderator of {1}", mod.Name, subreddit);
+                Console.WriteLine("/u/{0} is a moderator of {1} with perms: {2}", mod.Name, subreddit, mod.Permissions);
             Console.ReadKey(true);
         }
 
