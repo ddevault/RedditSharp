@@ -184,5 +184,30 @@ namespace RedditSharp
             else
                 throw new Exception("Error editing text.");
         }
+        
+         public void SetFlair(string flairText, string flairClass)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+
+            var request = Reddit.CreatePost(SetFlairUrl);
+            Reddit.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                r = Subreddit,
+                css_class = flairClass,
+                link = FullName,
+                //name = Name,
+                text = flairText,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            //if (json["json"].ToString().Contains("\"errors\": []"))
+            //    this.LinkFlairText = flairText;
+            //else
+            //    throw new Exception("Error editing text.");
+        }
     }
 }
