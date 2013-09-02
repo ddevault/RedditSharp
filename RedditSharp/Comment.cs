@@ -32,7 +32,8 @@ namespace RedditSharp
             var subComments = new List<Comment>();
             if (data["replies"] != null && data["replies"].Any())
             {
-                subComments.AddRange(data["replies"]["data"]["children"].Select(comment => new Comment(reddit, comment)));
+                foreach (var comment in data["replies"]["data"]["children"])
+                    subComments.Add(new Comment(reddit, comment));
             }
             Comments = subComments.ToArray();
 
