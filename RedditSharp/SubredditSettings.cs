@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
+﻿using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -58,7 +54,7 @@ namespace RedditSharp
             PublicDescription = HttpUtility.HtmlDecode(data["public_description"].ValueOrDefault<string>() ?? string.Empty);
             if (data["wikimode"] != null)
             {
-                string wikiMode = data["wikimode"].ValueOrDefault<string>();
+                var wikiMode = data["wikimode"].ValueOrDefault<string>();
                 switch (wikiMode)
                 {
                     case "disabled":
@@ -74,7 +70,7 @@ namespace RedditSharp
             }
             if (data["subreddit_type"] != null)
             {
-                string type = data["subreddit_type"].ValueOrDefault<string>();
+                var type = data["subreddit_type"].ValueOrDefault<string>();
                 switch (type)
                 {
                     case "public":
@@ -92,7 +88,7 @@ namespace RedditSharp
             WikiEditAge = data["wiki_edit_age"].ValueOrDefault<int>();
             if (data["content_options"] != null)
             {
-                string contentOptions = data["content_options"].ValueOrDefault<string>();
+                var contentOptions = data["content_options"].ValueOrDefault<string>();
                 switch (contentOptions)
                 {
                     case "any":
@@ -134,10 +130,10 @@ namespace RedditSharp
             string wikimode;
             switch (ContentOptions)
             {
-                case RedditSharp.ContentOptions.All:
+                case ContentOptions.All:
                     link_type = "any";
                     break;
-                case RedditSharp.ContentOptions.LinkOnly:
+                case ContentOptions.LinkOnly:
                     link_type = "link";
                     break;
                 default:
