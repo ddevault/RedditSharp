@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace RedditSharp
 {
@@ -25,7 +22,7 @@ namespace RedditSharp
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         private class ListingEnumerator<T> : IEnumerator<T> where T : Thing
@@ -86,7 +83,7 @@ namespace RedditSharp
 
             object System.Collections.IEnumerator.Current
             {
-                get { return this.Current; }
+                get { return Current; }
             }
 
             public bool MoveNext()

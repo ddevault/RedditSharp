@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Security.Authentication;
-using System.Net;
 using Newtonsoft.Json;
 
 namespace RedditSharp
@@ -63,7 +61,7 @@ namespace RedditSharp
             var request = Reddit.CreatePost(SetAsReadUrl);
             Reddit.WritePostBody(request.GetRequestStream(), new
             {
-                id = this.FullName,
+                id = FullName,
                 uh = Reddit.User.Modhash,
                 api_type = "json"
             });

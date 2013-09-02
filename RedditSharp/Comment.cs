@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.IO;
@@ -160,14 +159,14 @@ namespace RedditSharp
             {
                 api_type = "json",
                 text = newText,
-                thing_id = this.FullName,
+                thing_id = FullName,
                 uh = Reddit.User.Modhash
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             JToken json = JToken.Parse(result);
             if (json["json"].ToString().Contains("\"errors\": []"))
-                this.Body = newText;
+                Body = newText;
             else
                 throw new Exception("Error editing text.");
         }
@@ -207,7 +206,7 @@ namespace RedditSharp
             var request = Reddit.CreatePost(SetAsReadUrl);
             Reddit.WritePostBody(request.GetRequestStream(), new
                                  {
-                id = this.FullName,
+                id = FullName,
                 uh = Reddit.User.Modhash,
                 api_type = "json"
             });
