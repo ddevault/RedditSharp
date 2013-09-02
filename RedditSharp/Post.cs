@@ -16,6 +16,7 @@ namespace RedditSharp
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
         private const string EditUserTextUrl = "/api/editusertext";
+        private const string SetFlairUrl = "/api/flair";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -197,17 +198,17 @@ namespace RedditSharp
                 r = Subreddit,
                 css_class = flairClass,
                 link = FullName,
-                //name = Name,
                 text = flairText,
                 uh = Reddit.User.Modhash
             });
             var response = request.GetResponse();
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
-            //if (json["json"].ToString().Contains("\"errors\": []"))
-            //    this.LinkFlairText = flairText;
-            //else
-            //    throw new Exception("Error editing text.");
+            
+            if (json["json"].ToString().Contains("\"errors\": []"))
+                LinkFlairText = flairText;
+            else
+                throw new Exception("Error editing text.");
         }
     }
 }
