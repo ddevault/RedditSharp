@@ -141,9 +141,7 @@ namespace RedditSharp
         public Post GetPost(string url, bool prependDomain)
         {
             if (url.EndsWith("/"))
-            {
                 url = url.Remove(url.Length - 1);
-            }
 
             var request = CreateGet(string.Format(GetPostUrl, url), prependDomain);
             var response = request.GetResponse();
