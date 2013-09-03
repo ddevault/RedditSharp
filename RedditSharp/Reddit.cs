@@ -23,6 +23,8 @@ namespace RedditSharp
         private const string RegisterAccountUrl = "/api/register";
         private const string GetThingUrl = "/by_id/{0}.json";
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}.json";
+        private const string GetPostUrl = "{0}.json";
+        private const string DomainUrl = "www.reddit.com";
 
         #endregion
 
@@ -135,6 +137,21 @@ namespace RedditSharp
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
             return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
+        }
+
+        public Post GetPost(string url)
+        {
+            if (url.EndsWith("/"))
+                url = url.Remove(url.Length - 1);
+
+            var prependDomain = !url.Contains(DomainUrl);
+
+            var request = CreateGet(string.Format(GetPostUrl, url), prependDomain);
+            var response = request.GetResponse();
+            var data = GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+
+            return new Post(this, json[0]["data"]["children"].First);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to)
