@@ -16,6 +16,7 @@ namespace RedditSharp
         private const string EditUserTextUrl = "/api/editusertext";
         private const string RemoveUrl = "/api/remove";
         private const string SetAsReadUrl = "/api/read_message";
+        private const string DeleteUrl = "/api/del";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -200,6 +201,20 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = Reddit.GetResponseString(response.GetResponseStream());
         }
+        
+        public void Delete()
+		{
+			var request = Reddit.CreatePost(DeleteUrl);
+			var stream = request.GetRequestStream();
+			Reddit.WritePostBody(stream, new
+			                     {
+				id = FullName,
+				uh = Reddit.User.Modhash
+			});
+			stream.Close();
+			var response = request.GetResponse();
+			var data = Reddit.GetResponseString(response.GetResponseStream());
+		}
 
         public void SetAsRead()
         {
