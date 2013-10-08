@@ -216,5 +216,10 @@ namespace RedditSharp
             else
                 throw new Exception("Error editing text.");
         }
+        public void Update()
+        {
+            JToken post = Reddit.GetToken(this.Url);
+            JsonConvert.PopulateObject(post["data"].ToString(), this, Reddit.JsonSerializerSettings);
+        }
     }
 }
