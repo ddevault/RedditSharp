@@ -139,7 +139,7 @@ namespace RedditSharp
             return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
         }
 
-        public Post GetPost(string url)
+        public JToken GetToken(string url)
         {
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
@@ -151,7 +151,11 @@ namespace RedditSharp
             var data = GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
 
-            return new Post(this, json[0]["data"]["children"].First);
+            return json[0]["data"]["children"].First;
+        }
+        public Post GetPost(string url)
+        {
+            return new Post(this, this.GetToken(url));
         }
 
         public void ComposePrivateMessage(string subject, string body, string to)
