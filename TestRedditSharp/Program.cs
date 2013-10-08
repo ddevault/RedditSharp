@@ -27,15 +27,18 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = reddit.GetSubreddit("pokemon");
-            var posts = subreddit.GetNew();
-            foreach (var post in posts.Take(25))
-                Console.WriteLine("/u/{0}: (+{1}-{2}:{3}) {4}", post.AuthorName, post.Upvotes, post.Downvotes, post.Score, post.Title);
-            var moderators = subreddit.GetModerators();
-            foreach (var mod in moderators)
-                Console.WriteLine("/u/{0} is a moderator of {1} with perms: {2}", mod.Name, subreddit, mod.Permissions);
-            Console.ReadKey(true);
+            var subreddit = reddit.GetSubreddit("askreddit");
+            var posts = subreddit.GetPosts();
+            var post = posts.Last();
+            Console.WriteLine("sucess");
+            while (true)
+            {
+                post.Update();
+                System.Threading.Thread.Sleep(5000);
+                Console.WriteLine(post.Upvotes);
+            }
         }
+        
 
         public static string ReadPassword()
         {
