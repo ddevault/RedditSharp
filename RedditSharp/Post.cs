@@ -220,7 +220,7 @@ namespace RedditSharp
         }
         public void Update()
         {
-            JsonConvert.PopulateObject(Address, this, reddit.JsonSerializerSettings);
+            JsonConvert.PopulateObject(Address, this, Reddit.JsonSerializerSettings);
         }
     }
 }
