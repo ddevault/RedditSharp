@@ -19,11 +19,13 @@ namespace RedditSharp
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
+        private String Address { get; set; }
 
         public Post(Reddit reddit, JToken post) : base(reddit, post)
         {
             Reddit = reddit;
-            JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
+            Address = post["data"].ToString();
+            JsonConvert.PopulateObject(Address, this, reddit.JsonSerializerSettings);
         }
 
         [JsonProperty("author")]
@@ -215,6 +217,10 @@ namespace RedditSharp
                 SelfText = newText;
             else
                 throw new Exception("Error editing text.");
+        }
+        public void Update()
+        {
+            JsonConvert.PopulateObject(Address, this, reddit.JsonSerializerSettings);
         }
     }
 }
