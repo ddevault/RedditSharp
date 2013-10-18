@@ -10,14 +10,16 @@ namespace RedditSharp
         private const string DeleteHeaderImageUrl = "/api/delete_sr_header";
 
         private Reddit Reddit { get; set; }
+        private IWebAgent WebAgent { get; set; }
 
         [JsonIgnore]
         public Subreddit Subreddit { get; set; }
 
-        public SubredditSettings(Reddit reddit, Subreddit subreddit)
+        public SubredditSettings(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Subreddit = subreddit;
             Reddit = reddit;
+            WebAgent = webAgent;
             // Default settings, for use when reduced information is given
             AllowAsDefault = true;
             Domain = null;
@@ -37,8 +39,8 @@ namespace RedditSharp
             ContentOptions = ContentOptions.All;
         }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json)
-            : this(reddit, subreddit)
+        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json, IWebAgent webAgent)
+            : this(reddit, subreddit, webAgent)
         {
             var data = json["data"];
             AllowAsDefault = data["default_set"].ValueOrDefault<bool>();
@@ -123,7 +125,7 @@ namespace RedditSharp
 
         public void UpdateSettings()
         {
-            var request = Reddit.CreatePost(SiteAdminUrl);
+            var request = WebAgent.CreatePost(SiteAdminUrl);
             var stream = request.GetRequestStream();
             string link_type;
             string type;
@@ -164,7 +166,7 @@ namespace RedditSharp
                     wikimode = "disabled";
                     break;
             }
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 allow_top = AllowAsDefault,
                 description = Sidebar,
@@ -185,7 +187,7 @@ namespace RedditSharp
             }, "header-title", HeaderHoverText);
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         /// <summary>
@@ -193,16 +195,16 @@ namespace RedditSharp
         /// </summary>
         public void ResetHeaderImage()
         {
-            var request = Reddit.CreatePost(DeleteHeaderImageUrl);
+            var request = WebAgent.CreatePost(DeleteHeaderImageUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 uh = Reddit.User.Modhash,
                 r = Subreddit.Name
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }
 
