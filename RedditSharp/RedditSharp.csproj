@@ -67,6 +67,7 @@
     <Compile Include="SubredditSettings.cs" />
     <Compile Include="SubredditStyle.cs" />
     <Compile Include="Thing.cs" />
+    <Compile Include="UnixTimeStamp.cs" />
     <Compile Include="UnixTimestampConverter.cs" />
     <Compile Include="VotableThing.cs" />
     <Compile Include="RateLimitException.cs" />
