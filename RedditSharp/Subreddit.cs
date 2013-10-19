@@ -377,7 +377,7 @@ namespace RedditSharp
             {
                 api_type = "json",
                 kind = "self",
-                sr = Name,
+                sr = Title,
                 text = text,
                 title = title,
                 uh = Reddit.User.Modhash
@@ -386,7 +386,6 @@ namespace RedditSharp
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
             return new Post(Reddit, json["json"]);
-            // Handle for user needing catchpa
             // TODO: Error
         }
 
@@ -406,7 +405,7 @@ namespace RedditSharp
                 api_type = "json",
                 extension = "json",
                 kind = "link",
-                sr = Name,
+                sr = Title,
                 title = title,
                 uh = Reddit.User.Modhash,
                 url = url
