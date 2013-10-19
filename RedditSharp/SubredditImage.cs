@@ -5,19 +5,21 @@
         private const string DeleteImageUrl = "/api/delete_sr_img";
 
         private Reddit Reddit { get; set; }
+        private IWebAgent WebAgent { get; set; }
 
         public SubredditImage(Reddit reddit, SubredditStyle subredditStyle,
-            string cssLink, string name)
+            string cssLink, string name, IWebAgent webAgent)
         {
             Reddit = reddit;
+            WebAgent = webAgent;
             SubredditStyle = subredditStyle;
             Name = name;
             CssLink = cssLink;
         }
 
         public SubredditImage(Reddit reddit, SubredditStyle subreddit,
-            string cssLink, string name, string url)
-            : this(reddit, subreddit, cssLink, name)
+            string cssLink, string name, string url, IWebAgent webAgent)
+            : this(reddit, subreddit, cssLink, name, webAgent)
         {
             Url = url;
             // Handle legacy image urls
@@ -34,9 +36,9 @@
 
         public void Delete()
         {
-            var request = Reddit.CreatePost(DeleteImageUrl);
+            var request = WebAgent.CreatePost(DeleteImageUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 img_name = Name,
                 uh = Reddit.User.Modhash,
@@ -44,7 +46,7 @@
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             SubredditStyle.Images.Remove(this);
         }
     }

@@ -10,14 +10,16 @@ namespace RedditSharp
         private const string UpdateCssUrl = "/api/subreddit_stylesheet";
 
         private Reddit Reddit { get; set; }
+        private IWebAgent WebAgent { get; set; }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit)
+        public SubredditStyle(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Reddit = reddit;
             Subreddit = subreddit;
+            WebAgent = webAgent;
         }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json) : this(reddit, subreddit)
+        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json, IWebAgent webAgent) : this(reddit, subreddit, webAgent)
         {
             Images = new List<SubredditImage>();
             var data = json["data"];
@@ -26,7 +28,7 @@ namespace RedditSharp
             {
                 Images.Add(new SubredditImage(
                     Reddit, this, image["link"].Value<string>(),
-                    image["name"].Value<string>(), image["url"].Value<string>()));
+                    image["name"].Value<string>(), image["url"].Value<string>(), WebAgent));
             }
         }
 
@@ -36,9 +38,9 @@ namespace RedditSharp
 
         public void UpdateCss()
         {
-            var request = Reddit.CreatePost(UpdateCssUrl);
+            var request = WebAgent.CreatePost(UpdateCssUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 op = "save",
                 stylesheet_contents = CSS,
@@ -48,13 +50,13 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
         }
 
         public void UploadImage(string name, ImageType imageType, byte[] file)
         {
-            var request = Reddit.CreatePost(UploadImageUrl);
+            var request = WebAgent.CreatePost(UploadImageUrl);
             var formData = new MultipartFormBuilder(request);
             formData.AddDynamic(new
                 {
@@ -68,7 +70,7 @@ namespace RedditSharp
             formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
             formData.Finish();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
         }
     }

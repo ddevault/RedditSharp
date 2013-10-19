@@ -33,6 +33,9 @@ namespace RedditSharp
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
+        [JsonIgnore]
+        private IWebAgent WebAgent { get; set; }
+
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime? Created { get; set; }
@@ -69,9 +72,10 @@ namespace RedditSharp
         {
         }
 
-        protected internal Subreddit(Reddit reddit, JToken json) : base(json)
+        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
             Reddit = reddit;
+            WebAgent = webAgent;
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             Name = Url;
             if (Name.StartsWith("/r/"))
@@ -110,15 +114,15 @@ namespace RedditSharp
         public Listing<Post> GetPosts()
         {
             if (Name == "/")
-                return new Listing<Post>(Reddit, "/.json");
-            return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name));
+                return new Listing<Post>(Reddit, "/.json", WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name), WebAgent);
         }
 
         public Listing<Post> GetNew()
         {
             if (Name == "/")
-                return new Listing<Post>(Reddit, "/new.json");
-            return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name));
+                return new Listing<Post>(Reddit, "/new.json", WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name), WebAgent);
         }
 
         public Listing<Post> GetHot()
@@ -130,21 +134,21 @@ namespace RedditSharp
 
         public Listing<VotableThing> GetModQueue()
         {
-            return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name));
+            return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
         }
 
         public Listing<Post> GetUnmoderatedLinks()
         {
-            return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name));
+            return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name), WebAgent);
         }
 
         public void Subscribe()
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = Reddit.CreatePost(SubscribeUrl);
+            var request = WebAgent.CreatePost(SubscribeUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
                 {
                     action = "sub",
                     sr = FullName,
@@ -152,7 +156,7 @@ namespace RedditSharp
                 });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             // Discard results
         }
 
@@ -160,9 +164,9 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = Reddit.CreatePost(SubscribeUrl);
+            var request = WebAgent.CreatePost(SubscribeUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 action = "unsub",
                 sr = FullName,
@@ -170,7 +174,7 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             // Discard results
         }
 
@@ -180,28 +184,28 @@ namespace RedditSharp
                 throw new AuthenticationException("No user logged in.");
             try
             {
-                var request = Reddit.CreateGet(string.Format(GetSettingsUrl, Name));
+                var request = WebAgent.CreateGet(string.Format(GetSettingsUrl, Name));
                 var response = request.GetResponse();
-                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
                 var json = JObject.Parse(data);
-                return new SubredditSettings(this, Reddit, json);
+                return new SubredditSettings(this, Reddit, json, WebAgent);
             }
             catch // TODO: More specific catch
             {
                 // Do it unauthed
-                var request = Reddit.CreateGet(string.Format(GetReducedSettingsUrl, Name));
+                var request = WebAgent.CreateGet(string.Format(GetReducedSettingsUrl, Name));
                 var response = request.GetResponse();
-                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
                 var json = JObject.Parse(data);
-                return new SubredditSettings(this, Reddit, json);
+                return new SubredditSettings(this, Reddit, json, WebAgent);
             }
         }
 
         public void ClearFlairTemplates(FlairType flairType)
         {
-            var request = Reddit.CreatePost(ClearFlairTemplatesUrl);
+            var request = WebAgent.CreatePost(ClearFlairTemplatesUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
                 uh = Reddit.User.Modhash,
@@ -209,14 +213,14 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void AddFlairTemplate(string cssClass, FlairType flairType, string text, bool userEditable)
         {
-            var request = Reddit.CreatePost(FlairTemplateUrl);
+            var request = WebAgent.CreatePost(FlairTemplateUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 css_class = cssClass,
                 flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
@@ -228,15 +232,15 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
         }
 
         public void SetUserFlair(string user, string cssClass, string text)
         {
-            var request = Reddit.CreatePost(SetUserFlairUrl);
+            var request = WebAgent.CreatePost(SetUserFlairUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 css_class = cssClass,
                 text = text,
@@ -246,14 +250,14 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public UserFlairTemplate[] GetUserFlairTemplates() // Hacky, there isn't a proper endpoint for this
         {
-            var request = Reddit.CreatePost(FlairSelectorUrl);
+            var request = WebAgent.CreatePost(FlairSelectorUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 name = Reddit.User.Name,
                 r = Name,
@@ -261,7 +265,7 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             var document = new HtmlDocument();
             document.LoadHtml(data);
             if (document.DocumentNode.Descendants("div").First().Attributes["error"] != null)
@@ -281,7 +285,7 @@ namespace RedditSharp
 
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
         {
-            var request = Reddit.CreatePost(UploadImageUrl);
+            var request = WebAgent.CreatePost(UploadImageUrl);
             var formData = new MultipartFormBuilder(request);
             formData.AddDynamic(new
             {
@@ -296,36 +300,36 @@ namespace RedditSharp
             formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
             formData.Finish();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
         }
 
         public SubredditStyle GetStylesheet()
         {
-            var request = Reddit.CreateGet(string.Format(StylesheetUrl, Name));
+            var request = WebAgent.CreateGet(string.Format(StylesheetUrl, Name));
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return new SubredditStyle(Reddit, this, json);
+            return new SubredditStyle(Reddit, this, json, WebAgent);
         }
 
         public void AcceptModeratorInvite()
         {
-            var request = Reddit.CreatePost(AcceptModeratorInviteUrl);
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            var request = WebAgent.CreatePost(AcceptModeratorInviteUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
                 uh = Reddit.User.Modhash,
                 r = Name
             });
             var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void RemoveModerator(string id)
         {
-            var request = Reddit.CreatePost(LeaveModerationUrl);
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            var request = WebAgent.CreatePost(LeaveModerationUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
                 uh = Reddit.User.Modhash,
@@ -334,14 +338,14 @@ namespace RedditSharp
                 id
             });
             var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public IEnumerable<ModeratorUser> GetModerators()
         {
-            var request = Reddit.CreateGet(string.Format(ModeratorsUrl, Name));
+            var request = WebAgent.CreateGet(string.Format(ModeratorsUrl, Name));
             var response = request.GetResponse();
-            var responseString = Reddit.GetResponseString(response.GetResponseStream());
+            var responseString = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(responseString);
             var type = json["kind"].ToString();
             if (type != "UserList")
@@ -371,9 +375,9 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
-            var request = Reddit.CreatePost(SubmitLinkUrl);
+            var request = WebAgent.CreatePost(SubmitLinkUrl);
 
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
                 kind = "self",
@@ -383,9 +387,9 @@ namespace RedditSharp
                 uh = Reddit.User.Modhash
             });
             var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
-            return new Post(Reddit, json["json"]);
+            return new Post(Reddit, json["json"], WebAgent);
             // TODO: Error
         }
 
@@ -398,9 +402,9 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
-            var request = Reddit.CreatePost(SubmitLinkUrl);
+            var request = WebAgent.CreatePost(SubmitLinkUrl);
 
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
                 extension = "json",
@@ -411,9 +415,9 @@ namespace RedditSharp
                 url = url
             });
             var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
-            return new Post(Reddit, json["json"]);
+            return new Post(Reddit, json["json"], WebAgent);
             // TODO: Error
         }
     }

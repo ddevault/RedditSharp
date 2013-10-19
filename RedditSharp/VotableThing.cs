@@ -17,12 +17,16 @@ namespace RedditSharp
         private const string UnsaveUrl = "/api/unsave";
 
         [JsonIgnore]
+        private IWebAgent WebAgent { get; set; }
+
+        [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        public VotableThing(Reddit reddit, JToken json) : base(reddit, json)
+        public VotableThing(Reddit reddit, IWebAgent webAgent, JToken json) : base(reddit, json)
         {
             Reddit = reddit;
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            WebAgent = webAgent;
+            JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
         }
 
         [JsonProperty("downs")]
@@ -42,9 +46,9 @@ namespace RedditSharp
 
         public void Upvote()
         {
-            var request = Reddit.CreatePost(VoteUrl);
+            var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 dir = 1,
                 id = FullName,
@@ -52,15 +56,15 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             Liked = true;
         }
 
         public void Downvote()
         {
-            var request = Reddit.CreatePost(VoteUrl);
+            var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 dir = -1,
                 id = FullName,
@@ -68,45 +72,45 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             Liked = false;
         }
 
         public void Save()
         {
-            var request = Reddit.CreatePost(SaveUrl);
+            var request = WebAgent.CreatePost(SaveUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 id = FullName,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             Saved = true;
         }
 
         public void Unsave()
         {
-            var request = Reddit.CreatePost(UnsaveUrl);
+            var request = WebAgent.CreatePost(UnsaveUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 id = FullName,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             Saved = false;
         }
 
         public void ClearVote()
         {
-            var request = Reddit.CreatePost(VoteUrl);
+            var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 dir = 0,
                 id = FullName,
@@ -114,14 +118,14 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void Vote(VoteType type)
         {
-            var request = Reddit.CreatePost(VoteUrl);
+            var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 dir = (int)type,
                 id = FullName,
@@ -129,7 +133,7 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             Liked = null;
         }
     }

@@ -14,7 +14,7 @@ namespace RedditSharp
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var token = JToken.Load(reader);
-            return Reddit.UnixTimeStampToDateTime(token.Value<double>());
+            return token.Value<double>().UnixTimeStampToDateTime();
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
