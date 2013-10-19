@@ -12,6 +12,7 @@ namespace RedditSharp
     {
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
+        private const string SubredditHotUrl = "/r/{0}/hot.json"; 
         private const string SubscribeUrl = "/api/subscribe";
         private const string GetSettingsUrl = "/r/{0}/about/edit.json";
         private const string GetReducedSettingsUrl = "/r/{0}/about.json";
@@ -118,6 +119,13 @@ namespace RedditSharp
             if (Name == "/")
                 return new Listing<Post>(Reddit, "/new.json");
             return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name));
+        }
+
+        public Listing<Post> GetHot()
+        {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/.json");
+            return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name));
         }
 
         public Listing<VotableThing> GetModQueue()
@@ -369,7 +377,7 @@ namespace RedditSharp
             {
                 api_type = "json",
                 kind = "self",
-                sr = Title,
+                sr = Name,
                 text = text,
                 title = title,
                 uh = Reddit.User.Modhash
@@ -378,6 +386,7 @@ namespace RedditSharp
             var result = Reddit.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
             return new Post(Reddit, json["json"]);
+            // Handle for user needing catchpa
             // TODO: Error
         }
 
@@ -397,7 +406,7 @@ namespace RedditSharp
                 api_type = "json",
                 extension = "json",
                 kind = "link",
-                sr = Title,
+                sr = Name,
                 title = title,
                 uh = Reddit.User.Modhash,
                 url = url
