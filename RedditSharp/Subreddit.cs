@@ -132,6 +132,13 @@ namespace RedditSharp
             return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
         }
 
+        public Listing<Post> GetHot()
+        {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/.json");
+            return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name));
+        }
+
         public Listing<VotableThing> GetModQueue()
         {
             return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
