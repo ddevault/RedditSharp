@@ -128,8 +128,8 @@ namespace RedditSharp
         public Listing<Post> GetHot()
         {
             if (Name == "/")
-                return new Listing<Post>(Reddit, "/.json");
-            return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name));
+                return new Listing<Post>(Reddit, "/.json", WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
         }
 
         public Listing<VotableThing> GetModQueue()
