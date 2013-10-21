@@ -19,13 +19,16 @@ namespace RedditSharp
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
+        [JsonIgnore]
+        private IWebAgent WebAgent { get; set; }
 
-        public Comment(Reddit reddit, JToken json)
-            : base(reddit, json)
+        public Comment(Reddit reddit, JToken json, IWebAgent webAgent)
+            : base(reddit, webAgent, json)
         {
             var data = json["data"];
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             Reddit = reddit;
+            WebAgent = webAgent;
 
             // Parse sub comments
             // TODO: Consider deserializing this properly
@@ -33,7 +36,7 @@ namespace RedditSharp
             if (data["replies"] != null && data["replies"].Any())
             {
                 foreach (var comment in data["replies"]["data"]["children"])
-                    subComments.Add(new Comment(reddit, comment));
+                    subComments.Add(new Comment(reddit, comment, webAgent));
             }
             Comments = subComments.ToArray();
 
@@ -82,9 +85,9 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = Reddit.CreatePost(CommentUrl);
+            var request = WebAgent.CreatePost(CommentUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 text = message,
                 thing_id = FullName,
@@ -96,11 +99,11 @@ namespace RedditSharp
             try
             {
                 var response = request.GetResponse();
-                var data = Reddit.GetResponseString(response.GetResponseStream());
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
                 var json = JObject.Parse(data);
                 if (json["json"]["ratelimit"] != null)
                     throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-                return new Comment(Reddit, json["json"]["data"]["things"][0]);
+                return new Comment(Reddit, json["json"]["data"]["things"][0], WebAgent);
             }
             catch (WebException ex)
             {
@@ -113,7 +116,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = Reddit.CreatePost(DistinguishUrl);
+            var request = WebAgent.CreatePost(DistinguishUrl);
             var stream = request.GetRequestStream();
             string how;
             switch (distinguishType)
@@ -131,7 +134,7 @@ namespace RedditSharp
                     how = "special";
                     break;
             }
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 how,
                 id = Id,
@@ -139,12 +142,12 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
                 throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
-        
+
         /// <summary>
         /// Replaces the text in this comment with the input text.
         /// </summary>
@@ -154,8 +157,8 @@ namespace RedditSharp
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
 
-            var request = Reddit.CreatePost(EditUserTextUrl);
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            var request = WebAgent.CreatePost(EditUserTextUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
                 text = newText,
@@ -163,7 +166,7 @@ namespace RedditSharp
                 uh = Reddit.User.Modhash
             });
             var response = request.GetResponse();
-            var result = Reddit.GetResponseString(response.GetResponseStream());
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
             JToken json = JToken.Parse(result);
             if (json["json"].ToString().Contains("\"errors\": []"))
                 Body = newText;
@@ -173,9 +176,9 @@ namespace RedditSharp
 
         public void Remove()
         {
-            var request = Reddit.CreatePost(RemoveUrl);
+            var request = WebAgent.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 id = FullName,
                 spam = false,
@@ -183,14 +186,14 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void RemoveSpam()
         {
-            var request = Reddit.CreatePost(RemoveUrl);
+            var request = WebAgent.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();
-            Reddit.WritePostBody(stream, new
+            WebAgent.WritePostBody(stream, new
             {
                 id = FullName,
                 spam = true,
@@ -198,20 +201,20 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void SetAsRead()
         {
-            var request = Reddit.CreatePost(SetAsReadUrl);
-            Reddit.WritePostBody(request.GetRequestStream(), new
+            var request = WebAgent.CreatePost(SetAsReadUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
                                  {
-                id = FullName,
-                uh = Reddit.User.Modhash,
-                api_type = "json"
-            });
+                                     id = FullName,
+                                     uh = Reddit.User.Modhash,
+                                     api_type = "json"
+                                 });
             var response = request.GetResponse();
-            var data = Reddit.GetResponseString(response.GetResponseStream());
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }
 

@@ -11,34 +11,34 @@ namespace RedditSharp
         private const string UnmoderatedUrl = "/r/mod/about/unmoderated.json";
         private const string ModMailUrl = "/message/moderator.json";
 
-        public AuthenticatedUser(Reddit reddit, JToken json) : base(reddit, json)
+        public AuthenticatedUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(reddit, json, webAgent)
         {
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
         public Listing<Subreddit> GetModeratorReddits()
         {
-            return new Listing<Subreddit>(Reddit, ModeratorUrl);
+            return new Listing<Subreddit>(Reddit, ModeratorUrl, WebAgent);
         }
 
         public Listing<Thing> GetUnreadMessages()
         {
-            return new Listing<Thing>(Reddit, UnreadMessagesUrl);
+            return new Listing<Thing>(Reddit, UnreadMessagesUrl, WebAgent);
         }
 
         public Listing<VotableThing> GetModerationQueue()
         {
-            return new Listing<VotableThing>(Reddit, ModQueueUrl);
+            return new Listing<VotableThing>(Reddit, ModQueueUrl, WebAgent);
         }
 
         public Listing<Post> GetUnmoderatedLinks ()
         {
-            return new Listing<Post>(Reddit, UnmoderatedUrl);
+            return new Listing<Post>(Reddit, UnmoderatedUrl, WebAgent);
         }
 
         public Listing<PrivateMessage> GetModMail()
         {
-            return new Listing<PrivateMessage>(Reddit, ModMailUrl);
+            return new Listing<PrivateMessage>(Reddit, ModMailUrl, WebAgent);
         }
 
         [JsonProperty("modhash")]

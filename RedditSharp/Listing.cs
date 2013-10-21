@@ -6,11 +6,13 @@ namespace RedditSharp
 {
     public class Listing<T> : IEnumerable<T> where T : Thing
     {
+        private IWebAgent WebAgent { get; set; }
         private Reddit Reddit { get; set; }
         private string Url { get; set; }
 
-        internal Listing(Reddit reddit, string url)
+        internal Listing(Reddit reddit, string url, IWebAgent webAgent)
         {
+            WebAgent = webAgent;
             Reddit = reddit;
             Url = url;
         }
@@ -57,9 +59,9 @@ namespace RedditSharp
                     else
                         url += "?after=" + After;
                 }
-                var request = Listing.Reddit.CreateGet(url);
+                var request = Listing.WebAgent.CreateGet(url);
                 var response = request.GetResponse();
-                var data = Listing.Reddit.GetResponseString(response.GetResponseStream());
+                var data = Listing.WebAgent.GetResponseString(response.GetResponseStream());
                 var json = JToken.Parse(data);
                 if (json["kind"].ValueOrDefault<string>() != "Listing")
                     throw new FormatException("Reddit responded with an object that is not a listing.");
@@ -71,7 +73,7 @@ namespace RedditSharp
                 var children = json["data"]["children"] as JArray;
                 CurrentPage = new Thing[children.Count];
                 for (int i = 0; i < CurrentPage.Length; i++)
-                    CurrentPage[i] = Thing.Parse(Listing.Reddit, children[i]);
+                    CurrentPage[i] = Thing.Parse(Listing.Reddit, children[i], Listing.WebAgent);
                 After = json["data"]["after"].Value<string>();
                 Before = json["data"]["before"].Value<string>();
             }

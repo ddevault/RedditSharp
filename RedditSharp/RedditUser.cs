@@ -11,14 +11,18 @@ namespace RedditSharp
         private const string LinksUrl = "/user/{0}/submitted.json";
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
 
-        public RedditUser(Reddit reddit, JToken json) : base(json)
+        public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
             Reddit = reddit;
+            WebAgent = webAgent;
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }
 
         [JsonIgnore]
         protected Reddit Reddit { get; set; }
+
+        [JsonIgnore]
+        protected IWebAgent WebAgent { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -36,22 +40,22 @@ namespace RedditSharp
 
         public Listing<VotableThing> GetOverview()
         {
-            return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name));
+            return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
         }
 
         public Listing<Comment> GetComments()
         {
-            return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name));
+            return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
         }
 
         public Listing<Post> GetPosts()
         {
-            return new Listing<Post>(Reddit, string.Format(LinksUrl, Name));
+            return new Listing<Post>(Reddit, string.Format(LinksUrl, Name), WebAgent);
         }
 
         public Listing<Subreddit> GetSubscribedSubreddits()
         {
-            return new Listing<Subreddit>(Reddit, SubscribedSubredditsUrl);
+            return new Listing<Subreddit>(Reddit, SubscribedSubredditsUrl, WebAgent);
         }
 
         public override string ToString()
