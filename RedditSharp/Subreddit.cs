@@ -382,7 +382,7 @@ namespace RedditSharp
             {
                 api_type = "json",
                 kind = "self",
-                sr = Title,
+                sr = Name,
                 text = text,
                 title = title,
                 uh = Reddit.User.Modhash
@@ -429,7 +429,7 @@ namespace RedditSharp
                 api_type = "json",
                 extension = "json",
                 kind = "link",
-                sr = Title,
+                sr = Name,
                 title = title,
                 uh = Reddit.User.Modhash,
                 url = url
