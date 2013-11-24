@@ -11,6 +11,7 @@ namespace RedditSharp
     {
         private const string CommentUrl = "/api/comment";
         private const string RemoveUrl = "/api/remove";
+        private const string DelUrl = "/api/del";
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
         private const string EditUserTextUrl = "/api/editusertext";
@@ -143,6 +144,25 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+        
+        public void Del()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            else
+            {
+                var request = WebAgent.CreatePost(DelUrl);
+                var stream = request.GetRequestStream();
+                WebAgent.WritePostBody(stream, new
+                {
+                    id = FullName,
+                    uh = Reddit.User.Modhash
+                });
+                stream.Close();
+                var response = request.GetResponse();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+            }
         }
 
         public void Hide()
