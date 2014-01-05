@@ -38,14 +38,15 @@ namespace RedditSharp
             public ListingEnumerator(Listing<T> listing)
             {
                 Listing = listing;
-                CurrentPageIndex = 0;
+                CurrentPageIndex = -1;
+                CurrentPage = new Thing[0];
             }
 
             public T Current
             {
                 get 
                 {
-                    return (T)CurrentPage[CurrentPageIndex - 1];
+                    return (T)CurrentPage[CurrentPageIndex];
                 }
             }
 
@@ -90,27 +91,22 @@ namespace RedditSharp
 
             public bool MoveNext()
             {
-                if (CurrentPage == null)
-                    FetchNextPage();
-                if (CurrentPageIndex >= CurrentPage.Length)
+                CurrentPageIndex++;
+                if (CurrentPageIndex == CurrentPage.Length)
                 {
-                    if (After == null)
+                    if (After == null && CurrentPageIndex != 0)
                         return false;
                     FetchNextPage();
-                    ResetCurrentPageIndex();
+                    CurrentPageIndex = 0;
                 }
-                CurrentPageIndex++;
                 return true;
-            }
-
-            private void ResetCurrentPageIndex()
-            {
-                CurrentPageIndex = 0;
             }
 
             public void Reset()
             {
                 After = Before = null;
+                CurrentPageIndex = -1;
+                CurrentPage = new Thing[0];
             }
         }
     }
