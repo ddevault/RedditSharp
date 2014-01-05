@@ -98,6 +98,8 @@ namespace RedditSharp
                         return false;
                     FetchNextPage();
                     CurrentPageIndex = 0;
+                    if (CurrentPage.Length == 0)
+                        return false;
                 }
                 return true;
             }
