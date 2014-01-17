@@ -51,6 +51,7 @@
     <Compile Include="CreatedThing.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FlairTemplate.cs" />
+    <Compile Include="ICaptchaSolver.cs" />
     <Compile Include="IWebAgent.cs" />
     <Compile Include="Listing.cs" />
     <Compile Include="ModeratorPermission.cs" />
