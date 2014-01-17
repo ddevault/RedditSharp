@@ -40,6 +40,11 @@ namespace RedditSharp
         private readonly IWebAgent _webAgent;
 
         /// <summary>
+        /// Captcha solver instance to use when solving captchas.
+        /// </summary>
+        public ICaptchaSolver CaptchaSolver;
+
+        /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
         public AuthenticatedUser User { get; set; }
@@ -141,7 +146,7 @@ namespace RedditSharp
             return new Post(this, this.GetToken(url), _webAgent);
         }
 
-        public void ComposePrivateMessage(string subject, string body, string to)
+        public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
         {
             if (User == null)
                 throw new Exception("User can not be null.");
@@ -152,11 +157,24 @@ namespace RedditSharp
                 subject,
                 text = body,
                 to,
-                uh = User.Modhash
+                uh = User.Modhash,
+                iden = captchaId,
+                captcha = captchaAnswer
             });
             var response = request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
-            // TODO: Error
+            var json = JObject.Parse(result);
+
+            ICaptchaSolver solver = CaptchaSolver; // Prevent race condition
+
+            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA" && solver != null)
+            {
+                captchaId = json["json"]["captcha"].ToString();
+                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(captchaId));
+
+                if (!captchaResponse.Cancel) // Keep trying until we are told to cancel
+                    ComposePrivateMessage(subject, body, to, captchaId, captchaResponse.Answer);
+            }
         }
         
         /// <summary>
