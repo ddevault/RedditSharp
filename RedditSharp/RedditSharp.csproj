@@ -50,7 +50,7 @@
     <Compile Include="AuthenticatedUser.cs" />
     <Compile Include="Captcha.cs" />
     <Compile Include="CaptchaResponse.cs" />
-    <Compile Include="CaptchaSolver.cs" />
+    <Compile Include="ICaptchaSolver.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="CreatedThing.cs" />
     <Compile Include="Extensions.cs" />

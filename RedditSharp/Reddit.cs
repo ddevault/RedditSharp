@@ -42,7 +42,7 @@ namespace RedditSharp
         /// <summary>
         /// Captcha solver instance to use when solving captchas.
         /// </summary>
-        public CaptchaSolver CaptchaSolver;
+        public ICaptchaSolver CaptchaSolver;
 
         /// <summary>
         /// The authenticated user for this instance.
@@ -165,7 +165,7 @@ namespace RedditSharp
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
 
-            CaptchaSolver solver = CaptchaSolver; // Prevent race condition
+            ICaptchaSolver solver = CaptchaSolver; // Prevent race condition
 
             if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA" && solver != null)
             {
