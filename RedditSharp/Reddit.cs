@@ -40,6 +40,11 @@ namespace RedditSharp
         private readonly IWebAgent _webAgent;
 
         /// <summary>
+        /// Captcha solver instance to use when solving captchas.
+        /// </summary>
+        public ICaptchaSolver CaptchaSolver;
+
+        /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
         public AuthenticatedUser User { get; set; }
@@ -156,7 +161,33 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
-            // TODO: Error
+            var json = JObject.Parse(result);
+            
+            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA" && CaptchaSolver != null)
+            {
+                string captchaId = json["json"]["captcha"].ToString();
+                string captchaAnswer = CaptchaSolver.GetAnswer(captchaId);
+                ComposePrivateMessage(subject, body, to, captchaId, captchaAnswer);
+            }
+        }
+
+        public void ComposePrivateMessage(string subject, string body, string to, string captchaId, string captchaAnswer)
+        {
+            if (User == null)
+                throw new Exception("User can not be null.");
+            var request = _webAgent.CreatePost(ComposeMessageUrl);
+            _webAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                subject,
+                text = body,
+                to,
+                uh = User.Modhash,
+                iden = captchaId,
+                captcha = captchaAnswer
+            });
+            var response = request.GetResponse();
+            var result = _webAgent.GetResponseString(response.GetResponseStream());
         }
         
         /// <summary>
