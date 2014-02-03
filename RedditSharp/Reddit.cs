@@ -225,7 +225,7 @@ namespace RedditSharp
                 var json = JToken.Parse(data);
                 return Thing.Parse(this, json[1]["data"]["children"][0], _webAgent) as Comment;
             }
-            catch (WebException e)
+            catch (WebException)
             {
                 return null;
             }
