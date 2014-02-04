@@ -30,6 +30,7 @@ namespace RedditSharp
         private const string ModeratorsUrl = "/r/{0}/about/moderators.json";
         private const string FrontPageUrl = "/.json";
         private const string SubmitLinkUrl = "/api/submit";
+        private const string FlairListUrl = "/r/{0}/api/flairlist.json";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -235,6 +236,24 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
+        }
+
+        public string GetFlairText(string user)
+        {
+            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return (string)json["users"][0]["flair_text"];
+        }
+
+        public string GetFlairCssClass(string user)
+        {
+            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return (string)json["users"][0]["flair_css_class"];
         }
 
         public void SetUserFlair(string user, string cssClass, string text)
