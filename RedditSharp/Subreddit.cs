@@ -305,23 +305,12 @@ namespace RedditSharp
 
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
         {
-            var request = WebAgent.CreatePost(UploadImageUrl);
-            var formData = new MultipartFormBuilder(request);
-            formData.AddDynamic(new
-            {
-                name,
-                uh = Reddit.User.Modhash,
-                r = Name,
-                formid = "image-upload",
-                img_type = imageType == ImageType.PNG ? "png" : "jpg",
-                upload = "",
-                header = 1
-            });
-            formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
-            formData.Finish();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // TODO: Detect errors
+            UploadImage(name, imageType, file, 1);
+        }
+
+        public void UploadStyleSheetImage(string name, ImageType imageType, byte[] file)
+        {
+            UploadImage(name, imageType, file, 0);
         }
 
         public SubredditStyle GetStylesheet()
@@ -459,5 +448,27 @@ namespace RedditSharp
             return new Post(Reddit, json["json"], WebAgent);
             // TODO: Error
         }
+
+        private void UploadImage(string name, ImageType imageType, byte[] file, int headerValue)
+        {
+            var request = WebAgent.CreatePost(UploadImageUrl);
+            var formData = new MultipartFormBuilder(request);
+            formData.AddDynamic(new
+            {
+              name,
+              uh = Reddit.User.Modhash,
+              r = Name,
+              formid = "image-upload",
+              img_type = imageType == ImageType.PNG ? "png" : "jpg",
+              upload = "",
+              header = headerValue
+            });
+            formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
+            formData.Finish();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            // TODO: Detect errors
+        }
+
     }
 }
