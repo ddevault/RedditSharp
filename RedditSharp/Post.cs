@@ -17,6 +17,7 @@ namespace RedditSharp
         private const string EditUserTextUrl = "/api/editusertext";
         private const string HideUrl = "/api/hide";
         private const string UnhideUrl = "/api/unhide";
+        private const string SetFlairUrl = "/api/flair";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -244,6 +245,28 @@ namespace RedditSharp
         {
             JToken post = Reddit.GetToken(this.Url);
             JsonConvert.PopulateObject(post["data"].ToString(), this, Reddit.JsonSerializerSettings);
+        }
+        
+         public void SetFlair(string flairText, string flairClass)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+
+            var request = WebAgent.CreatePost(SetFlairUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                r = Subreddit,
+                css_class = flairClass,
+                link = FullName,
+                //name = Name,
+                text = flairText,
+                uh = Reddit.User.Modhash
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+            LinkFlairText = flairText;
         }
     }
 }
