@@ -58,8 +58,8 @@ namespace RedditSharp
         /// <returns>The listing of comments requested.</returns>
         public Listing<Comment> GetComments(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
         {
-            if (limit > 100)
-                limit = 100;
+            if ((limit < 1) || (limit > 100))
+               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
             string commentsUrl = string.Format(CommentsUrl, Name);
             commentsUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
@@ -81,8 +81,8 @@ namespace RedditSharp
         /// <returns>The listing of posts requested.</returns>
         public Listing<Post> GetPosts(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
         {
-            if (limit > 100)
-                limit = 100;
+            if ((limit < 1) || (limit > 100))
+               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
             string linksUrl = string.Format(LinksUrl, Name);
             linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
