@@ -100,7 +100,7 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
             var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
-            return new Comment(Reddit, comment[3][0][0], WebAgent);
+            return new Comment(Reddit, comment[3][0][0], WebAgent, this);
         }
 
         public void Approve()
@@ -209,7 +209,7 @@ namespace RedditSharp
 
             var postJson = json.Last()["data"]["children"];
             foreach (var comment in postJson)
-                comments.Add(new Comment(Reddit, comment, WebAgent));
+                comments.Add(new Comment(Reddit, comment, WebAgent, this));
 
             return comments.ToArray();
         }

@@ -26,7 +26,7 @@ namespace RedditSharp
         {
             return GetEnumerator();
         }
-
+        
         private class ListingEnumerator<T> : IEnumerator<T> where T : Thing
         {
             private Listing<T> Listing { get; set; }

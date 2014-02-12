@@ -10,7 +10,7 @@ namespace RedditSharp
             switch (kind)
             {
                 case "t1":
-                    return new Comment(reddit, json, webAgent);
+                    return new Comment(reddit, json, webAgent, null);
                 case "t2":
                     return new RedditUser(reddit, json, webAgent); 
                 case "t3":
