@@ -48,9 +48,45 @@ namespace RedditSharp
             return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
         }
 
+        /// <summary>
+        /// Get a listing of comments from the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
+        /// and limited to <paramref name="limit"/>.
+        /// </summary>
+        /// <param name="sorting">How to sort the comments (hot, new, top, controversial).</param>
+        /// <param name="limit">How many comments to fetch per request. Max is 100.</param>
+        /// <param name="fromTime">What time frame of comments to show (hour, day, week, month, year, all).</param>
+        /// <returns>The listing of comments requested.</returns>
+        public Listing<Comment> GetComments(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
+        {
+            if ((limit < 1) || (limit > 100))
+               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
+            string commentsUrl = string.Format(CommentsUrl, Name);
+            commentsUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
+
+            return new Listing<Comment>(Reddit, commentsUrl, WebAgent);
+        }
+
         public Listing<Post> GetPosts()
         {
             return new Listing<Post>(Reddit, string.Format(LinksUrl, Name), WebAgent);
+        }
+
+        /// <summary>
+        /// Get a listing of posts from the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
+        /// and limited to <paramref name="limit"/>.
+        /// </summary>
+        /// <param name="sorting">How to sort the posts (hot, new, top, controversial).</param>
+        /// <param name="limit">How many posts to fetch per request. Max is 100.</param>
+        /// <param name="fromTime">What time frame of posts to show (hour, day, week, month, year, all).</param>
+        /// <returns>The listing of posts requested.</returns>
+        public Listing<Post> GetPosts(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
+        {
+            if ((limit < 1) || (limit > 100))
+               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
+            string linksUrl = string.Format(LinksUrl, Name);
+            linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
+
+            return new Listing<Post>(Reddit, linksUrl, WebAgent);
         }
 
         public Listing<Subreddit> GetSubscribedSubreddits()
@@ -62,5 +98,23 @@ namespace RedditSharp
         {
             return Name;
         }
+    }
+
+    public enum Sort
+    {
+        New,
+        Hot,
+        Top,
+        Controversial
+    }
+
+    public enum FromTime
+    {
+        All,
+        Year,
+        Month,
+        Week,
+        Day,
+        Hour
     }
 }
