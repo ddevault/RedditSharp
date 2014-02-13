@@ -22,7 +22,7 @@ namespace RedditSharp
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment(Reddit reddit, JToken json, IWebAgent webAgent)
+        public Comment(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
             : base(reddit, webAgent, json)
         {
             var data = json["data"];
@@ -36,9 +36,11 @@ namespace RedditSharp
             if (data["replies"] != null && data["replies"].Any())
             {
                 foreach (var comment in data["replies"]["data"]["children"])
-                    subComments.Add(new Comment(reddit, comment, webAgent));
+                    subComments.Add(new Comment(reddit, comment, webAgent, sender));
             }
             Comments = subComments.ToArray();
+
+            this.Parent = sender;
 
             // Handle Reddit's API being horrible
             if (data["context"] != null)
@@ -81,6 +83,9 @@ namespace RedditSharp
         [JsonIgnore]
         public Comment[] Comments { get; set; }
 
+        [JsonIgnore]
+        public Thing Parent { get; internal set; }
+
         public Comment Reply(string message)
         {
             if (Reddit.User == null)
@@ -103,7 +108,7 @@ namespace RedditSharp
                 var json = JObject.Parse(data);
                 if (json["json"]["ratelimit"] != null)
                     throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-                return new Comment(Reddit, json["json"]["data"]["things"][0], WebAgent);
+                return new Comment(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
             }
             catch (WebException ex)
             {

@@ -11,6 +11,8 @@ namespace RedditSharp
         private const string LinksUrl = "/user/{0}/submitted.json";
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
 
+        private const int MAX_LIMIT = 100;
+
         public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
             Reddit = reddit;
@@ -58,8 +60,8 @@ namespace RedditSharp
         /// <returns>The listing of comments requested.</returns>
         public Listing<Comment> GetComments(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
         {
-            if ((limit < 1) || (limit > 100))
-               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
+            if ((limit < 1) || (limit > MAX_LIMIT))
+                throw new ArgumentOutOfRangeException("limit", "Valid range: [1," + MAX_LIMIT + "]");
             string commentsUrl = string.Format(CommentsUrl, Name);
             commentsUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
