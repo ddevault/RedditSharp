@@ -11,7 +11,7 @@ namespace RedditSharp
         private const string LinksUrl = "/user/{0}/submitted.json";
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
 
-        private const UInt16 MAX_LIMIT = 100;
+        private const int MAX_LIMIT = 100;
 
         public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
