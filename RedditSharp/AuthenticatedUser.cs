@@ -10,6 +10,7 @@ namespace RedditSharp
         private const string ModQueueUrl = "/r/mod/about/modqueue.json";
         private const string UnmoderatedUrl = "/r/mod/about/unmoderated.json";
         private const string ModMailUrl = "/message/moderator.json";
+        private const string InboxUrl = "/message/messages.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(reddit, json, webAgent)
         {
@@ -39,6 +40,11 @@ namespace RedditSharp
         public Listing<PrivateMessage> GetModMail()
         {
             return new Listing<PrivateMessage>(Reddit, ModMailUrl, WebAgent);
+        }
+
+        public Listing<PrivateMessage> GetPrivateMessages()
+        {
+            return new Listing<PrivateMessage>(Reddit, InboxUrl, WebAgent);
         }
 
         [JsonProperty("modhash")]
