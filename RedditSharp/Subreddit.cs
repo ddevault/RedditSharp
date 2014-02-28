@@ -95,7 +95,8 @@ namespace RedditSharp
                 Title = "/r/all",
                 Url = "/r/all",
                 Name = "all",
-                Reddit = reddit
+                Reddit = reddit,
+                WebAgent = reddit._webAgent
             };
             return rSlashAll;
         }
@@ -108,7 +109,8 @@ namespace RedditSharp
                 Title = "reddit: the front page of the internet",
                 Url = "/",
                 Name = "/",
-                Reddit = reddit
+                Reddit = reddit,
+                WebAgent = reddit._webAgent
             };
             return frontPage;
         }

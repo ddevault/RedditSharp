@@ -37,7 +37,7 @@ namespace RedditSharp
         #endregion
 
 
-        private readonly IWebAgent _webAgent;
+        internal readonly IWebAgent _webAgent;
 
         /// <summary>
         /// Captcha solver instance to use when solving captchas.
