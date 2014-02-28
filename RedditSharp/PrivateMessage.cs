@@ -24,6 +24,9 @@ namespace RedditSharp
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Sent { get; set; }
+        [JsonProperty("created_utc")]
+        [JsonConverter(typeof(UnixTimestampConverter))]
+        public DateTime SentUTC { get; set; }
         [JsonProperty("dest")]
         public string Destination { get; set; }
         [JsonProperty("author")]
