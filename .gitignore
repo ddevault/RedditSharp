@@ -9,3 +9,6 @@ TestResults/
 *.mdf
 *.psess
 *.vsp
+
+# StyleCop files
+StyleCop.Cache

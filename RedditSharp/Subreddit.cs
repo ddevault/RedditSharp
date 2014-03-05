@@ -387,33 +387,6 @@ namespace RedditSharp
         {
             return "/r/" + DisplayName;
         }
-        
-        /// <summary>
-        /// Submits a text post in the current subreddit using the logged-in user
-        /// </summary>
-        /// <param name="title">The title of the submission</param>
-        /// <param name="text">The raw markdown text of the submission</param>
-        public Post SubmitTextPost(string title, string text)
-        {
-            if (Reddit.User == null)
-                throw new Exception("No user logged in.");
-            var request = WebAgent.CreatePost(SubmitLinkUrl);
-
-            WebAgent.WritePostBody(request.GetRequestStream(), new
-            {
-                api_type = "json",
-                kind = "self",
-                sr = Name,
-                text = text,
-                title = title,
-                uh = Reddit.User.Modhash
-            });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            return new Post(Reddit, json["json"], WebAgent);
-            // TODO: Error
-        }
 
         public void BanUser(string user, string reason)
         {
@@ -434,32 +407,75 @@ namespace RedditSharp
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        private Post Submit(SubmitData data)
+        {
+            if (Reddit.User == null)
+                throw new RedditException("No user logged in.");
+            var request = WebAgent.CreatePost(SubmitLinkUrl);
+
+            WebAgent.WritePostBody(request.GetRequestStream(), data);
+
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+
+            ICaptchaSolver solver = Reddit.CaptchaSolver;
+            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA"
+                && solver != null)
+            {
+                data.iden = json["json"]["captcha"].ToString();
+                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(data.iden));
+
+                // We throw exception due to this method being expected to return a valid Post object, but we cannot
+                // if we got a Captcha error.
+                if (captchaResponse.Cancel)
+                    throw new CaptchaFailedException("Captcha verification failed when submitting " + data.kind + " post");
+
+                data.captcha = captchaResponse.Answer;
+                return Submit(data);
+            }
+
+            return new Post(Reddit, json["json"], WebAgent);
+        }
+
         /// <summary>
         /// Submits a link post in the current subreddit using the logged-in user
         /// </summary>
         /// <param name="title">The title of the submission</param>
         /// <param name="url">The url of the submission link</param>
-        public Post SubmitPost(string title, string url)
+        public Post SubmitPost(string title, string url, string captchaId = "", string captchaAnswer = "")
         {
-            if (Reddit.User == null)
-                throw new Exception("No user logged in.");
-            var request = WebAgent.CreatePost(SubmitLinkUrl);
+            return
+                Submit(
+                    new LinkData
+                    {
+                        sr = Name,
+                        uh = Reddit.User.Modhash,
+                        title = title,
+                        url = url,
+                        iden = captchaId,
+                        captcha = captchaAnswer
+                    });
+        }
 
-            WebAgent.WritePostBody(request.GetRequestStream(), new
-            {
-                api_type = "json",
-                extension = "json",
-                kind = "link",
-                sr = Name,
-                title = title,
-                uh = Reddit.User.Modhash,
-                url = url
-            });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
-            return new Post(Reddit, json["json"], WebAgent);
-            // TODO: Error
+        /// <summary>
+        /// Submits a text post in the current subreddit using the logged-in user
+        /// </summary>
+        /// <param name="title">The title of the submission</param>
+        /// <param name="text">The raw markdown text of the submission</param>
+        public Post SubmitTextPost(string title, string text, string captchaId = "", string captchaAnswer = "")
+        {
+            return
+                Submit(
+                    new TextData
+                    {
+                        sr = Name,
+                        uh = Reddit.User.Modhash,
+                        title = title,
+                        text = text,
+                        iden = captchaId,
+                        captcha = captchaAnswer
+                    });
         }
     }
 }
