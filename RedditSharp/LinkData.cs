@@ -1,11 +1,11 @@
 ﻿namespace RedditSharp
 {
-    public class LinkData : SubmitData
+    internal class LinkData : SubmitData
     {
-        public string extension = "json";
-        public string url;
+        internal string extension = "json";
+        internal string url;
 
-        public LinkData()
+        internal LinkData()
         {
             kind = "link";
         }

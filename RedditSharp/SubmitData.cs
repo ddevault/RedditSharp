@@ -1,19 +1,19 @@
 ﻿namespace RedditSharp
 {
-    public class SubmitData
+    internal abstract class SubmitData
     {
-        public string api_type = "json";
+        internal string api_type = "json";
 
-        public string kind;
+        internal string kind;
 
-        public string sr;
+        internal string sr;
 
-        public string uh;
+        internal string uh;
 
-        public string title;
+        internal string title;
 
-        public string iden;
+        internal string iden;
 
-        public string captcha;
+        internal string captcha;
     }
 }
