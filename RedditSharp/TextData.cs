@@ -1,10 +1,10 @@
 ﻿namespace RedditSharp
 {
-    public class TextData : SubmitData
+    internal class TextData : SubmitData
     {
-        public string text;
+        internal string text;
 
-        public TextData()
+        internal TextData()
         {
             kind = "self";
         }
