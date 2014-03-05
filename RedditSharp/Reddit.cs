@@ -57,6 +57,7 @@ namespace RedditSharp
             JsonSerializerSettings.CheckAdditionalContent = false;
             JsonSerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
             _webAgent = new WebAgent();
+            CaptchaSolver = new ConsoleCaptchaSolver();
         }
 
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
