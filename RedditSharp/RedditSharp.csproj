@@ -49,13 +49,16 @@
   <ItemGroup>
     <Compile Include="AuthenticatedUser.cs" />
     <Compile Include="Captcha.cs" />
+    <Compile Include="CaptchaFailedException.cs" />
     <Compile Include="CaptchaResponse.cs" />
+    <Compile Include="ConsoleCaptchaSolver.cs" />
     <Compile Include="ICaptchaSolver.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="CreatedThing.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FlairTemplate.cs" />
     <Compile Include="IWebAgent.cs" />
+    <Compile Include="LinkData.cs" />
     <Compile Include="Listing.cs" />
     <Compile Include="ModeratorPermission.cs" />
     <Compile Include="ModeratorUser.cs" />
@@ -67,10 +70,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedditException.cs" />
     <Compile Include="RedditUser.cs" />
+    <Compile Include="SubmitData.cs" />
     <Compile Include="Subreddit.cs" />
     <Compile Include="SubredditImage.cs" />
     <Compile Include="SubredditSettings.cs" />
     <Compile Include="SubredditStyle.cs" />
+    <Compile Include="TextData.cs" />
     <Compile Include="Thing.cs" />
     <Compile Include="UnixTimeStamp.cs" />
     <Compile Include="UnixTimestampConverter.cs" />
