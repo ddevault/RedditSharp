@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Web;
 
@@ -72,7 +73,7 @@ namespace RedditSharp
         public void WritePostBody(Stream stream, object data, params string[] additionalFields)
         {
             var type = data.GetType();
-            var properties = type.GetProperties();
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             string value = "";
             foreach (var property in properties)
             {

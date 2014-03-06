@@ -2,7 +2,7 @@
 {
     internal class TextData : SubmitData
     {
-        internal string text;
+        internal string text { get; set; }
 
         internal TextData()
         {
