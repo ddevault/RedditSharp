@@ -2,11 +2,12 @@
 {
     internal class LinkData : SubmitData
     {
-        internal string extension = "json";
-        internal string url;
+        internal string extension { get; set; }
+        internal string url { get; set; }
 
         internal LinkData()
         {
+            extension = "json";
             kind = "link";
         }
     }
