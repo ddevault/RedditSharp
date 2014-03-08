@@ -93,14 +93,17 @@ namespace RedditSharp
                 {
                     text = message,
                     thing_id = FullName,
-                    uh = Reddit.User.Modhash
+                    uh = Reddit.User.Modhash,
+                    api_type = "json"
                 });
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(data);
-            var comment = json["jquery"].FirstOrDefault(i => i[0].Value<int>() == 18 && i[1].Value<int>() == 19);
-            return new Comment(Reddit, comment[3][0][0], WebAgent, this);
+            if (json["json"]["ratelimit"] != null)
+                throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
+            var comment = json["json"]["data"]["things"][0];
+            return new Comment(Reddit, comment, WebAgent, this);
         }
 
         public void Approve()
