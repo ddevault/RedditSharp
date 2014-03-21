@@ -27,6 +27,8 @@ namespace RedditSharp
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
         private const string BanUserUrl = "/api/friend";
+        private const string AddModeratorUrl = "/api/friend";
+        private const string AddContributorUrl = "/api/friend";
         private const string ModeratorsUrl = "/r/{0}/about/moderators.json";
         private const string FrontPageUrl = "/.json";
         private const string SubmitLinkUrl = "/api/submit";
@@ -335,6 +337,21 @@ namespace RedditSharp
             return new SubredditStyle(Reddit, this, json, WebAgent);
         }
 
+        public void AddModerator(string user)
+        {
+            var request = WebAgent.CreatePost(AddModeratorUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "moderator",
+                name = user
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
         public void AcceptModeratorInvite()
         {
             var request = WebAgent.CreatePost(AcceptModeratorInviteUrl);
@@ -386,6 +403,21 @@ namespace RedditSharp
         public override string ToString()
         {
             return "/r/" + DisplayName;
+        }
+
+        public void AddContributor(string user)
+        {
+            var request = WebAgent.CreatePost(AddContributorUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "contributor",
+                name = user
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void BanUser(string user, string reason)
