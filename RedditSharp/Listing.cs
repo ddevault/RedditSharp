@@ -74,7 +74,7 @@ namespace RedditSharp
                 var children = json["data"]["children"] as JArray;
                 CurrentPage = new Thing[children.Count];
                 for (int i = 0; i < CurrentPage.Length; i++)
-                    CurrentPage[i] = Thing.Parse(Listing.Reddit, children[i], Listing.WebAgent);
+                    CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
                 After = json["data"]["after"].Value<string>();
                 Before = json["data"]["before"].Value<string>();
             }

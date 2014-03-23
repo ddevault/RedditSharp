@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace RedditSharp
 {
@@ -37,6 +38,9 @@ namespace RedditSharp
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
+
+        [JsonIgnore]
+        public Wiki Wiki { get; private set; }
 
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
@@ -78,6 +82,7 @@ namespace RedditSharp
         {
             Reddit = reddit;
             WebAgent = webAgent;
+            Wiki = new Wiki(reddit, this, webAgent);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             Name = Url;
             if (Name.StartsWith("/r/"))
