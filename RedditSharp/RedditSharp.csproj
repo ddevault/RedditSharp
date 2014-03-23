@@ -82,6 +82,10 @@
     <Compile Include="VotableThing.cs" />
     <Compile Include="RateLimitException.cs" />
     <Compile Include="WebAgent.cs" />
+    <Compile Include="Wiki.cs" />
+    <Compile Include="WikiPage.cs" />
+    <Compile Include="WikiPageRevision.cs" />
+    <Compile Include="WikiPageSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

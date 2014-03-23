@@ -39,8 +39,6 @@ namespace RedditSharp
 
         internal readonly IWebAgent _webAgent;
 
-        public IWebAgent MyWebAgent { get { return _webAgent; } }
-
         /// <summary>
         /// Captcha solver instance to use when solving captchas.
         /// </summary>

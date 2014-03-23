@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 
 namespace RedditSharp
 {
@@ -22,6 +23,20 @@ namespace RedditSharp
                 default:
                     return null;
             }
+        }
+
+        // if we can't determine the type of thing by "kind", try by type
+        public static Thing Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        {
+            Thing result = Parse(reddit, json, webAgent);
+            if (result == null)
+            {
+                if (typeof(T) == typeof(WikiPageRevision))
+                {
+                    return new WikiPageRevision(reddit, json, webAgent);
+                }
+            }
+            return result;
         }
 
         internal Thing(JToken json)
