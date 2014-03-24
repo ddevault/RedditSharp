@@ -42,38 +42,47 @@ namespace RedditSharp
         /// Null if they have not cast a vote.
         /// </summary>
         [JsonProperty("likes")]
-        public bool? Liked { get; set; }
+        private bool? Liked { get; set; }
 
-        public void Upvote()
+        /// <summary>
+        /// Gets or sets the vote for the current VotableThing.
+        /// </summary>
+        [JsonIgnore]
+        public VoteType Vote
         {
-            var request = WebAgent.CreatePost(VoteUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
+            get
             {
-                dir = 1,
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            Liked = true;
+                switch (this.Liked)
+                {
+                    case true: return VoteType.Upvote;
+                    case false: return VoteType.Downvote;
+
+                    default: return VoteType.None;
+                }
+            }
+            set { this.SetVote(value); }
         }
 
-        public void Downvote()
+        private void SetVote(VoteType type)
         {
             var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
             {
-                dir = -1,
+                dir = (int)type,
                 id = FullName,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
-            Liked = false;
+            
+            switch(type)
+            {
+                case VoteType.Upvote: Liked = true; return;
+                case VoteType.None: Liked = null; return;
+                case VoteType.Downvote: Liked = false; return;
+            }
         }
 
         public void Save()
@@ -119,22 +128,6 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
-        }
-
-        public void Vote(VoteType type)
-        {
-            var request = WebAgent.CreatePost(VoteUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                dir = (int)type,
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            Liked = null;
         }
     }
 }
