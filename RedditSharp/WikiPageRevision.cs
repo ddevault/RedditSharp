@@ -7,7 +7,7 @@ namespace RedditSharp
     public class WikiPageRevision : Thing
     {
         [JsonProperty("id")]
-        public string Id { get; private set; }
+        new public string Id { get; private set; }
 
         [JsonProperty("timestamp")]
         [JsonConverter(typeof(UnixTimestampConverter))]

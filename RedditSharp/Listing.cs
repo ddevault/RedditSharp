@@ -26,7 +26,8 @@ namespace RedditSharp
         {
             return GetEnumerator();
         }
-        
+
+#pragma warning disable 0693
         private class ListingEnumerator<T> : IEnumerator<T> where T : Thing
         {
             private Listing<T> Listing { get; set; }
@@ -111,5 +112,6 @@ namespace RedditSharp
                 CurrentPage = new Thing[0];
             }
         }
+#pragma warning restore
     }
 }
