@@ -53,11 +53,18 @@ namespace RedditSharp
 
         public Reddit()
         {
-            JsonSerializerSettings = new JsonSerializerSettings();
-            JsonSerializerSettings.CheckAdditionalContent = false;
-            JsonSerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
+            JsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    CheckAdditionalContent = false,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                };
             _webAgent = new WebAgent();
             CaptchaSolver = new ConsoleCaptchaSolver();
+        }
+
+        public Reddit(string username, string password, bool useSsl = true) : this()
+        {
+            this.LogIn(username, password, useSsl);
         }
 
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
