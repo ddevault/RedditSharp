@@ -1,4 +1,5 @@
-﻿namespace RedditSharp
+﻿using System;
+namespace RedditSharp
 {
     public class SubredditImage
     {
@@ -21,17 +22,17 @@
             string cssLink, string name, string url, IWebAgent webAgent)
             : this(reddit, subreddit, cssLink, name, webAgent)
         {
-            Url = url;
+            Url = new Uri(url);
             // Handle legacy image urls
             // http://thumbs.reddit.com/FULLNAME_NUMBER.png
             int discarded;
             if (int.TryParse(url, out discarded))
-                Url = string.Format("http://thumbs.reddit.com/{0}_{1}.png", subreddit.Subreddit.FullName, url);
+                Url = new Uri(string.Format("http://thumbs.reddit.com/{0}_{1}.png", subreddit.Subreddit.FullName, url), UriKind.Absolute);
         }
 
         public string CssLink { get; set; }
         public string Name { get; set; }
-        public string Url { get; set; }
+        public Uri Url { get; set; }
         public SubredditStyle SubredditStyle { get; set; }
 
         public void Delete()

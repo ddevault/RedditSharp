@@ -135,8 +135,10 @@ namespace RedditSharp
             return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
         }
 
-        public JToken GetToken(string url)
+        public JToken GetToken(Uri uri)
         {
+            var url = uri.AbsoluteUri;
+
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
 
@@ -149,9 +151,9 @@ namespace RedditSharp
 
             return json[0]["data"]["children"].First;
         }
-        public Post GetPost(string url)
+        public Post GetPost(Uri uri)
         {
-            return new Post(this, this.GetToken(url), _webAgent);
+            return new Post(this, this.GetToken(uri), _webAgent);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
