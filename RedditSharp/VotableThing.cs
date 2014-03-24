@@ -65,6 +65,8 @@ namespace RedditSharp
 
         private void SetVote(VoteType type)
         {
+            if (this.Vote == type) return;
+
             var request = WebAgent.CreatePost(VoteUrl);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
@@ -76,12 +78,15 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
-            
+
+            if (Liked == true) Upvotes--;
+            if (Liked == false) Downvotes--;
+
             switch(type)
             {
-                case VoteType.Upvote: Liked = true; return;
+                case VoteType.Upvote: Liked = true; Upvotes++; return;
                 case VoteType.None: Liked = null; return;
-                case VoteType.Downvote: Liked = false; return;
+                case VoteType.Downvote: Liked = false; Downvotes++; return;
             }
         }
 
