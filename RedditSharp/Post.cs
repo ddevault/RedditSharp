@@ -79,7 +79,8 @@ namespace RedditSharp
         [JsonProperty("title")]
         public string Title { get; set; }
         [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonConverter(typeof(UrlParser))]
+        public Uri Url { get; set; }
         [JsonProperty("num_reports")]
         public int? Reports { get; set; }
 
