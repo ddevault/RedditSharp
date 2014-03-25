@@ -81,7 +81,7 @@ namespace RedditSharp
         public DistinguishType Distinguished { get; set; }
 
         [JsonIgnore]
-        public Comment[] Comments { get; set; }
+        public IList<Comment> Comments { get; private set; }
 
         [JsonIgnore]
         public Thing Parent { get; internal set; }
