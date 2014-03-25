@@ -68,7 +68,8 @@ namespace RedditSharp
         [JsonProperty("title")]
         public string Title { get; set; }
         [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonConverter(typeof(UrlParser))]
+        public Uri Url { get; set; }
         [JsonIgnore]
         public string Name { get; set; }
 
@@ -86,7 +87,7 @@ namespace RedditSharp
             WebAgent = webAgent;
             Wiki = new Wiki(reddit, this, webAgent);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
-            Name = Url;
+            Name = Url.ToString();
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);
             if (Name.StartsWith("r/"))
@@ -100,7 +101,7 @@ namespace RedditSharp
             {
                 DisplayName = "/r/all",
                 Title = "/r/all",
-                Url = "/r/all",
+                Url = new Uri("/r/all", UriKind.Relative),
                 Name = "all",
                 Reddit = reddit,
                 WebAgent = reddit._webAgent
@@ -114,7 +115,7 @@ namespace RedditSharp
             {
                 DisplayName = "Front Page",
                 Title = "reddit: the front page of the internet",
-                Url = "/",
+                Url = new Uri("/", UriKind.Relative),
                 Name = "/",
                 Reddit = reddit,
                 WebAgent = reddit._webAgent

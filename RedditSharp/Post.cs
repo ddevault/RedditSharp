@@ -65,7 +65,8 @@ namespace RedditSharp
         [JsonProperty("over_18")]
         public bool NSFW { get; set; }
         [JsonProperty("permalink")]
-        public string Permalink { get; set; }
+        [JsonConverter(typeof(UrlParser))]
+        public Uri Permalink { get; set; }
         [JsonProperty("score")]
         public int Score { get; set; }
         [JsonProperty("selftext")]
@@ -75,11 +76,13 @@ namespace RedditSharp
         [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
         [JsonProperty("thumbnail")]
-        public string Thumbnail { get; set; }
+        [JsonConverter(typeof(UrlParser))]
+        public Uri Thumbnail { get; set; }
         [JsonProperty("title")]
         public string Title { get; set; }
         [JsonProperty("url")]
-        public string Url { get; set; }
+        [JsonConverter(typeof(UrlParser))]
+        public Uri Url { get; set; }
         [JsonProperty("num_reports")]
         public int? Reports { get; set; }
 
