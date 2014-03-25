@@ -158,7 +158,7 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
+            return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
         public JToken GetToken(Uri uri)
@@ -269,13 +269,13 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected internal Thing GetThing(string url, bool prependDomain = true)
+        protected internal T GetThing<T>(string url, bool prependDomain = true) where T: Thing
         {
             var request = _webAgent.CreateGet(url, prependDomain);
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return Thing.Parse(this, json, _webAgent);
+            return (T)Thing.Parse(this, json, _webAgent);
         }
 
         #endregion
