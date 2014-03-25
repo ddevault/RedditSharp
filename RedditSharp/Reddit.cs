@@ -7,6 +7,9 @@ using System.Security.Authentication;
 
 namespace RedditSharp
 {
+    /// <summary>
+    /// Class to communicate with Reddit.com
+    /// </summary>
     public partial class Reddit
     {
         #region Constant Urls
@@ -51,6 +54,22 @@ namespace RedditSharp
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
+        /// <summary>
+        /// Gets the FrontPage using the current Reddit instance.
+        /// </summary>
+        public Subreddit FrontPage
+        {
+            get { return Subreddit.GetFrontPage(this); }
+        }
+
+        /// <summary>
+        /// Gets /r/All using the current Reddit instance.
+        /// </summary>
+        public Subreddit RSlashAll
+        {
+            get { return Subreddit.GetRSlashAll(this); }
+        }
+
         public Reddit()
         {
             JsonSerializerSettings = new JsonSerializerSettings()
@@ -67,6 +86,13 @@ namespace RedditSharp
             this.LogIn(username, password, useSsl);
         }
 
+        /// <summary>
+        /// Logs in the current Reddit instance.
+        /// </summary>
+        /// <param name="username">The username of the user to log on to.</param>
+        /// <param name="password">The password of the user to log on to.</param>
+        /// <param name="useSsl">Whether to use SSL or not. (default: true)</param>
+        /// <returns></returns>
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
             if (Type.GetType("Mono.Runtime") != null)
