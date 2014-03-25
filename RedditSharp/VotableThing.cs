@@ -65,42 +65,12 @@ namespace RedditSharp
 
         public void Upvote()
         {
-            if (this.Liked == true) return;
-            else if (this.Liked == false) Downvotes--;
-
-            var request = WebAgent.CreatePost(VoteUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                dir = 1,
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            Liked = true;
-            Upvotes++;
+            this.SetVote(VoteType.Upvote);
         }
 
         public void Downvote()
         {
-            if (this.Liked == false) return;
-            else if (this.Liked == true) Upvotes--;
-
-            var request = WebAgent.CreatePost(VoteUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                dir = -1,
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            Liked = false;
-            Downvotes++;
+            this.SetVote(VoteType.Downvote);
         }
 
         public void SetVote(VoteType type)
