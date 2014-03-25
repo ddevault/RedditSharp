@@ -100,7 +100,7 @@ namespace RedditSharp
             _webAgent.Cookies = new CookieContainer();
             HttpWebRequest request;
             if (useSsl)
-                request = _webAgent.CreatePost(SslLoginUrl, false);
+                request = _webAgent.CreatePost(SslLoginUrl);
             else
                 request = _webAgent.CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
@@ -168,9 +168,7 @@ namespace RedditSharp
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
 
-            var prependDomain = !url.Contains(DomainUrl);
-
-            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url), prependDomain);
+            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url));
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -240,7 +238,7 @@ namespace RedditSharp
 
         public Thing GetThingByFullname(string fullname)
         {
-            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname), true);
+            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -255,7 +253,7 @@ namespace RedditSharp
                     linkName = linkName.Substring(3);
                 if (name.StartsWith("t1_"))
                     name = name.Substring(3);
-                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name), true);
+                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name));
                 var response = request.GetResponse();
                 var data = _webAgent.GetResponseString(response.GetResponseStream());
                 var json = JToken.Parse(data);
@@ -269,9 +267,9 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected internal T GetThing<T>(string url, bool prependDomain = true) where T: Thing
+        protected internal T GetThing<T>(string url) where T: Thing
         {
-            var request = _webAgent.CreateGet(url, prependDomain);
+            var request = _webAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);

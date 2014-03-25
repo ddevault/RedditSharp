@@ -31,8 +31,10 @@ namespace RedditSharp
 
         private static DateTime lastRequest = DateTime.MinValue;
 
-        public HttpWebRequest CreateRequest(string url, string method, bool prependDomain = true)
+        public HttpWebRequest CreateRequest(string url, string method)
         {
+            var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+
             while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2) ; // Rate limiting
             lastRequest = DateTime.Now;
             HttpWebRequest request;
@@ -51,14 +53,14 @@ namespace RedditSharp
             return request;
         }
 
-        public HttpWebRequest CreateGet(string url, bool prependDomain = true)
+        public HttpWebRequest CreateGet(string url)
         {
-            return CreateRequest(url, "GET", prependDomain);
+            return CreateRequest(url, "GET");
         }
 
-        public HttpWebRequest CreatePost(string url, bool prependDomain = true)
+        public HttpWebRequest CreatePost(string url)
         {
-            var request = CreateRequest(url, "POST", prependDomain);
+            var request = CreateRequest(url, "POST");
             request.ContentType = "application/x-www-form-urlencoded";
             return request;
         }
