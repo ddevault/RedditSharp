@@ -42,7 +42,7 @@ namespace RedditSharp
         /// Null if they have not cast a vote.
         /// </summary>
         [JsonProperty("likes")]
-        private bool? Liked { get; set; }
+        public bool? Liked { get; set; }
 
         /// <summary>
         /// Gets or sets the vote for the current VotableThing.
@@ -63,7 +63,47 @@ namespace RedditSharp
             set { this.SetVote(value); }
         }
 
-        private void SetVote(VoteType type)
+        public void Upvote()
+        {
+            if (this.Liked == true) return;
+            else if (this.Liked == false) Downvotes--;
+
+            var request = WebAgent.CreatePost(VoteUrl);
+            var stream = request.GetRequestStream();
+            WebAgent.WritePostBody(stream, new
+            {
+                dir = 1,
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            Liked = true;
+            Upvotes++;
+        }
+
+        public void Downvote()
+        {
+            if (this.Liked == false) return;
+            else if (this.Liked == true) Upvotes--;
+
+            var request = WebAgent.CreatePost(VoteUrl);
+            var stream = request.GetRequestStream();
+            WebAgent.WritePostBody(stream, new
+            {
+                dir = -1,
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            Liked = false;
+            Downvotes++;
+        }
+
+        public void SetVote(VoteType type)
         {
             if (this.Vote == type) return;
 
