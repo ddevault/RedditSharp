@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace RedditSharp
@@ -35,7 +36,8 @@ namespace RedditSharp
         {
             var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
 
-            while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2) ; // Rate limiting
+            while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2)// Rate limiting
+                Thread.Sleep(250);
             lastRequest = DateTime.Now;
             HttpWebRequest request;
             if (prependDomain)
