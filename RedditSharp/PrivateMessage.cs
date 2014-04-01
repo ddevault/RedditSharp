@@ -17,30 +17,47 @@ namespace RedditSharp
 
         [JsonProperty("body")]
         public string Body { get; set; }
+
         [JsonProperty("body_html")]
         public string BodyHtml { get; set; }
+
         [JsonProperty("was_comment")]
         public bool IsComment { get; set; }
+
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Sent { get; set; }
+
         [JsonProperty("created_utc")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime SentUTC { get; set; }
+
         [JsonProperty("dest")]
         public string Destination { get; set; }
+
         [JsonProperty("author")]
         public string Author { get; set; }
+
         [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
+
         [JsonProperty("new")]
         public bool Unread { get; set; }
+
         [JsonProperty("subject")]
         public string Subject { get; set; }
+
+        [JsonProperty("parent_id")]
+        public string ParentID { get; set; }
+
+        [JsonProperty("first_message_name")]
+        public string FirstMessageName { get; set; }
+
         [JsonIgnore]
         public PrivateMessage[] Replies { get; set; }
-
-        public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        
+        public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -59,6 +76,19 @@ namespace RedditSharp
                     }
                 }
             }
+        }
+
+        public PrivateMessage GetParent()
+        {
+            if (string.IsNullOrEmpty(ParentID))
+                return null;
+            var id = ParentID.Remove(0, 3);
+            var listing = new Listing<PrivateMessage>(Reddit, "/message/messages/" + id + ".json", WebAgent);
+            var firstMessage = listing.First();
+            if (firstMessage.FullName == ParentID)
+                return listing.First();
+            else
+                return firstMessage.Replies.First(x => x.FullName == ParentID);
         }
 
         public void SetAsRead()
