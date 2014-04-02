@@ -41,7 +41,6 @@ namespace RedditSharp
         public string ParentID { get; set; }
         [JsonProperty("first_message_name")]
         public string FirstMessageName { get; set; }
-
         [JsonIgnore]
         public PrivateMessage[] Replies { get; set; }
         
