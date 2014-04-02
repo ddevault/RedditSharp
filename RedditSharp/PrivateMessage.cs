@@ -43,7 +43,7 @@ namespace RedditSharp
         public string FirstMessageName { get; set; }
         [JsonIgnore]
         public PrivateMessage[] Replies { get; set; }
-        
+
         public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
             Reddit = reddit;
