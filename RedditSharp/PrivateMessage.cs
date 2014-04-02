@@ -17,39 +17,28 @@ namespace RedditSharp
 
         [JsonProperty("body")]
         public string Body { get; set; }
-
         [JsonProperty("body_html")]
         public string BodyHtml { get; set; }
-
         [JsonProperty("was_comment")]
         public bool IsComment { get; set; }
-
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Sent { get; set; }
-
         [JsonProperty("created_utc")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime SentUTC { get; set; }
-
         [JsonProperty("dest")]
         public string Destination { get; set; }
-
         [JsonProperty("author")]
         public string Author { get; set; }
-
         [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
-
         [JsonProperty("new")]
         public bool Unread { get; set; }
-
         [JsonProperty("subject")]
         public string Subject { get; set; }
-
         [JsonProperty("parent_id")]
         public string ParentID { get; set; }
-
         [JsonProperty("first_message_name")]
         public string FirstMessageName { get; set; }
 
