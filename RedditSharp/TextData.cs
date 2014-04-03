@@ -1,12 +1,13 @@
 ﻿namespace RedditSharp
 {
-    internal class TextData : SubmitData
+    public class TextData : SubmitData
     {
-        internal string text { get; set; }
+        [RedditAPIName("text")]
+        public string Text { get; set; }
 
-        internal TextData()
+        public TextData()
         {
-            kind = "self";
+            Kind = "self";
         }
     }
 }
