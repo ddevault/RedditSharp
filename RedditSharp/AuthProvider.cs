@@ -58,7 +58,7 @@ namespace RedditSharp
         }
 
         /// <summary>
-        /// Creates the reddit OAuth2 Url to redirect the user to. 
+        /// Creates the reddit OAuth2 Url to redirect the user to for authorization. 
         /// </summary>
         /// <param name="state">Used to verify that the user received is the user that was sent</param>
         /// <param name="scope">Determines what actions can be performed against the user.</param>
@@ -86,12 +86,23 @@ namespace RedditSharp
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
 
-            _webAgent.WritePostBody(stream, new
+            if (isRefresh)
             {
-                grant_type = isRefresh ? "refresh_token" : "authorization_code",
-                code,
-                redirect_uri = _redirectUri
-            });
+                _webAgent.WritePostBody(stream, new
+                {
+                    grant_type = "authorization_code",
+                    code,
+                    redirect_uri = _redirectUri
+                });
+            }
+            else
+            {
+                _webAgent.WritePostBody(stream, new
+                {
+                    grant_type = "refresh_token",
+                    refresh_token = code
+                });
+            }
 
             stream.Close();
             var response = (HttpWebResponse)request.GetResponse();
