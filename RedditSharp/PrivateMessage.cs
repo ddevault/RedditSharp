@@ -43,6 +43,22 @@ namespace RedditSharp
         public string FirstMessageName { get; set; }
         [JsonIgnore]
         public PrivateMessage[] Replies { get; set; }
+        [JsonIgnore]
+        public PrivateMessage Parent
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ParentID))
+                    return null;
+                var id = ParentID.Remove(0, 3);
+                var listing = new Listing<PrivateMessage>(Reddit, "/message/messages/" + id + ".json", WebAgent);
+                var firstMessage = listing.First();
+                if (firstMessage.FullName == ParentID)
+                    return listing.First();
+                else
+                    return firstMessage.Replies.First(x => x.FullName == ParentID);
+            }
+        }
 
         public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
         {
@@ -65,17 +81,12 @@ namespace RedditSharp
             }
         }
 
-        public PrivateMessage GetParent()
+        public Listing<PrivateMessage> GetThread()
         {
             if (string.IsNullOrEmpty(ParentID))
                 return null;
             var id = ParentID.Remove(0, 3);
-            var listing = new Listing<PrivateMessage>(Reddit, "/message/messages/" + id + ".json", WebAgent);
-            var firstMessage = listing.First();
-            if (firstMessage.FullName == ParentID)
-                return listing.First();
-            else
-                return firstMessage.Replies.First(x => x.FullName == ParentID);
+            return new Listing<PrivateMessage>(Reddit, "/message/messages/" + id + ".json", WebAgent);
         }
 
         public void SetAsRead()
