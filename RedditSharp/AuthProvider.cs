@@ -14,28 +14,29 @@ namespace RedditSharp
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
         private const string OauthGetMeUrl = "https://oauth.reddit.com/api/v1/me";
         private Reddit Reddit { get; set; }
-
+        [Flags]
         public enum Scope
         {
-            identity,
-            edit,
-            flair,
-            history,
-            modconfig,
-            modflair,
-            modlog,
-            modposts,
-            modwiki,
-            mysubreddits,
-            privatemessages,
-            read,
-            report,
-            save,
-            submit,
-            subscribe,
-            vote,
-            wikiedit,
-            wikiread
+            none=0x0,
+            identity=0x1,
+            edit = 0x2,
+            flair = 0x4,
+            history = 0x8,
+            modconfig = 0x10,
+            modflair = 0x20,
+            modlog = 0x40,
+            modposts = 0x80,
+            modwiki = 0x100,
+            mysubreddits = 0x200,
+            privatemessages = 0x400,
+            read = 0x800,
+            report = 0x1000,
+            save = 0x2000,
+            submit = 0x4000,
+            subscribe = 0x8000,
+            vote = 0x10000,
+            wikiedit = 0x20000,
+            wikiread = 0x40000
         }
         private readonly IWebAgent _webAgent;
         private readonly string _redirectUri;
@@ -49,11 +50,9 @@ namespace RedditSharp
             _webAgent = new WebAgent();
         }
 
-        public string GetAuthUrl(string state, List<Scope> scopes, bool permanent = false)
+        public string GetAuthUrl(string state,Scope scope, bool permanent = false)
         {
-            var scopestring = scopes.Aggregate("", (current, scope) => current + (scope + ","));
-            scopestring = scopestring.Remove(scopestring.LastIndexOf(','));
-            return String.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type=code&state={1}&redirect_uri={2}&duration={3}&scope={4}", _clientID, state, _redirectUri, permanent ? "permanent" : "temporary", scopestring);
+            return String.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type=code&state={1}&redirect_uri={2}&duration={3}&scope={4}", _clientID, state, _redirectUri, permanent ? "permanent" : "temporary", scope);
         }
 
         public string GetOAuthToken(string code, string clientId, string clientSecret, bool isRefresh = false)
