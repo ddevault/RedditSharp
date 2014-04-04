@@ -6,11 +6,11 @@ using System.Text;
 namespace RedditSharp
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class RedditAPINameAttribute : Attribute
+    internal class RedditAPINameAttribute : Attribute
     {
-        public string Name { get; private set; }
+        internal string Name { get; private set; }
 
-        public RedditAPINameAttribute(string name)
+        internal RedditAPINameAttribute(string name)
         {
             Name = name;
         }
