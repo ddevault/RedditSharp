@@ -461,15 +461,15 @@ namespace RedditSharp
             if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA"
                 && solver != null)
             {
-                data.iden = json["json"]["captcha"].ToString();
-                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(data.iden));
+                data.Iden = json["json"]["captcha"].ToString();
+                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(data.Iden));
 
                 // We throw exception due to this method being expected to return a valid Post object, but we cannot
                 // if we got a Captcha error.
                 if (captchaResponse.Cancel)
-                    throw new CaptchaFailedException("Captcha verification failed when submitting " + data.kind + " post");
+                    throw new CaptchaFailedException("Captcha verification failed when submitting " + data.Kind + " post");
 
-                data.captcha = captchaResponse.Answer;
+                data.Captcha = captchaResponse.Answer;
                 return Submit(data);
             }
 
@@ -487,12 +487,12 @@ namespace RedditSharp
                 Submit(
                     new LinkData
                     {
-                        sr = Name,
-                        uh = Reddit.User.Modhash,
-                        title = title,
-                        url = url,
-                        iden = captchaId,
-                        captcha = captchaAnswer
+                        Subreddit = Name,
+                        UserHash = Reddit.User.Modhash,
+                        Title = title,
+                        URL = url,
+                        Iden = captchaId,
+                        Captcha = captchaAnswer
                     });
         }
 
@@ -507,12 +507,12 @@ namespace RedditSharp
                 Submit(
                     new TextData
                     {
-                        sr = Name,
-                        uh = Reddit.User.Modhash,
-                        title = title,
-                        text = text,
-                        iden = captchaId,
-                        captcha = captchaAnswer
+                        Subreddit = Name,
+                        UserHash = Reddit.User.Modhash,
+                        Title = title,
+                        Text = text,
+                        Iden = captchaId,
+                        Captcha = captchaAnswer
                     });
         }
     }

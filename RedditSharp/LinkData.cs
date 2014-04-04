@@ -2,13 +2,16 @@
 {
     internal class LinkData : SubmitData
     {
-        internal string extension { get; set; }
-        internal string url { get; set; }
+        [RedditAPIName("extension")]
+        internal string Extension { get; set; }
+        
+        [RedditAPIName("url")]
+        internal string URL { get; set; }
 
         internal LinkData()
         {
-            extension = "json";
-            kind = "link";
+            Extension = "json";
+            Kind = "link";
         }
     }
 }

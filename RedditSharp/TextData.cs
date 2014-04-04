@@ -2,11 +2,12 @@
 {
     internal class TextData : SubmitData
     {
-        internal string text { get; set; }
+        [RedditAPIName("text")]
+        internal string Text { get; set; }
 
         internal TextData()
         {
-            kind = "self";
+            Kind = "self";
         }
     }
 }

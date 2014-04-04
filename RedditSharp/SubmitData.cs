@@ -2,23 +2,30 @@
 {
     internal abstract class SubmitData
     {
-        internal string api_type { get; set; }
+        [RedditAPIName("api_type")]
+        internal string APIType { get; set; }
 
-        internal string kind { get; set; }
+        [RedditAPIName("kind")]
+        internal string Kind { get; set; }
 
-        internal string sr { get; set; }
+        [RedditAPIName("sr")]
+        internal string Subreddit { get; set; }
 
-        internal string uh { get; set; }
+        [RedditAPIName("uh")]
+        internal string UserHash { get; set; }
 
-        internal string title { get; set; }
+        [RedditAPIName("title")]
+        internal string Title { get; set; }
 
-        internal string iden { get; set; }
+        [RedditAPIName("iden")]
+        internal string Iden { get; set; }
 
-        internal string captcha { get; set; }
+        [RedditAPIName("captcha")]
+        internal string Captcha { get; set; }
 
         protected SubmitData()
         {
-            api_type = "json";
+            APIType = "json";
         }
     }
 }

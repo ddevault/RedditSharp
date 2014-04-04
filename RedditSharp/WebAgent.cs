@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -81,8 +82,10 @@ namespace RedditSharp
             string value = "";
             foreach (var property in properties)
             {
+                var attr = property.GetCustomAttributes(typeof(RedditAPINameAttribute), false).FirstOrDefault() as RedditAPINameAttribute;
+                string name = attr == null ? property.Name : attr.Name;
                 var entry = Convert.ToString(property.GetValue(data, null));
-                value += property.Name + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
+                value += name + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             for (int i = 0; i < additionalFields.Length; i += 2)
             {
