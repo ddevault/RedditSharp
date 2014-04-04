@@ -8,7 +8,7 @@
         [RedditAPIName("url")]
         public string URL { get; set; }
 
-        public LinkData()
+        internal LinkData()
         {
             Extension = "json";
             Kind = "link";

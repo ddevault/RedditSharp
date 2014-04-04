@@ -5,7 +5,7 @@
         [RedditAPIName("text")]
         public string Text { get; set; }
 
-        public TextData()
+        internal TextData()
         {
             Kind = "self";
         }
