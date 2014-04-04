@@ -1,9 +1,9 @@
 ﻿namespace RedditSharp
 {
-    public class TextData : SubmitData
+    internal class TextData : SubmitData
     {
         [RedditAPIName("text")]
-        public string Text { get; set; }
+        internal string Text { get; set; }
 
         internal TextData()
         {

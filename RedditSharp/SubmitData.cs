@@ -1,27 +1,27 @@
 ﻿namespace RedditSharp
 {
-    public abstract class SubmitData
+    internal abstract class SubmitData
     {
         [RedditAPIName("api_type")]
-        public string APIType { get; set; }
+        internal string APIType { get; set; }
 
         [RedditAPIName("kind")]
-        public string Kind { get; set; }
+        internal string Kind { get; set; }
 
         [RedditAPIName("sr")]
-        public string Subreddit { get; set; }
+        internal string Subreddit { get; set; }
 
         [RedditAPIName("uh")]
-        public string UserHash { get; set; }
+        internal string UserHash { get; set; }
 
         [RedditAPIName("title")]
-        public string Title { get; set; }
+        internal string Title { get; set; }
 
         [RedditAPIName("iden")]
-        public string Iden { get; set; }
+        internal string Iden { get; set; }
 
         [RedditAPIName("captcha")]
-        public string Captcha { get; set; }
+        internal string Captcha { get; set; }
 
         protected SubmitData()
         {

@@ -1,12 +1,12 @@
 ﻿namespace RedditSharp
 {
-    public class LinkData : SubmitData
+    internal class LinkData : SubmitData
     {
         [RedditAPIName("extension")]
-        public string Extension { get; set; }
+        internal string Extension { get; set; }
         
         [RedditAPIName("url")]
-        public string URL { get; set; }
+        internal string URL { get; set; }
 
         internal LinkData()
         {
