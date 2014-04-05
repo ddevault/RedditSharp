@@ -24,7 +24,7 @@ foreach (var post in posts.Take(25))
 **Important note**: Make sure you use `.Take(int)` when working with pagable content. For example, don't do this:
 
 ```csharp
-var all = reddit.GetRSlashAll();
+var all = reddit.RSlashAll();
 foreach (var post in all)
 {
     // ...
@@ -34,7 +34,7 @@ foreach (var post in all)
 This will cause you to page through everything that has ever been posted on Reddit. Better:
 
 ```csharp
-var all = reddit.GetRSlashAll();
+var all = reddit.RSlashAll();
 foreach (var post in all.Take(25))
 {
     // ...
