@@ -14,6 +14,7 @@ namespace RedditSharp
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
         private const string SubredditHotUrl = "/r/{0}/hot.json";
+        private const string SubredditCommentsUrl = "/r/{0}/comments.json";
         private const string SubscribeUrl = "/api/subscribe";
         private const string GetSettingsUrl = "/r/{0}/about/edit.json";
         private const string GetReducedSettingsUrl = "/r/{0}/about.json";
@@ -34,6 +35,7 @@ namespace RedditSharp
         private const string FrontPageUrl = "/.json";
         private const string SubmitLinkUrl = "/api/submit";
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
+        private const string RemoveContributorUrl = "/api/unfriend";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -142,6 +144,13 @@ namespace RedditSharp
             if (Name == "/")
                 return new Listing<Post>(Reddit, "/.json", WebAgent);
             return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
+        }
+
+        public Listing<Comment> GetComments()
+        {
+            if (Name == "/")
+                return new Listing<Comment>(Reddit, "/comments.json", WebAgent);
+            return new Listing<Comment>(Reddit, string.Format(SubredditCommentsUrl, Name), WebAgent);
         }
 
         public Listing<VotableThing> GetModQueue()
@@ -414,6 +423,21 @@ namespace RedditSharp
         public void AddContributor(string user)
         {
             var request = WebAgent.CreatePost(AddContributorUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "contributor",
+                name = user
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public void RemoveContributor(string user)
+        {
+            var request = WebAgent.CreatePost(RemoveContributorUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
