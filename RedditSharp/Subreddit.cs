@@ -5,7 +5,6 @@ using System.Security.Authentication;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Net;
 
 namespace RedditSharp
 {
@@ -47,31 +46,183 @@ namespace RedditSharp
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime? Created { get; set; }
+
         [JsonProperty("description")]
         public string Description { get; set; }
+
         [JsonProperty("description_html")]
         public string DescriptionHTML { get; set; }
+
         [JsonProperty("display_name")]
         public string DisplayName { get; set; }
+
         [JsonProperty("header_img")]
         public string HeaderImage { get; set; }
+
         [JsonProperty("header_title")]
         public string HeaderTitle { get; set; }
+
         [JsonProperty("over18")]
         public bool? NSFW { get; set; }
+
         [JsonProperty("public_description")]
         public string PublicDescription { get; set; }
+
         [JsonProperty("subscribers")]
         public int? Subscribers { get; set; }
+
         [JsonProperty("accounts_active")]
         public int? ActiveUsers { get; set; }
+
         [JsonProperty("title")]
         public string Title { get; set; }
+
         [JsonProperty("url")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Url { get; set; }
+
         [JsonIgnore]
         public string Name { get; set; }
+
+        public Listing<Post> Posts
+        {
+            get
+            {
+                if (Name == "/")
+                    return new Listing<Post>(Reddit, "/.json", WebAgent);
+                return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> New
+        {
+            get
+            {
+                if (Name == "/")
+                    return new Listing<Post>(Reddit, "/new.json", WebAgent);
+                return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> Hot
+        {
+            get
+            {
+                if (Name == "/")
+                    return new Listing<Post>(Reddit, "/.json", WebAgent);
+                return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<VotableThing> ModQueue
+        {
+            get
+            {
+                return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> UnmoderatedLinks
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name), WebAgent);
+            }
+        }
+
+        public SubredditSettings Settings
+        {
+            get
+            {
+                if (Reddit.User == null)
+                    throw new AuthenticationException("No user logged in.");
+                try
+                {
+                    var request = WebAgent.CreateGet(string.Format(GetSettingsUrl, Name));
+                    var response = request.GetResponse();
+                    var data = WebAgent.GetResponseString(response.GetResponseStream());
+                    var json = JObject.Parse(data);
+                    return new SubredditSettings(this, Reddit, json, WebAgent);
+                }
+                catch // TODO: More specific catch
+                {
+                    // Do it unauthed
+                    var request = WebAgent.CreateGet(string.Format(GetReducedSettingsUrl, Name));
+                    var response = request.GetResponse();
+                    var data = WebAgent.GetResponseString(response.GetResponseStream());
+                    var json = JObject.Parse(data);
+                    return new SubredditSettings(this, Reddit, json, WebAgent);
+                }
+            }
+        }
+
+        public UserFlairTemplate[] UserFlairTemplates // Hacky, there isn't a proper endpoint for this
+        {
+            get
+            {
+                var request = WebAgent.CreatePost(FlairSelectorUrl);
+                var stream = request.GetRequestStream();
+                WebAgent.WritePostBody(stream, new
+                {
+                    name = Reddit.User.Name,
+                    r = Name,
+                    uh = Reddit.User.Modhash
+                });
+                stream.Close();
+                var response = request.GetResponse();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var document = new HtmlDocument();
+                document.LoadHtml(data);
+                if (document.DocumentNode.Descendants("div").First().Attributes["error"] != null)
+                    throw new InvalidOperationException("This subreddit does not allow users to select flair.");
+                var templateNodes = document.DocumentNode.Descendants("li");
+                var list = new List<UserFlairTemplate>();
+                foreach (var node in templateNodes)
+                {
+                    list.Add(new UserFlairTemplate
+                    {
+                        CssClass = node.Descendants("span").First().Attributes["class"].Value.Split(' ')[1],
+                        Text = node.Descendants("span").First().InnerText
+                    });
+                }
+                return list.ToArray();
+            }
+        }
+
+        public SubredditStyle Stylesheet
+        {
+            get
+            {
+                var request = WebAgent.CreateGet(string.Format(StylesheetUrl, Name));
+                var response = request.GetResponse();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var json = JToken.Parse(data);
+                return new SubredditStyle(Reddit, this, json, WebAgent);
+            }
+        }
+
+        public IEnumerable<ModeratorUser> Moderators
+        {
+            get
+            {
+                var request = WebAgent.CreateGet(string.Format(ModeratorsUrl, Name));
+                var response = request.GetResponse();
+                var responseString = WebAgent.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(responseString);
+                var type = json["kind"].ToString();
+                if (type != "UserList")
+                    throw new FormatException("Reddit responded with an object that is not a user listing.");
+                var data = json["data"];
+                var mods = data["children"].ToArray();
+                var result = new ModeratorUser[mods.Length];
+                for (var i = 0; i < mods.Length; i++)
+                {
+                    var mod = new ModeratorUser(Reddit, mods[i]);
+                    result[i] = mod;
+                }
+                return result;
+            }
+        }
 
         /// <summary>
         /// This constructor only exists for internal use and serialization.
@@ -123,37 +274,6 @@ namespace RedditSharp
             return frontPage;
         }
 
-        public Listing<Post> GetPosts()
-        {
-            if (Name == "/")
-                return new Listing<Post>(Reddit, "/.json", WebAgent);
-            return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name), WebAgent);
-        }
-
-        public Listing<Post> GetNew()
-        {
-            if (Name == "/")
-                return new Listing<Post>(Reddit, "/new.json", WebAgent);
-            return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name), WebAgent);
-        }
-
-        public Listing<Post> GetHot()
-        {
-            if (Name == "/")
-                return new Listing<Post>(Reddit, "/.json", WebAgent);
-            return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
-        }
-
-        public Listing<VotableThing> GetModQueue()
-        {
-            return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
-        }
-
-        public Listing<Post> GetUnmoderatedLinks()
-        {
-            return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name), WebAgent);
-        }
-
         public void Subscribe()
         {
             if (Reddit.User == null)
@@ -188,29 +308,6 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             // Discard results
-        }
-
-        public SubredditSettings GetSettings()
-        {
-            if (Reddit.User == null)
-                throw new AuthenticationException("No user logged in.");
-            try
-            {
-                var request = WebAgent.CreateGet(string.Format(GetSettingsUrl, Name));
-                var response = request.GetResponse();
-                var data = WebAgent.GetResponseString(response.GetResponseStream());
-                var json = JObject.Parse(data);
-                return new SubredditSettings(this, Reddit, json, WebAgent);
-            }
-            catch // TODO: More specific catch
-            {
-                // Do it unauthed
-                var request = WebAgent.CreateGet(string.Format(GetReducedSettingsUrl, Name));
-                var response = request.GetResponse();
-                var data = WebAgent.GetResponseString(response.GetResponseStream());
-                var json = JObject.Parse(data);
-                return new SubredditSettings(this, Reddit, json, WebAgent);
-            }
         }
 
         public void ClearFlairTemplates(FlairType flairType)
@@ -283,36 +380,6 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
-        public UserFlairTemplate[] GetUserFlairTemplates() // Hacky, there isn't a proper endpoint for this
-        {
-            var request = WebAgent.CreatePost(FlairSelectorUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                name = Reddit.User.Name,
-                r = Name,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var document = new HtmlDocument();
-            document.LoadHtml(data);
-            if (document.DocumentNode.Descendants("div").First().Attributes["error"] != null)
-                throw new InvalidOperationException("This subreddit does not allow users to select flair.");
-            var templateNodes = document.DocumentNode.Descendants("li");
-            var list = new List<UserFlairTemplate>();
-            foreach (var node in templateNodes)
-            {
-                list.Add(new UserFlairTemplate
-                {
-                    CssClass = node.Descendants("span").First().Attributes["class"].Value.Split(' ')[1],
-                    Text = node.Descendants("span").First().InnerText
-                });
-            }
-            return list.ToArray();
-        }
-
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
         {
             var request = WebAgent.CreatePost(UploadImageUrl);
@@ -332,15 +399,6 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
-        }
-
-        public SubredditStyle GetStylesheet()
-        {
-            var request = WebAgent.CreateGet(string.Format(StylesheetUrl, Name));
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
-            return new SubredditStyle(Reddit, this, json, WebAgent);
         }
 
         public void AddModerator(string user)
@@ -384,26 +442,6 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
-        }
-
-        public IEnumerable<ModeratorUser> GetModerators()
-        {
-            var request = WebAgent.CreateGet(string.Format(ModeratorsUrl, Name));
-            var response = request.GetResponse();
-            var responseString = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(responseString);
-            var type = json["kind"].ToString();
-            if (type != "UserList")
-                throw new FormatException("Reddit responded with an object that is not a user listing.");
-            var data = json["data"];
-            var mods = data["children"].ToArray();
-            var result = new ModeratorUser[mods.Length];
-            for (var i = 0; i < mods.Length; i++)
-            {
-                var mod = new ModeratorUser(Reddit, mods[i]);
-                result[i] = mod;
-            }
-            return result;
         }
 
         public override string ToString()
@@ -515,5 +553,63 @@ namespace RedditSharp
                         Captcha = captchaAnswer
                     });
         }
+
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use Posts property instead")]
+        public Listing<Post> GetPosts()
+        {
+            return Posts;
+        }
+
+        [Obsolete("Use New property instead")]
+        public Listing<Post> GetNew()
+        {
+            return New;
+        }
+
+        [Obsolete("Use Hot property instead")]
+        public Listing<Post> GetHot()
+        {
+            return Hot;
+        }
+
+        [Obsolete("Use ModQueue property instead")]
+        public Listing<VotableThing> GetModQueue()
+        {
+            return ModQueue;
+        }
+
+        [Obsolete("Use UnmoderatedLinks property instead")]
+        public Listing<Post> GetUnmoderatedLinks()
+        {
+            return UnmoderatedLinks;
+        }
+
+        [Obsolete("Use Settings property instead")]
+        public SubredditSettings GetSettings()
+        {
+            return Settings;
+        }
+
+        [Obsolete("Use UserFlairTemplates property instead")]
+        public UserFlairTemplate[] GetUserFlairTemplates() // Hacky, there isn't a proper endpoint for this
+        {
+            return UserFlairTemplates;
+        }
+
+        [Obsolete("Use Stylesheet property instead")]
+        public SubredditStyle GetStylesheet()
+        {
+            return Stylesheet;
+        }
+
+        [Obsolete("Use Moderators property instead")]
+        public IEnumerable<ModeratorUser> GetModerators()
+        {
+            return Moderators;
+        }
+
+        #endregion Obsolete Getter Methods
     }
 }

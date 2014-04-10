@@ -39,7 +39,6 @@ namespace RedditSharp
 
         #endregion
 
-
         internal readonly IWebAgent _webAgent;
 
         /// <summary>
@@ -68,6 +67,19 @@ namespace RedditSharp
         public Subreddit RSlashAll
         {
             get { return Subreddit.GetRSlashAll(this); }
+        }
+
+        public AuthenticatedUser Me
+        {
+            get
+            {
+                var request = _webAgent.CreateGet(MeUrl);
+                var response = (HttpWebResponse)request.GetResponse();
+                var result = _webAgent.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(result);
+                User = new AuthenticatedUser(this, json, _webAgent);
+                return User;
+            }
         }
 
         public Reddit()
@@ -129,7 +141,12 @@ namespace RedditSharp
             var json = JObject.Parse(result)["json"];
             if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
-            GetMe();
+            
+            // TODO: (Previous usage: GetMe())
+            // TODO: This should probably be replaced with something better to
+            // do whatever it is this is trying to achieve.
+            var temp = Me;
+
             return User;
         }
 
@@ -142,15 +159,15 @@ namespace RedditSharp
             return new RedditUser(this, json, _webAgent);
         }
 
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use Me property instead")]
         public AuthenticatedUser GetMe()
         {
-            var request = _webAgent.CreateGet(MeUrl);
-            var response = (HttpWebResponse)request.GetResponse();
-            var result = _webAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            User = new AuthenticatedUser(this, json, _webAgent);
-            return User;
+            return Me;
         }
+
+        #endregion Obsolete Getter Methods
 
         public Subreddit GetSubreddit(string name)
         {

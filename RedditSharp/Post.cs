@@ -34,6 +34,7 @@ namespace RedditSharp
 
         [JsonProperty("author")]
         public string AuthorName { get; set; }
+
         [JsonIgnore]
         public RedditUser Author
         {
@@ -42,47 +43,86 @@ namespace RedditSharp
                 return Reddit.GetUser(AuthorName);
             }
         }
+
+        public Comment[] Comments
+        {
+            get
+            {
+                var comments = new List<Comment>();
+
+                var request = WebAgent.CreateGet(string.Format(GetCommentsUrl, Id));
+                var response = request.GetResponse();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var json = JArray.Parse(data);
+
+                var postJson = json.Last()["data"]["children"];
+                foreach (var comment in postJson)
+                    comments.Add(new Comment(Reddit, comment, WebAgent, this));
+
+                return comments.ToArray();
+            }
+        }
+
         [JsonProperty("approved_by")]
         public string ApprovedBy { get; set; }
+
         [JsonProperty("author_flair_css_class")]
         public string AuthorFlairCssClass { get; set; }
+
         [JsonProperty("author_flair_text")]
         public string AuthorFlairText { get; set; }
+
         [JsonProperty("banned_by")]
         public string BannedBy { get; set; }
+
         [JsonProperty("domain")]
         public string Domain { get; set; }
+
         [JsonProperty("edited")]
         public bool Edited { get; set; }
+
         [JsonProperty("is_self")]
         public bool IsSelfPost { get; set; }
+
         [JsonProperty("link_flair_css_class")]
         public string LinkFlairCssClass { get; set; }
+
         [JsonProperty("link_flair_text")]
         public string LinkFlairText { get; set; }
+
         [JsonProperty("num_comments")]
         public int CommentCount { get; set; }
+
         [JsonProperty("over_18")]
         public bool NSFW { get; set; }
+
         [JsonProperty("permalink")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Permalink { get; set; }
+
         [JsonProperty("score")]
         public int Score { get; set; }
+
         [JsonProperty("selftext")]
         public string SelfText { get; set; }
+
         [JsonProperty("selftext_html")]
         public string SelfTextHtml { get; set; }
+
         [JsonProperty("subreddit")]
         public string Subreddit { get; set; }
+
         [JsonProperty("thumbnail")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Thumbnail { get; set; }
+
         [JsonProperty("title")]
         public string Title { get; set; }
+
         [JsonProperty("url")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Url { get; set; }
+
         [JsonProperty("num_reports")]
         public int? Reports { get; set; }
 
@@ -204,21 +244,15 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use Comments property instead")]
         public Comment[] GetComments()
         {
-            var comments = new List<Comment>();
-
-            var request = WebAgent.CreateGet(string.Format(GetCommentsUrl, Id));
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JArray.Parse(data);
-
-            var postJson = json.Last()["data"]["children"];
-            foreach (var comment in postJson)
-                comments.Add(new Comment(Reddit, comment, WebAgent, this));
-
-            return comments.ToArray();
+            return Comments;
         }
+
+        #endregion Obsolete Getter Methods
 
         /// <summary>
         /// Replaces the text in this post with the input text.
