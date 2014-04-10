@@ -84,18 +84,6 @@ namespace RedditSharp
             get { return Subreddit.GetRSlashAll(this); }
         }
 
-        /// <summary>
-        /// The authenticated user for this instance.
-        /// </summary>
-        [Obsolete("Use User property instead")]
-        public AuthenticatedUser Me
-        {
-            get
-            {
-                return User;
-            }
-        }
-
         public Reddit()
         {
             JsonSerializerSettings = new JsonSerializerSettings()
@@ -186,10 +174,10 @@ namespace RedditSharp
 
         #region Obsolete Getter Methods
 
-        [Obsolete("Use Me property instead")]
+        [Obsolete("Use User property instead")]
         public AuthenticatedUser GetMe()
         {
-            return Me;
+            return User;
         }
 
         #endregion Obsolete Getter Methods
