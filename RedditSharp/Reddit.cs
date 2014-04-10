@@ -39,6 +39,8 @@ namespace RedditSharp
 
         #endregion
 
+        private AuthenticatedUser _user;
+
         internal readonly IWebAgent _webAgent;
 
         /// <summary>
@@ -49,7 +51,20 @@ namespace RedditSharp
         /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
-        public AuthenticatedUser User { get; set; }
+        public AuthenticatedUser User
+        {
+            get
+            {
+                if (_user == null)
+                    InitOrUpdateUser();
+                return _user;
+            }
+
+            set
+            {
+                _user = value;
+            }
+        }
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
@@ -69,15 +84,14 @@ namespace RedditSharp
             get { return Subreddit.GetRSlashAll(this); }
         }
 
+        /// <summary>
+        /// The authenticated user for this instance.
+        /// </summary>
+        [Obsolete("Use User property instead")]
         public AuthenticatedUser Me
         {
             get
             {
-                var request = _webAgent.CreateGet(MeUrl);
-                var response = (HttpWebResponse)request.GetResponse();
-                var result = _webAgent.GetResponseString(response.GetResponseStream());
-                var json = JObject.Parse(result);
-                User = new AuthenticatedUser(this, json, _webAgent);
                 return User;
             }
         }
@@ -142,10 +156,7 @@ namespace RedditSharp
             if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
             
-            // TODO: (Previous usage: GetMe())
-            // TODO: This should probably be replaced with something better to
-            // do whatever it is this is trying to achieve.
-            var temp = Me;
+            InitOrUpdateUser();
 
             return User;
         }
@@ -157,6 +168,20 @@ namespace RedditSharp
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             return new RedditUser(this, json, _webAgent);
+        }
+
+        /// <summary>
+        /// Initializes the User property if it's null,
+        /// otherwise replaces the existing user object
+        /// with a new one fetched from reddit servers.
+        /// </summary>
+        public void InitOrUpdateUser()
+        {
+            var request = _webAgent.CreateGet(MeUrl);
+            var response = (HttpWebResponse)request.GetResponse();
+            var result = _webAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(result);
+            User = new AuthenticatedUser(this, json, _webAgent);
         }
 
         #region Obsolete Getter Methods

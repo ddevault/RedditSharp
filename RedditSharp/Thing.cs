@@ -47,6 +47,7 @@ namespace RedditSharp
             FullName = data["name"].ValueOrDefault<string>();
             Id = data["id"].ValueOrDefault<string>();
             Kind = json["kind"].ValueOrDefault<string>();
+            FetchedAt = DateTime.Now;
         }
 
         public string Shortlink
@@ -57,5 +58,21 @@ namespace RedditSharp
         public string Id { get; set; }
         public string FullName { get; set; }
         public string Kind { get; set; }
+
+        /// <summary>
+        /// The time at which this object was fetched from reddit servers.
+        /// </summary>
+        public DateTime FetchedAt { get; private set; }
+
+        /// <summary>
+        /// Gets the time since last fetch from reddit servers.
+        /// </summary>
+        public TimeSpan TimeSinceFetch
+        {
+            get
+            {
+                return DateTime.Now - FetchedAt;
+            }
+        }
     }
 }
