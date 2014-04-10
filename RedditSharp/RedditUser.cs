@@ -28,26 +28,53 @@ namespace RedditSharp
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
         [JsonProperty("is_gold")]
         public bool HasGold { get; set; }
+
         [JsonProperty("is_mod")]
         public bool IsModerator { get; set; }
+
         [JsonProperty("link_karma")]
         public int LinkKarma { get; set; }
+
         [JsonProperty("comment_karma")]
         public int CommentKarma { get; set; }
+
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Created { get; set; }
 
-        public Listing<VotableThing> GetOverview()
+        public Listing<VotableThing> Overview
         {
-            return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
+            get
+            {
+                return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
+            }
         }
 
-        public Listing<Comment> GetComments()
+        public Listing<Comment> Comments
         {
-            return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
+            get
+            {
+                return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> Posts
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(LinksUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Subreddit> SubscribedSubreddits
+        {
+            get
+            {
+                return new Listing<Subreddit>(Reddit, SubscribedSubredditsUrl, WebAgent);
+            }
         }
 
         /// <summary>
@@ -68,11 +95,6 @@ namespace RedditSharp
             return new Listing<Comment>(Reddit, commentsUrl, WebAgent);
         }
 
-        public Listing<Post> GetPosts()
-        {
-            return new Listing<Post>(Reddit, string.Format(LinksUrl, Name), WebAgent);
-        }
-
         /// <summary>
         /// Get a listing of posts from the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
         /// and limited to <paramref name="limit"/>.
@@ -91,15 +113,38 @@ namespace RedditSharp
             return new Listing<Post>(Reddit, linksUrl, WebAgent);
         }
 
-        public Listing<Subreddit> GetSubscribedSubreddits()
-        {
-            return new Listing<Subreddit>(Reddit, SubscribedSubredditsUrl, WebAgent);
-        }
-
         public override string ToString()
         {
             return Name;
         }
+
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use Overview property instead")]
+        public Listing<VotableThing> GetOverview()
+        {
+            return Overview;
+        }
+
+        [Obsolete("Use Comments property instead")]
+        public Listing<Comment> GetComments()
+        {
+            return Comments;
+        }
+
+        [Obsolete("Use Posts property instead")]
+        public Listing<Post> GetPosts()
+        {
+            return Posts;
+        }
+
+        [Obsolete("Use SubscribedSubreddits property instead")]
+        public Listing<Subreddit> GetSubscribedSubreddits()
+        {
+            return SubscribedSubreddits;
+        }
+
+        #endregion Obsolete Getter Methods
     }
 
     public enum Sort

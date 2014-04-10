@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace RedditSharp
 {
+    using System;
+
     public class Wiki
     {
         private Reddit Reddit { get; set; }
@@ -22,19 +24,30 @@ namespace RedditSharp
         private const string WikiPageRevisionsUrl = "/r/{0}/wiki/revisions/{1}.json";
         private const string WikiPageDiscussionsUrl = "/r/{0}/wiki/discussions/{1}.json";
 
+        public IEnumerable<string> PageNames
+        {
+            get
+            {
+                var request = WebAgent.CreateGet(string.Format(GetWikiPagesUrl, Subreddit.Name));
+                var response = request.GetResponse();
+                string json = WebAgent.GetResponseString(response.GetResponseStream());
+                return JObject.Parse(json)["data"].Values<string>();
+            }
+        }
+
+        public Listing<WikiPageRevision> Revisions
+        {
+            get
+            {
+                return new Listing<WikiPageRevision>(Reddit, string.Format(WikiRevisionsUrl, Subreddit.Name), WebAgent);
+            }
+        }
+
         protected internal Wiki(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Reddit = reddit;
             Subreddit = subreddit;
             WebAgent = webAgent;
-        }
-
-        public IEnumerable<string> GetPageNames()
-        {
-            var request = WebAgent.CreateGet(string.Format(GetWikiPagesUrl, Subreddit.Name));
-            var response = request.GetResponse();
-            string json = WebAgent.GetResponseString(response.GetResponseStream());
-            return JObject.Parse(json)["data"].Values<string>();
         }
 
         public WikiPage GetPage(string page, string version = null)
@@ -71,10 +84,6 @@ namespace RedditSharp
         #endregion
 
         #region Revisions
-        public Listing<WikiPageRevision> GetRevisions()
-        {
-            return new Listing<WikiPageRevision>(Reddit, string.Format(WikiRevisionsUrl, Subreddit.Name), WebAgent);
-        }
 
         public Listing<WikiPageRevision> GetPageRevisions(string page)
         {
@@ -139,6 +148,20 @@ namespace RedditSharp
             var response = request.GetResponse();
         }
 
-        
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use PageNames property instead")]
+        public IEnumerable<string> GetPageNames()
+        {
+            return PageNames;
+        }
+
+        [Obsolete("Use Revisions property instead")]
+        public Listing<WikiPageRevision> GetRevisions()
+        {
+            return Revisions;
+        }
+
+        #endregion Obsolete Getter Methods
     }
 }

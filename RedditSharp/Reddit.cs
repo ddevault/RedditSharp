@@ -39,6 +39,7 @@ namespace RedditSharp
 
         #endregion
 
+        private AuthenticatedUser _user;
 
         internal readonly IWebAgent _webAgent;
 
@@ -50,7 +51,20 @@ namespace RedditSharp
         /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
-        public AuthenticatedUser User { get; set; }
+        public AuthenticatedUser User
+        {
+            get
+            {
+                if (_user == null)
+                    InitOrUpdateUser();
+                return _user;
+            }
+
+            set
+            {
+                _user = value;
+            }
+        }
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
@@ -129,7 +143,9 @@ namespace RedditSharp
             var json = JObject.Parse(result)["json"];
             if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
-            GetMe();
+            
+            InitOrUpdateUser();
+
             return User;
         }
 
@@ -142,15 +158,29 @@ namespace RedditSharp
             return new RedditUser(this, json, _webAgent);
         }
 
-        public AuthenticatedUser GetMe()
+        /// <summary>
+        /// Initializes the User property if it's null,
+        /// otherwise replaces the existing user object
+        /// with a new one fetched from reddit servers.
+        /// </summary>
+        public void InitOrUpdateUser()
         {
             var request = _webAgent.CreateGet(MeUrl);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             User = new AuthenticatedUser(this, json, _webAgent);
+        }
+
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use User property instead")]
+        public AuthenticatedUser GetMe()
+        {
             return User;
         }
+
+        #endregion Obsolete Getter Methods
 
         public Subreddit GetSubreddit(string name)
         {
