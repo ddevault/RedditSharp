@@ -33,6 +33,7 @@ namespace RedditSharp
         private const string FrontPageUrl = "/.json";
         private const string SubmitLinkUrl = "/api/submit";
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
+        private const string CommentsUrl = "/r/{0}/comments.json";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -91,6 +92,16 @@ namespace RedditSharp
                 if (Name == "/")
                     return new Listing<Post>(Reddit, "/.json", WebAgent);
                 return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Comment> Comments
+        {
+            get
+            {
+                if (Name == "/")
+                    return new Listing<Comment>(Reddit, "/comments.json", WebAgent);
+                return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
             }
         }
 
