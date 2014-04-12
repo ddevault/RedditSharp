@@ -8,8 +8,7 @@ var reddit = new Reddit();
 var user = reddit.LogIn("username", "password");
 var subreddit = reddit.GetSubreddit("/r/example");
 subreddit.Subscribe();
-var posts = subreddit.New;
-foreach (var post in posts.Take(25))
+foreach (var post in subreddit.New.Take(25))
 {
     if (post.Title == "What is my karma?")
     {
@@ -25,7 +24,7 @@ foreach (var post in posts.Take(25))
 
 ```csharp
 var all = reddit.RSlashAll;
-foreach (var post in all)
+foreach (var post in all) // BAD
 {
     // ...
 }
@@ -41,29 +40,14 @@ foreach (var post in all.Take(25))
 }
 ```
 
-Here's another example: you've made a bot to periodically check your subreddit's new page for things to automatically
-remove:
-
-```csharp
-var subreddit = reddit.GetSubreddit("/r/myawesomesubreddit");
-var newPosts = subreddit.New;
-var latest = newPosts.Skip(24).First();
-while (true)
-{
-    // Gets all posts since the last post checked
-    var toCheck = newPosts.TakeWhile(p => p != latest).ToArray();
-    CheckPosts(toCheck);
-    Thread.Sleep(60000);
-}
-```
-
 ## Development
 
 RedditSharp is developed with the following workflow:
 
-1. Nothing happens for weeks
+1. Nothing happens for weeks/months/years
 2. Someone needs it to do something it doesn't already do
 3. That person implements that something and submits a pull request
 4. Repeat
 
-If it doesn't have a feature that you want it to have, add it! The code isn't that scary.
+If it doesn't have a feature that you want it to have, add it! The code isn't that scary. Don't get angry
+when I won't add a feature for you - just add it yourself.
