@@ -79,7 +79,7 @@ namespace RedditSharp
                         url += "?after=" + After;
                 }
                 
-                if(Limit != 25)
+                if (Limit != 25)
                 {
                     if (url.Contains("?"))
                         url += "&limit=" + Limit.ToString();
@@ -87,7 +87,7 @@ namespace RedditSharp
                         url += "?limit=" + Limit.ToString();
                 }
                 
-                if(Count > 0)
+                if (Count > 0)
                 {
                     if (url.Contains("?"))
                         url += "&count=" + Count.ToString();
