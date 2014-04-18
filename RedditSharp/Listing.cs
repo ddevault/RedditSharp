@@ -22,6 +22,11 @@ namespace RedditSharp
             return new ListingEnumerator<T>(this);
         }
 
+        public IEnumerator<T> GetEnumerator(int limit)
+        {
+            return new ListingEnumerator<T>(this, limit);
+        }
+
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -35,12 +40,24 @@ namespace RedditSharp
             private string After { get; set; }
             private string Before { get; set; }
             private Thing[] CurrentPage { get; set; }
+            private int Limit { get; set; }
+            private int Count { get; set; }
+
 
             public ListingEnumerator(Listing<T> listing)
             {
                 Listing = listing;
                 CurrentPageIndex = -1;
                 CurrentPage = new Thing[0];
+            }
+
+            public ListingEnumerator(Listing<T> listing, int limit)
+            {
+                if (limit <= 0) limit = 25;
+                Listing = listing;
+                CurrentPageIndex = -1;
+                CurrentPage = new Thing[0];
+                Limit = limit;
             }
 
             public T Current
@@ -61,6 +78,23 @@ namespace RedditSharp
                     else
                         url += "?after=" + After;
                 }
+                
+                if(Limit != 25)
+                {
+                    if (url.Contains("?"))
+                        url += "&limit=" + Limit.ToString();
+                    else
+                        url += "?limit=" + Limit.ToString();
+                }
+                
+                if(Count > 0)
+                {
+                    if (url.Contains("?"))
+                        url += "&count=" + Count.ToString();
+                    else
+                        url += "?count=" + Count.ToString();
+                }
+
                 var request = Listing.WebAgent.CreateGet(url);
                 var response = request.GetResponse();
                 var data = Listing.WebAgent.GetResponseString(response.GetResponseStream());
@@ -78,6 +112,7 @@ namespace RedditSharp
                     CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
                 After = json["data"]["after"].Value<string>();
                 Before = json["data"]["before"].Value<string>();
+                Count += Limit;
             }
 
             public void Dispose()
