@@ -6,6 +6,7 @@ namespace RedditSharp
 {
     public interface IWebAgent
     {
+        bool IsAsync { get; }
         CookieContainer Cookies { get; set; }
         string AuthCookie { get; set; }
         HttpWebRequest CreateRequest(string url, string method);

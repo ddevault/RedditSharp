@@ -5,7 +5,7 @@ namespace RedditSharp
 {
     public class Thing
     {
-        public static Thing Parse(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
+        public static Thing Parse(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             var kind = json["kind"].ValueOrDefault<string>();
             switch (kind)
@@ -26,7 +26,7 @@ namespace RedditSharp
         }
 
         // if we can't determine the type of thing by "kind", try by type
-        public static Thing Parse<T>(Reddit reddit, JToken json, IAsyncWebAgent webAgent) where T : Thing
+        public static Thing Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
         {
             Thing result = Parse(reddit, json, webAgent);
             if (result == null)

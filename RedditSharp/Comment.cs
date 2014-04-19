@@ -21,9 +21,9 @@ namespace RedditSharp
         [JsonIgnore]
         private Reddit Reddit { get; set; }
         [JsonIgnore]
-        private IAsyncWebAgent WebAgent { get; set; }
+        private IWebAgent WebAgent { get; set; }
 
-        public Comment(Reddit reddit, JToken json, IAsyncWebAgent webAgent, Thing sender)
+        public Comment(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
             : base(reddit, webAgent, json)
         {
             var data = json["data"];
@@ -87,7 +87,7 @@ namespace RedditSharp
         [JsonIgnore]
         public Thing Parent { get; internal set; }
 
-        public Comment Reply(string message)
+        internal Comment ReplySync(string message)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -118,7 +118,7 @@ namespace RedditSharp
             }
         }
 
-        public async Task<Comment> ReplyAsync(string message)
+        internal async Task<Comment> ReplyAsync(string message)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -149,7 +149,19 @@ namespace RedditSharp
             }
         }
 
-        public void Distinguish(DistinguishType distinguishType)
+        public Comment Reply(string message)
+        {
+            if(WebAgent.IsAsync)
+            {
+                return ReplyAsync(message).Result;
+            }
+            else
+            {
+                return Reply(message);
+            }
+        }
+
+        internal void DistinguishSync(DistinguishType distinguishType)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -185,7 +197,7 @@ namespace RedditSharp
                 throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
 
-        public async Task DistinguishAsync(DistinguishType distinguishType)
+        internal async Task DistinguishAsync(DistinguishType distinguishType)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -221,11 +233,23 @@ namespace RedditSharp
                 throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
 
+        public void Distinguish(DistinguishType distinguishType)
+        {
+            if(WebAgent.IsAsync)
+            {
+                 DistinguishAsync(distinguishType).Start();
+            }
+            else
+            {
+                DistinguishSync(distinguishType);
+            }
+        }
+
         /// <summary>
         /// Replaces the text in this comment with the input text.
         /// </summary>
         /// <param name="newText">The text to replace the comment's contents</param>        
-        public void EditText(string newText)
+        internal void EditTextSync(string newText)
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
@@ -270,7 +294,19 @@ namespace RedditSharp
                 throw new Exception("Error editing text.");
         }
 
-        public void Remove()
+        public void EditText(string newText)
+        {
+            if(WebAgent.IsAsync)
+            {
+                EditTextAsync(newText).Start();
+            }
+            else
+            {
+                EditTextSync(newText);
+            }
+        }
+
+        internal void RemoveSync()
         {
             var request = WebAgent.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();
@@ -285,7 +321,7 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
-        public async Task RemoveAsync()
+        internal async Task RemoveAsync()
         {
             var request = await WebAgent.CreatePostAsync(RemoveUrl);
             var stream = await request.GetRequestStreamAsync();
@@ -293,6 +329,48 @@ namespace RedditSharp
             {
                 id = FullName,
                 spam = false,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public void Remove()
+        {
+            if(WebAgent.IsAsync)
+            {
+                RemoveAsync().Start();
+            }
+            else
+            {
+                RemoveSync();
+            }
+        }
+
+        internal void RemoveSpamSync()
+        {
+            var request = WebAgent.CreatePost(RemoveUrl);
+            var stream = request.GetRequestStream();
+            WebAgent.WritePostBody(stream, new
+            {
+                id = FullName,
+                spam = true,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        internal async Task RemoveSpamAsync()
+        {
+            var request = await ((IAsyncWebAgent)WebAgent).CreatePostAsync(RemoveUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await ((IAsyncWebAgent)WebAgent).WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                spam = true,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
@@ -302,35 +380,17 @@ namespace RedditSharp
 
         public void RemoveSpam()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
+            if(WebAgent.IsAsync)
             {
-                id = FullName,
-                spam = true,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
+                RemoveSpamAsync().Start();
+            }
+            else
+            {
+                RemoveSpamSync();
+            }
         }
 
-        public async Task RemoveSpamAsync()
-        {
-            var request = await WebAgent.CreatePostAsync(RemoveUrl);
-            var stream = await request.GetRequestStreamAsync();
-            await WebAgent.WritePostBodyAsync(stream, new
-            {
-                id = FullName,
-                spam = true,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = await request.GetResponseAsync();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-        }
-
-        public void SetAsRead()
+        internal void SetAsReadSync()
         {
             var request = WebAgent.CreatePost(SetAsReadUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
@@ -343,7 +403,7 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
-        public async Task SetAsReadAsync()
+        internal async Task SetAsReadAsync()
         {
             var request = await WebAgent.CreatePostAsync(SetAsReadUrl);
             var stream = await request.GetRequestStreamAsync();
@@ -355,6 +415,18 @@ namespace RedditSharp
             });
             var response = await request.GetResponseAsync();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public void SetAsRead()
+        {
+            if (WebAgent.IsAsync)
+            {
+                SetAsReadAsync().Start();
+            }
+            else
+            {
+                SetAsReadSync();
+            }
         }
     }
 
