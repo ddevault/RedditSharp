@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -117,6 +118,37 @@ namespace RedditSharp
             }
         }
 
+        public async Task<Comment> ReplyAsync(string message)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(CommentUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                text = message,
+                thing_id = FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+                //r = Subreddit
+            });
+            stream.Close();
+            try
+            {
+                var response = await request.GetResponseAsync();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                if (json["json"]["ratelimit"] != null)
+                    throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
+                return new Comment(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
+            }
+            catch (WebException ex)
+            {
+                var error = new StreamReader(ex.Response.GetResponseStream()).ReadToEndAsync();
+                return null;
+            }
+        }
+
         public void Distinguish(DistinguishType distinguishType)
         {
             if (Reddit.User == null)
@@ -153,6 +185,42 @@ namespace RedditSharp
                 throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
 
+        public async Task DistinguishAsync(DistinguishType distinguishType)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(DistinguishUrl);
+            var stream = await request.GetRequestStreamAsync();
+            string how;
+            switch (distinguishType)
+            {
+                case DistinguishType.Admin:
+                    how = "admin";
+                    break;
+                case DistinguishType.Moderator:
+                    how = "yes";
+                    break;
+                case DistinguishType.None:
+                    how = "no";
+                    break;
+                default:
+                    how = "special";
+                    break;
+            }
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                how,
+                id = Id,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
+                throw new AuthenticationException("You are not permitted to distinguish this comment.");
+        }
+
         /// <summary>
         /// Replaces the text in this comment with the input text.
         /// </summary>
@@ -179,6 +247,29 @@ namespace RedditSharp
                 throw new Exception("Error editing text.");
         }
 
+        public async Task EditTextAsync(string newText)
+        {
+            if (Reddit.User == null)
+                throw new Exception("No user logged in.");
+
+            var request = WebAgent.CreatePost(EditUserTextUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                api_type = "json",
+                text = newText,
+                thing_id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            var response = await request.GetResponseAsync();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+            JToken json = JToken.Parse(result);
+            if (json["json"].ToString().Contains("\"errors\": []"))
+                Body = newText;
+            else
+                throw new Exception("Error editing text.");
+        }
+
         public void Remove()
         {
             var request = WebAgent.CreatePost(RemoveUrl);
@@ -191,6 +282,21 @@ namespace RedditSharp
             });
             stream.Close();
             var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task RemoveAsync()
+        {
+            var request = WebAgent.CreatePost(RemoveUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                spam = false,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
@@ -209,16 +315,45 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task RemoveSpamAsync()
+        {
+            var request = WebAgent.CreatePost(RemoveUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                spam = true,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
         public void SetAsRead()
         {
             var request = WebAgent.CreatePost(SetAsReadUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
-                                 {
-                                     id = FullName,
-                                     uh = Reddit.User.Modhash,
-                                     api_type = "json"
-                                 });
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+            });
             var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task SetAsReadAsync()
+        {
+            var request = WebAgent.CreatePost(SetAsReadUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+            });
+            var response = await request.GetResponseAsync();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }

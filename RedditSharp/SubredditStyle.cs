@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Web;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -54,6 +55,24 @@ namespace RedditSharp
             var json = JToken.Parse(data);
         }
 
+        public async Task UpdateCssAsync()
+        {
+            var request = WebAgent.CreatePost(UpdateCssUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                op = "save",
+                stylesheet_contents = CSS,
+                uh = Reddit.User.Modhash,
+                api_type = "json",
+                r = Subreddit.Name
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+        }
+
         public void UploadImage(string name, ImageType imageType, byte[] file)
         {
             var request = WebAgent.CreatePost(UploadImageUrl);
@@ -73,6 +92,27 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
         }
+
+        public async Task UploadImageAsync(string name, ImageType imageType, byte[] file)
+        {
+            var request = WebAgent.CreatePost(UploadImageUrl);
+            var formData = new MultipartFormBuilder(request);
+            formData.AddDynamic(new
+            {
+                name,
+                uh = Reddit.User.Modhash,
+                r = Subreddit.Name,
+                formid = "image-upload",
+                img_type = imageType == ImageType.PNG ? "png" : "jpg",
+                upload = ""
+            });
+            formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
+            formData.Finish();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            // TODO: Detect errors
+        }
+
     }
 
     public enum ImageType

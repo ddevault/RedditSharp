@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Security.Authentication;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -128,6 +129,19 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task SetAsReadAsync()
+        {
+            var request = WebAgent.CreatePost(SetAsReadUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+            });
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         public void Reply(string message)
         {
             if (Reddit.User == null)
@@ -143,6 +157,24 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+        }
+
+        public async Task ReplyAsync(string message)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(CommentUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                text = message,
+                thing_id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JObject.Parse(data);
         }
     }

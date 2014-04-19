@@ -5,6 +5,7 @@ using System.Linq;
 namespace RedditSharp
 {
     using System;
+    using System.Threading.Tasks;
 
     public class Wiki
     {
@@ -34,6 +35,22 @@ namespace RedditSharp
                 return JObject.Parse(json)["data"].Values<string>();
             }
         }
+
+        /*public Task<IEnumerable<string>> PageNamesAsync
+        {
+            get
+            {
+                return GetPageNamesAsync();
+            }
+        }
+        private async Task<IEnumerable<string>> GetPageNamesAsync()
+        {
+            var request = WebAgent.CreateGet(string.Format(GetWikiPagesUrl, Subreddit.Name));
+            var response = await request.GetResponseAsync();
+            string json = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            return JObject.Parse(json)["data"].Values<string>();
+        }*/
+
 
         public Listing<WikiPageRevision> Revisions
         {

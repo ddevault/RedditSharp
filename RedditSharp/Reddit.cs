@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -158,6 +159,15 @@ namespace RedditSharp
             return new RedditUser(this, json, _webAgent);
         }
 
+        public async Task<RedditUser> GetUserAsync(string name)
+        {
+            var request = _webAgent.CreateGet(string.Format(UserInfoUrl, name));
+            var response = await request.GetResponseAsync();
+            var result = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JObject.Parse(result);
+            return new RedditUser(this, json, _webAgent);
+        }
+
         /// <summary>
         /// Initializes the User property if it's null,
         /// otherwise replaces the existing user object
@@ -168,6 +178,16 @@ namespace RedditSharp
             var request = _webAgent.CreateGet(MeUrl);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(result);
+            User = new AuthenticatedUser(this, json, _webAgent);
+        }
+
+        public async Task InitOrUpdateUserAsync()
+        {
+            var request = _webAgent.CreateGet(MeUrl);
+            var response = await request.GetResponseAsync();
+            var httpResponse = (HttpWebResponse)response;
+            var result = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JObject.Parse(result);
             User = new AuthenticatedUser(this, json, _webAgent);
         }
@@ -191,6 +211,15 @@ namespace RedditSharp
             return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
+        public async Task<Subreddit> GetSubredditAsync(string name)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            return await GetThingAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
+        }
+
         public JToken GetToken(Uri uri)
         {
             var url = uri.AbsoluteUri;
@@ -205,9 +234,31 @@ namespace RedditSharp
 
             return json[0]["data"]["children"].First;
         }
+
+        public async Task<JToken> GetTokenAsync(Uri uri)
+        {
+            var url = uri.AbsoluteUri;
+
+            if (url.EndsWith("/"))
+                url = url.Remove(url.Length - 1);
+
+            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url));
+            var response = await request.GetResponseAsync();
+            var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+
+            return json[0]["data"]["children"].First;
+        }
+
         public Post GetPost(Uri uri)
         {
             return new Post(this, this.GetToken(uri), _webAgent);
+        }
+
+        public async Task<Post> GetPostAsync(Uri uri)
+        {
+            var token = await this.GetTokenAsync(uri);
+            return new Post(this, token, _webAgent);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
@@ -275,6 +326,15 @@ namespace RedditSharp
             return Thing.Parse(this, json["data"]["children"][0], _webAgent);
         }
 
+        public async Task<Thing> GetThingByFullnameAsync(string fullname)
+        {
+            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
+            var response = await request.GetResponseAsync();
+            var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return Thing.Parse(this, json["data"]["children"][0], _webAgent);
+        }
+
         public Comment GetComment(string subreddit, string name, string linkName)
         {
             try
@@ -295,6 +355,26 @@ namespace RedditSharp
             }
         }
 
+        public async Task<Comment> GetCommentAsync(string subreddit, string name, string linkName)
+        {
+            try
+            {
+                if (linkName.StartsWith("t3_"))
+                    linkName = linkName.Substring(3);
+                if (name.StartsWith("t1_"))
+                    name = name.Substring(3);
+                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name));
+                var response = await request.GetResponseAsync();
+                var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
+                var json = JToken.Parse(data);
+                return Thing.Parse(this, json[1]["data"]["children"][0], _webAgent) as Comment;
+            }
+            catch (WebException)
+            {
+                return null;
+            }
+        }
+
         #region Helpers
 
         protected internal T GetThing<T>(string url) where T: Thing
@@ -302,6 +382,15 @@ namespace RedditSharp
             var request = _webAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return (T)Thing.Parse(this, json, _webAgent);
+        }
+
+        protected internal async Task<T> GetThingAsync<T>(string url) where T : Thing
+        {
+            var request = _webAgent.CreateGet(url);
+            var response = await request.GetResponseAsync();
+            var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
             return (T)Thing.Parse(this, json, _webAgent);
         }

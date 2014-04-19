@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -190,6 +191,73 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task UpdateSettingsAsync()
+        {
+            var request = WebAgent.CreatePost(SiteAdminUrl);
+            var stream = await request.GetRequestStreamAsync();
+            string link_type;
+            string type;
+            string wikimode;
+            switch (ContentOptions)
+            {
+                case ContentOptions.All:
+                    link_type = "any";
+                    break;
+                case ContentOptions.LinkOnly:
+                    link_type = "link";
+                    break;
+                default:
+                    link_type = "self";
+                    break;
+            }
+            switch (SubredditType)
+            {
+                case SubredditType.Public:
+                    type = "public";
+                    break;
+                case SubredditType.Private:
+                    type = "private";
+                    break;
+                default:
+                    type = "restricted";
+                    break;
+            }
+            switch (WikiEditMode)
+            {
+                case WikiEditMode.All:
+                    wikimode = "anyone";
+                    break;
+                case WikiEditMode.Moderators:
+                    wikimode = "modonly";
+                    break;
+                default:
+                    wikimode = "disabled";
+                    break;
+            }
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                allow_top = AllowAsDefault,
+                description = Sidebar,
+                domain = Domain,
+                lang = Language,
+                link_type,
+                over_18 = NSFW,
+                public_description = PublicDescription,
+                show_media = ShowThumbnails,
+                sr = Subreddit.FullName,
+                title = Title,
+                type,
+                uh = Reddit.User.Modhash,
+                wiki_edit_age = WikiEditAge,
+                wiki_edit_karma = WikiEditKarma,
+                wikimode,
+                api_type = "json"
+            }, "header-title", HeaderHoverText);
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         /// <summary>
         /// Resets the subreddit's header image to the Reddit logo
         /// </summary>
@@ -205,6 +273,20 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task ResetHeaderImageAsync()
+        {
+            var request = WebAgent.CreatePost(DeleteHeaderImageUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                uh = Reddit.User.Modhash,
+                r = Subreddit.Name
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
     }
 

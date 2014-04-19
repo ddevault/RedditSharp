@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -167,6 +168,37 @@ namespace RedditSharp
             }
         }
 
+        public Task<SubredditSettings> SettingsAsync
+        {
+            get
+            {
+                return GetSettingsAsync();
+            }
+        }
+
+        private async Task<SubredditSettings> GetSettingsAsync()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            try
+            {
+                var request = WebAgent.CreateGet(string.Format(GetSettingsUrl, Name));
+                var response = await request.GetResponseAsync();
+                var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                return new SubredditSettings(this, Reddit, json, WebAgent);
+            }
+            catch // TODO: More specific catch
+            {
+                // Do it unauthed
+                var request = WebAgent.CreateGet(string.Format(GetReducedSettingsUrl, Name));
+                var response = request.GetResponse();
+                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var json = JObject.Parse(data);
+                return new SubredditSettings(this, Reddit, json, WebAgent);
+            }
+        }
+
         public UserFlairTemplate[] UserFlairTemplates // Hacky, there isn't a proper endpoint for this
         {
             get
@@ -200,6 +232,44 @@ namespace RedditSharp
             }
         }
 
+        public Task<UserFlairTemplate[]> UserFlairTemplatesAsync
+        {
+            get
+            {
+                return GetUserFlairTemplatesAsync();
+            }
+        }
+
+        private async Task<UserFlairTemplate[]> GetUserFlairTemplatesAsync()
+        {
+            var request = WebAgent.CreatePost(FlairSelectorUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                name = Reddit.User.Name,
+                r = Name,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var document = new HtmlDocument();
+            document.LoadHtml(data);
+            if (document.DocumentNode.Descendants("div").First().Attributes["error"] != null)
+                throw new InvalidOperationException("This subreddit does not allow users to select flair.");
+            var templateNodes = document.DocumentNode.Descendants("li");
+            var list = new List<UserFlairTemplate>();
+            foreach (var node in templateNodes)
+            {
+                list.Add(new UserFlairTemplate
+                {
+                    CssClass = node.Descendants("span").First().Attributes["class"].Value.Split(' ')[1],
+                    Text = node.Descendants("span").First().InnerText
+                });
+            }
+            return list.ToArray();
+        }
+
         public SubredditStyle Stylesheet
         {
             get
@@ -210,6 +280,23 @@ namespace RedditSharp
                 var json = JToken.Parse(data);
                 return new SubredditStyle(Reddit, this, json, WebAgent);
             }
+        }
+
+        public Task<SubredditStyle> StylesheetAsync
+        {
+            get
+            {
+                return GetStylesheetAsync();
+            }
+        }
+
+        private async Task<SubredditStyle> GetStylesheetAsync()
+        {
+            var request = WebAgent.CreateGet(string.Format(StylesheetUrl, Name));
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return new SubredditStyle(Reddit, this, json, WebAgent);
         }
 
         public IEnumerable<ModeratorUser> Moderators
@@ -233,6 +320,34 @@ namespace RedditSharp
                 }
                 return result;
             }
+        }
+
+        public Task<IEnumerable<ModeratorUser>> ModeratorsAsync
+        {
+            get
+            {
+                return GetModeratorsAsync();
+            }
+        }
+
+        private async Task<IEnumerable<ModeratorUser>> GetModeratorsAsync()
+        {
+            var request = WebAgent.CreateGet(string.Format(ModeratorsUrl, Name));
+            var response = await request.GetResponseAsync();
+            var responseString = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JObject.Parse(responseString);
+            var type = json["kind"].ToString();
+            if (type != "UserList")
+                throw new FormatException("Reddit responded with an object that is not a user listing.");
+            var data = json["data"];
+            var mods = data["children"].ToArray();
+            var result = new ModeratorUser[mods.Length];
+            for (var i = 0; i < mods.Length; i++)
+            {
+                var mod = new ModeratorUser(Reddit, mods[i]);
+                result[i] = mod;
+            }
+            return result;
         }
 
         /// <summary>
@@ -303,6 +418,23 @@ namespace RedditSharp
             // Discard results
         }
 
+        public async Task SubscribeAsync()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(SubscribeUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                action = "sub",
+                sr = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         public void Unsubscribe()
         {
             if (Reddit.User == null)
@@ -321,6 +453,24 @@ namespace RedditSharp
             // Discard results
         }
 
+        public async Task UnsubscribeAsync()
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(SubscribeUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                action = "unsub",
+                sr = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            // Discard results
+        }
+
         public void ClearFlairTemplates(FlairType flairType)
         {
             var request = WebAgent.CreatePost(ClearFlairTemplatesUrl);
@@ -334,6 +484,21 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task ClearFlairTemplatesAsync(FlairType flairType)
+        {
+            var request = WebAgent.CreatePost(ClearFlairTemplatesUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
+                uh = Reddit.User.Modhash,
+                r = Name
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
 
         public void AddFlairTemplate(string cssClass, FlairType flairType, string text, bool userEditable)
@@ -356,6 +521,26 @@ namespace RedditSharp
             var json = JToken.Parse(data);
         }
 
+        public async Task AddFlairTemplateAsync(string cssClass, FlairType flairType, string text, bool userEditable)
+        {
+            var request = WebAgent.CreatePost(FlairTemplateUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                css_class = cssClass,
+                flair_type = flairType == FlairType.Link ? "LINK_FLAIR" : "USER_FLAIR",
+                text = text,
+                text_editable = userEditable,
+                uh = Reddit.User.Modhash,
+                r = Name,
+                api_type = "json"
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+        }
+
         public string GetFlairText(string user)
         {
             var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
@@ -365,11 +550,29 @@ namespace RedditSharp
             return (string)json["users"][0]["flair_text"];
         }
 
+        public async Task<string> GetFlairTextAsync(string user)
+        {
+            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return (string)json["users"][0]["flair_text"];
+        }
+
         public string GetFlairCssClass(string user)
         {
             var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            return (string)json["users"][0]["flair_css_class"];
+        }
+
+        public async Task<string> GetFlairCssClassAsync(string user)
+        {
+            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
             return (string)json["users"][0]["flair_css_class"];
         }
@@ -389,6 +592,23 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task SetUserFlairAsync(string user, string cssClass, string text)
+        {
+            var request = WebAgent.CreatePost(SetUserFlairUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                css_class = cssClass,
+                text = text,
+                uh = Reddit.User.Modhash,
+                r = Name,
+                name = user
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
 
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
@@ -412,6 +632,27 @@ namespace RedditSharp
             // TODO: Detect errors
         }
 
+        public async Task UploadHeaderImageAsync(string name, ImageType imageType, byte[] file)
+        {
+            var request = WebAgent.CreatePost(UploadImageUrl);
+            var formData = new MultipartFormBuilder(request);
+            formData.AddDynamic(new
+            {
+                name,
+                uh = Reddit.User.Modhash,
+                r = Name,
+                formid = "image-upload",
+                img_type = imageType == ImageType.PNG ? "png" : "jpg",
+                upload = "",
+                header = 1
+            });
+            formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
+            formData.Finish();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            // TODO: Detect errors
+        }
+
         public void AddModerator(string user)
         {
             var request = WebAgent.CreatePost(AddModeratorUrl);
@@ -427,6 +668,21 @@ namespace RedditSharp
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task AddModeratorAsync(string user)
+        {
+            var request = WebAgent.CreatePost(AddModeratorUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "moderator",
+                name = user
+            });
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         public void AcceptModeratorInvite()
         {
             var request = WebAgent.CreatePost(AcceptModeratorInviteUrl);
@@ -438,6 +694,19 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task AcceptModeratorInviteAsync()
+        {
+            var request = WebAgent.CreatePost(AcceptModeratorInviteUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name
+            });
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
 
         public void RemoveModerator(string id)
@@ -453,6 +722,21 @@ namespace RedditSharp
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task RemoveModeratorAsync(string id)
+        {
+            var request = WebAgent.CreatePost(LeaveModerationUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "moderator",
+                id
+            });
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
 
         public override string ToString()
@@ -475,6 +759,21 @@ namespace RedditSharp
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task AddContributorAsync(string user)
+        {
+            var request = WebAgent.CreatePost(AddContributorUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "contributor",
+                name = user
+            });
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         public void BanUser(string user, string reason)
         {
             var request = WebAgent.CreatePost(BanUserUrl);
@@ -494,6 +793,25 @@ namespace RedditSharp
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task BanUserAsync(string user, string reason)
+        {
+            var request = WebAgent.CreatePost(BanUserUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "banned",
+                id = "#banned",
+                name = user,
+                note = reason,
+                action = "add",
+                container = FullName
+            });
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         private Post Submit(SubmitData data)
         {
             if (Reddit.User == null)
@@ -504,6 +822,37 @@ namespace RedditSharp
 
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(result);
+
+            ICaptchaSolver solver = Reddit.CaptchaSolver;
+            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA"
+                && solver != null)
+            {
+                data.Iden = json["json"]["captcha"].ToString();
+                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(data.Iden));
+
+                // We throw exception due to this method being expected to return a valid Post object, but we cannot
+                // if we got a Captcha error.
+                if (captchaResponse.Cancel)
+                    throw new CaptchaFailedException("Captcha verification failed when submitting " + data.Kind + " post");
+
+                data.Captcha = captchaResponse.Answer;
+                return Submit(data);
+            }
+
+            return new Post(Reddit, json["json"], WebAgent);
+        }
+
+        private async Task<Post> SubmitAsync(SubmitData data)
+        {
+            if (Reddit.User == null)
+                throw new RedditException("No user logged in.");
+            var request = WebAgent.CreatePost(SubmitLinkUrl);
+
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), data);
+
+            var response = await request.GetResponseAsync();
+            var result = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(result);
 
             ICaptchaSolver solver = Reddit.CaptchaSolver;
@@ -545,6 +894,21 @@ namespace RedditSharp
                     });
         }
 
+        public async Task<Post> SubmitPostAsync(string title, string url, string captchaId = "", string captchaAnswer = "")
+        {
+            return
+                await SubmitAsync(
+                    new LinkData
+                    {
+                        Subreddit = Name,
+                        UserHash = Reddit.User.Modhash,
+                        Title = title,
+                        URL = url,
+                        Iden = captchaId,
+                        Captcha = captchaAnswer
+                    });
+        }
+
         /// <summary>
         /// Submits a text post in the current subreddit using the logged-in user
         /// </summary>
@@ -554,6 +918,21 @@ namespace RedditSharp
         {
             return
                 Submit(
+                    new TextData
+                    {
+                        Subreddit = Name,
+                        UserHash = Reddit.User.Modhash,
+                        Title = title,
+                        Text = text,
+                        Iden = captchaId,
+                        Captcha = captchaAnswer
+                    });
+        }
+
+        public async Task<Post> SubmitTextPostAsync(string title, string text, string captchaId = "", string captchaAnswer = "")
+        {
+            return
+                await SubmitAsync(
                     new TextData
                     {
                         Subreddit = Name,

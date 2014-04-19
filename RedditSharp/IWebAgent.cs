@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -11,6 +12,8 @@ namespace RedditSharp
         HttpWebRequest CreateGet(string url);
         HttpWebRequest CreatePost(string url);
         string GetResponseString(Stream stream);
+        Task<string> GetResponseStringAsync(Stream stream);
         void WritePostBody(Stream stream, object data, params string[] additionalFields);
+        Task WritePostBodyAsync(Stream stream, object data, params string[] additionalFields);
     }
 }

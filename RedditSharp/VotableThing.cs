@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -73,6 +74,16 @@ namespace RedditSharp
             this.SetVote(VoteType.Downvote);
         }
 
+        public async Task UpvoteAsync()
+        {
+            await this.SetVoteAsync(VoteType.Upvote);
+        }
+
+        public async Task DownvoteAsync()
+        {
+            await this.SetVoteAsync(VoteType.Upvote);
+        }
+
         public void SetVote(VoteType type)
         {
             if (this.Vote == type) return;
@@ -100,6 +111,33 @@ namespace RedditSharp
             }
         }
 
+        public async Task SetVoteAsync(VoteType type)
+        {
+            if (this.Vote == type) return;
+
+            var request = WebAgent.CreatePost(VoteUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                dir = (int)type,
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+
+            if (Liked == true) Upvotes--;
+            if (Liked == false) Downvotes--;
+
+            switch (type)
+            {
+                case VoteType.Upvote: Liked = true; Upvotes++; return;
+                case VoteType.None: Liked = null; return;
+                case VoteType.Downvote: Liked = false; Downvotes++; return;
+            }
+        }
+
         public void Save()
         {
             var request = WebAgent.CreatePost(SaveUrl);
@@ -112,6 +150,21 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            Saved = true;
+        }
+
+        public async Task SaveAsync()
+        {
+            var request = WebAgent.CreatePost(SaveUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             Saved = true;
         }
 
@@ -130,6 +183,21 @@ namespace RedditSharp
             Saved = false;
         }
 
+        public async Task UnsaveAsync()
+        {
+            var request = WebAgent.CreatePost(UnsaveUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+            Saved = false;
+        }
+
         public void ClearVote()
         {
             var request = WebAgent.CreatePost(VoteUrl);
@@ -143,6 +211,21 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public async Task ClearVoteAsync()
+        {
+            var request = WebAgent.CreatePost(VoteUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                dir = 0,
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
         }
     }
 }

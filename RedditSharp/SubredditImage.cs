@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 namespace RedditSharp
 {
     public class SubredditImage
@@ -48,6 +49,22 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            SubredditStyle.Images.Remove(this);
+        }
+
+        public async Task DeleteAsync()
+        {
+            var request = WebAgent.CreatePost(DeleteImageUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                img_name = Name,
+                uh = Reddit.User.Modhash,
+                r = SubredditStyle.Subreddit.Name
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             SubredditStyle.Images.Remove(this);
         }
     }
