@@ -57,14 +57,49 @@ namespace RedditSharp
             return request;
         }
 
+        public async Task<HttpWebRequest> CreateRequestAsync(string url, string method)
+        {
+            var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+
+            while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2)// Rate limiting
+                await Task.Delay(250);
+            lastRequest = DateTime.Now;
+            HttpWebRequest request;
+            if (prependDomain)
+                request = (HttpWebRequest)WebRequest.Create(String.Format("http://{0}{1}", RootDomain, url));
+            else
+                request = (HttpWebRequest)WebRequest.Create(url);
+            request.CookieContainer = Cookies;
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
+                request.Headers.Set("Cookie", cookieHeader);
+            }
+            request.Method = method;
+            request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
+            return request;
+        }
+
         public HttpWebRequest CreateGet(string url)
         {
             return CreateRequest(url, "GET");
         }
 
+        public async Task<HttpWebRequest> CreateGetAsync(string url)
+        {
+            return await CreateRequestAsync(url, "GET");
+        }
+
         public HttpWebRequest CreatePost(string url)
         {
             var request = CreateRequest(url, "POST");
+            request.ContentType = "application/x-www-form-urlencoded";
+            return request;
+        }
+
+        public async Task<HttpWebRequest> CreatePostAsync(string url)
+        {
+            var request = await CreateRequestAsync(url, "POST");
             request.ContentType = "application/x-www-form-urlencoded";
             return request;
         }

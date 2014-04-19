@@ -122,7 +122,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(CommentUrl);
+            var request = await WebAgent.CreatePostAsync(CommentUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -136,7 +136,7 @@ namespace RedditSharp
             try
             {
                 var response = await request.GetResponseAsync();
-                var data = WebAgent.GetResponseString(response.GetResponseStream());
+                var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
                 var json = JObject.Parse(data);
                 if (json["json"]["ratelimit"] != null)
                     throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
@@ -189,7 +189,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(DistinguishUrl);
+            var request = await WebAgent.CreatePostAsync(DistinguishUrl);
             var stream = await request.GetRequestStreamAsync();
             string how;
             switch (distinguishType)
@@ -252,7 +252,7 @@ namespace RedditSharp
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
 
-            var request = WebAgent.CreatePost(EditUserTextUrl);
+            var request = await WebAgent.CreatePostAsync(EditUserTextUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -287,7 +287,7 @@ namespace RedditSharp
 
         public async Task RemoveAsync()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
+            var request = await WebAgent.CreatePostAsync(RemoveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -317,7 +317,7 @@ namespace RedditSharp
 
         public async Task RemoveSpamAsync()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
+            var request = await WebAgent.CreatePostAsync(RemoveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -345,7 +345,7 @@ namespace RedditSharp
 
         public async Task SetAsReadAsync()
         {
-            var request = WebAgent.CreatePost(SetAsReadUrl);
+            var request = await WebAgent.CreatePostAsync(SetAsReadUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {

@@ -115,7 +115,7 @@ namespace RedditSharp
         {
             if (this.Vote == type) return;
 
-            var request = WebAgent.CreatePost(VoteUrl);
+            var request = await WebAgent.CreatePostAsync(VoteUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -155,7 +155,7 @@ namespace RedditSharp
 
         public async Task SaveAsync()
         {
-            var request = WebAgent.CreatePost(SaveUrl);
+            var request = await WebAgent.CreatePostAsync(SaveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -185,7 +185,7 @@ namespace RedditSharp
 
         public async Task UnsaveAsync()
         {
-            var request = WebAgent.CreatePost(UnsaveUrl);
+            var request = await WebAgent.CreatePostAsync(UnsaveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -215,7 +215,7 @@ namespace RedditSharp
 
         public async Task ClearVoteAsync()
         {
-            var request = WebAgent.CreatePost(VoteUrl);
+            var request = await WebAgent.CreatePostAsync(VoteUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {

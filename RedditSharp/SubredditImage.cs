@@ -54,7 +54,7 @@ namespace RedditSharp
 
         public async Task DeleteAsync()
         {
-            var request = WebAgent.CreatePost(DeleteImageUrl);
+            var request = await WebAgent.CreatePostAsync(DeleteImageUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {

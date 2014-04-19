@@ -57,7 +57,7 @@ namespace RedditSharp
 
         public async Task UpdateCssAsync()
         {
-            var request = WebAgent.CreatePost(UpdateCssUrl);
+            var request = await WebAgent.CreatePostAsync(UpdateCssUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -95,7 +95,7 @@ namespace RedditSharp
 
         public async Task UploadImageAsync(string name, ImageType imageType, byte[] file)
         {
-            var request = WebAgent.CreatePost(UploadImageUrl);
+            var request = await WebAgent.CreatePostAsync(UploadImageUrl);
             var formData = new MultipartFormBuilder(request);
             formData.AddDynamic(new
             {

@@ -193,7 +193,7 @@ namespace RedditSharp
 
         public async Task UpdateSettingsAsync()
         {
-            var request = WebAgent.CreatePost(SiteAdminUrl);
+            var request = await WebAgent.CreatePostAsync(SiteAdminUrl);
             var stream = await request.GetRequestStreamAsync();
             string link_type;
             string type;
@@ -277,7 +277,7 @@ namespace RedditSharp
 
         public async Task ResetHeaderImageAsync()
         {
-            var request = WebAgent.CreatePost(DeleteHeaderImageUrl);
+            var request = await WebAgent.CreatePostAsync(DeleteHeaderImageUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {

@@ -131,7 +131,7 @@ namespace RedditSharp
 
         public async Task SetAsReadAsync()
         {
-            var request = WebAgent.CreatePost(SetAsReadUrl);
+            var request = await WebAgent.CreatePostAsync(SetAsReadUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 id = FullName,
@@ -164,7 +164,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(CommentUrl);
+            var request = await WebAgent.CreatePostAsync(CommentUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {

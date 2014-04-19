@@ -73,7 +73,7 @@ namespace RedditSharp
             }
         }
 
-        public async Task<Comment[]> CommentsAsync
+        public Task<Comment[]> CommentsAsync
         {
             get
             {
@@ -85,7 +85,7 @@ namespace RedditSharp
         {
             var comments = new List<Comment>();
 
-            var request = WebAgent.CreateGet(string.Format(GetCommentsUrl, Id));
+            var request = await WebAgent.CreateGetAsync(string.Format(GetCommentsUrl, Id));
             var response = await request.GetResponseAsync();
             var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JArray.Parse(data);
@@ -187,7 +187,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(CommentUrl);
+            var request = await WebAgent.CreatePostAsync(CommentUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -222,7 +222,7 @@ namespace RedditSharp
 
         public async Task ApproveAsync()
         {
-            var request = WebAgent.CreatePost(ApproveUrl);
+            var request = await WebAgent.CreatePostAsync(ApproveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -251,7 +251,7 @@ namespace RedditSharp
 
         public async Task RemoveAsync()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
+            var request = await WebAgent.CreatePostAsync(RemoveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -281,7 +281,7 @@ namespace RedditSharp
 
         public async Task RemoveSpamAsync()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
+            var request = await WebAgent.CreatePostAsync(RemoveUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -319,7 +319,7 @@ namespace RedditSharp
                 throw new AuthenticationException("No user logged in.");
             else
             {
-                var request = WebAgent.CreatePost(DelUrl);
+                var request = await WebAgent.CreatePostAsync(DelUrl);
                 var stream = await request.GetRequestStreamAsync();
                 await WebAgent.WritePostBodyAsync(stream, new
                 {
@@ -352,7 +352,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(HideUrl);
+            var request = await WebAgent.CreatePostAsync(HideUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -384,7 +384,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(UnhideUrl);
+            var request = await WebAgent.CreatePostAsync(UnhideUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -441,7 +441,7 @@ namespace RedditSharp
             if (!IsSelfPost)
                 throw new Exception("Submission to edit is not a self-post.");
 
-            var request = WebAgent.CreatePost(EditUserTextUrl);
+            var request = await WebAgent.CreatePostAsync(EditUserTextUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -492,7 +492,7 @@ namespace RedditSharp
              if (Reddit.User == null)
                  throw new Exception("No user logged in.");
 
-             var request = WebAgent.CreatePost(SetFlairUrl);
+             var request = await WebAgent.CreatePostAsync(SetFlairUrl);
              await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
              {
                  api_type = "json",

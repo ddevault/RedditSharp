@@ -182,7 +182,7 @@ namespace RedditSharp
                 throw new AuthenticationException("No user logged in.");
             try
             {
-                var request = WebAgent.CreateGet(string.Format(GetSettingsUrl, Name));
+                var request = await WebAgent.CreateGetAsync(string.Format(GetSettingsUrl, Name));
                 var response = await request.GetResponseAsync();
                 var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
                 var json = JObject.Parse(data);
@@ -242,7 +242,7 @@ namespace RedditSharp
 
         private async Task<UserFlairTemplate[]> GetUserFlairTemplatesAsync()
         {
-            var request = WebAgent.CreatePost(FlairSelectorUrl);
+            var request = await WebAgent.CreatePostAsync(FlairSelectorUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -292,7 +292,7 @@ namespace RedditSharp
 
         private async Task<SubredditStyle> GetStylesheetAsync()
         {
-            var request = WebAgent.CreateGet(string.Format(StylesheetUrl, Name));
+            var request = await WebAgent.CreateGetAsync(string.Format(StylesheetUrl, Name));
             var response = await request.GetResponseAsync();
             var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -332,7 +332,7 @@ namespace RedditSharp
 
         private async Task<IEnumerable<ModeratorUser>> GetModeratorsAsync()
         {
-            var request = WebAgent.CreateGet(string.Format(ModeratorsUrl, Name));
+            var request = await WebAgent.CreateGetAsync(string.Format(ModeratorsUrl, Name));
             var response = await request.GetResponseAsync();
             var responseString = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JObject.Parse(responseString);
@@ -422,7 +422,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(SubscribeUrl);
+            var request = await WebAgent.CreatePostAsync(SubscribeUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -457,7 +457,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(SubscribeUrl);
+            var request = await WebAgent.CreatePostAsync(SubscribeUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -488,7 +488,7 @@ namespace RedditSharp
 
         public async Task ClearFlairTemplatesAsync(FlairType flairType)
         {
-            var request = WebAgent.CreatePost(ClearFlairTemplatesUrl);
+            var request = await WebAgent.CreatePostAsync(ClearFlairTemplatesUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -523,7 +523,7 @@ namespace RedditSharp
 
         public async Task AddFlairTemplateAsync(string cssClass, FlairType flairType, string text, bool userEditable)
         {
-            var request = WebAgent.CreatePost(FlairTemplateUrl);
+            var request = await WebAgent.CreatePostAsync(FlairTemplateUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -552,7 +552,7 @@ namespace RedditSharp
 
         public async Task<string> GetFlairTextAsync(string user)
         {
-            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var request = await WebAgent.CreateGetAsync(String.Format(FlairListUrl + "?name=" + user, Name));
             var response = await request.GetResponseAsync();
             var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -570,7 +570,7 @@ namespace RedditSharp
 
         public async Task<string> GetFlairCssClassAsync(string user)
         {
-            var request = WebAgent.CreateGet(String.Format(FlairListUrl + "?name=" + user, Name));
+            var request = await WebAgent.CreateGetAsync(String.Format(FlairListUrl + "?name=" + user, Name));
             var response = await request.GetResponseAsync();
             var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -596,7 +596,7 @@ namespace RedditSharp
 
         public async Task SetUserFlairAsync(string user, string cssClass, string text)
         {
-            var request = WebAgent.CreatePost(SetUserFlairUrl);
+            var request = await WebAgent.CreatePostAsync(SetUserFlairUrl);
             var stream = await request.GetRequestStreamAsync();
             await WebAgent.WritePostBodyAsync(stream, new
             {
@@ -634,7 +634,7 @@ namespace RedditSharp
 
         public async Task UploadHeaderImageAsync(string name, ImageType imageType, byte[] file)
         {
-            var request = WebAgent.CreatePost(UploadImageUrl);
+            var request = await WebAgent.CreatePostAsync(UploadImageUrl);
             var formData = new MultipartFormBuilder(request);
             formData.AddDynamic(new
             {
@@ -670,7 +670,7 @@ namespace RedditSharp
 
         public async Task AddModeratorAsync(string user)
         {
-            var request = WebAgent.CreatePost(AddModeratorUrl);
+            var request = await WebAgent.CreatePostAsync(AddModeratorUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -698,7 +698,7 @@ namespace RedditSharp
 
         public async Task AcceptModeratorInviteAsync()
         {
-            var request = WebAgent.CreatePost(AcceptModeratorInviteUrl);
+            var request = await WebAgent.CreatePostAsync(AcceptModeratorInviteUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -726,7 +726,7 @@ namespace RedditSharp
 
         public async Task RemoveModeratorAsync(string id)
         {
-            var request = WebAgent.CreatePost(LeaveModerationUrl);
+            var request = await WebAgent.CreatePostAsync(LeaveModerationUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -761,7 +761,7 @@ namespace RedditSharp
 
         public async Task AddContributorAsync(string user)
         {
-            var request = WebAgent.CreatePost(AddContributorUrl);
+            var request = await WebAgent.CreatePostAsync(AddContributorUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -795,7 +795,7 @@ namespace RedditSharp
 
         public async Task BanUserAsync(string user, string reason)
         {
-            var request = WebAgent.CreatePost(BanUserUrl);
+            var request = await WebAgent.CreatePostAsync(BanUserUrl);
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -847,7 +847,7 @@ namespace RedditSharp
         {
             if (Reddit.User == null)
                 throw new RedditException("No user logged in.");
-            var request = WebAgent.CreatePost(SubmitLinkUrl);
+            var request = await WebAgent.CreatePostAsync(SubmitLinkUrl);
 
             await WebAgent.WritePostBodyAsync(request.GetRequestStream(), data);
 
@@ -868,7 +868,7 @@ namespace RedditSharp
                     throw new CaptchaFailedException("Captcha verification failed when submitting " + data.Kind + " post");
 
                 data.Captcha = captchaResponse.Answer;
-                return Submit(data);
+                return await SubmitAsync(data);
             }
 
             return new Post(Reddit, json["json"], WebAgent);

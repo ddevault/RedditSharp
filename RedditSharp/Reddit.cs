@@ -161,7 +161,7 @@ namespace RedditSharp
 
         public async Task<RedditUser> GetUserAsync(string name)
         {
-            var request = _webAgent.CreateGet(string.Format(UserInfoUrl, name));
+            var request = await _webAgent.CreateGetAsync(string.Format(UserInfoUrl, name));
             var response = await request.GetResponseAsync();
             var result = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JObject.Parse(result);
@@ -184,7 +184,7 @@ namespace RedditSharp
 
         public async Task InitOrUpdateUserAsync()
         {
-            var request = _webAgent.CreateGet(MeUrl);
+            var request = await _webAgent.CreateGetAsync(MeUrl);
             var response = await request.GetResponseAsync();
             var httpResponse = (HttpWebResponse)response;
             var result = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
@@ -242,7 +242,7 @@ namespace RedditSharp
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
 
-            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url));
+            var request = await _webAgent.CreateGetAsync(string.Format(GetPostUrl, url));
             var response = await request.GetResponseAsync();
             var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -328,7 +328,7 @@ namespace RedditSharp
 
         public async Task<Thing> GetThingByFullnameAsync(string fullname)
         {
-            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
+            var request = await _webAgent.CreateGetAsync(string.Format(GetThingUrl, fullname));
             var response = await request.GetResponseAsync();
             var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -363,7 +363,7 @@ namespace RedditSharp
                     linkName = linkName.Substring(3);
                 if (name.StartsWith("t1_"))
                     name = name.Substring(3);
-                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name));
+                var request = await _webAgent.CreateGetAsync(string.Format(GetCommentUrl, subreddit, linkName, name));
                 var response = await request.GetResponseAsync();
                 var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
                 var json = JToken.Parse(data);
@@ -388,7 +388,7 @@ namespace RedditSharp
 
         protected internal async Task<T> GetThingAsync<T>(string url) where T : Thing
         {
-            var request = _webAgent.CreateGet(url);
+            var request = await _webAgent.CreateGetAsync(url);
             var response = await request.GetResponseAsync();
             var data = await _webAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JToken.Parse(data);
