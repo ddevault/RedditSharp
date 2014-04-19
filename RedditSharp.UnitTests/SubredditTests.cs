@@ -6,9 +6,6 @@ namespace RedditSharp.UnitTests
     [TestClass]
     public class SubredditTests
     {
-        [TestMethod]
-        public void TestMethod1()
-        {
-        }
+        //TODO : CODE GOES HERE
     }
 }
