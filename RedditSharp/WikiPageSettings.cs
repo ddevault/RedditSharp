@@ -20,7 +20,7 @@ namespace RedditSharp
         {
         }
 
-        protected internal WikiPageSettings(Reddit reddit, JToken json, IWebAgent webAgent)
+        protected internal WikiPageSettings(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
         {
             var editors = json["editors"].ToArray();
             Editors = editors.Select(x =>

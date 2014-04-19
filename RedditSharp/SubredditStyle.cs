@@ -11,16 +11,17 @@ namespace RedditSharp
         private const string UpdateCssUrl = "/api/subreddit_stylesheet";
 
         private Reddit Reddit { get; set; }
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
+        public SubredditStyle(Reddit reddit, Subreddit subreddit, IAsyncWebAgent webAgent)
         {
             Reddit = reddit;
             Subreddit = subreddit;
             WebAgent = webAgent;
         }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json, IWebAgent webAgent) : this(reddit, subreddit, webAgent)
+        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json, IAsyncWebAgent webAgent)
+            : this(reddit, subreddit, webAgent)
         {
             Images = new List<SubredditImage>();
             var data = json["data"];

@@ -7,10 +7,10 @@ namespace RedditSharp
         private const string DeleteImageUrl = "/api/delete_sr_img";
 
         private Reddit Reddit { get; set; }
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         public SubredditImage(Reddit reddit, SubredditStyle subredditStyle,
-            string cssLink, string name, IWebAgent webAgent)
+            string cssLink, string name, IAsyncWebAgent webAgent)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -20,7 +20,7 @@ namespace RedditSharp
         }
 
         public SubredditImage(Reddit reddit, SubredditStyle subreddit,
-            string cssLink, string name, string url, IWebAgent webAgent)
+            string cssLink, string name, string url, IAsyncWebAgent webAgent)
             : this(reddit, subreddit, cssLink, name, webAgent)
         {
             Url = new Uri(url);

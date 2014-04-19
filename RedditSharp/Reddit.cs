@@ -42,7 +42,7 @@ namespace RedditSharp
 
         private AuthenticatedUser _user;
 
-        internal readonly IWebAgent _webAgent;
+        internal readonly IAsyncWebAgent _webAgent;
 
         /// <summary>
         /// Captcha solver instance to use when solving captchas.

@@ -18,12 +18,12 @@ namespace RedditSharp
         private const string UnsaveUrl = "/api/unsave";
 
         [JsonIgnore]
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        public VotableThing(Reddit reddit, IWebAgent webAgent, JToken json) : base(reddit, json)
+        public VotableThing(Reddit reddit, IAsyncWebAgent webAgent, JToken json) : base(reddit, json)
         {
             Reddit = reddit;
             WebAgent = webAgent;

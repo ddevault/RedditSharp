@@ -6,11 +6,11 @@ namespace RedditSharp
 {
     public class Listing<T> : IEnumerable<T> where T : Thing
     {
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
         private Reddit Reddit { get; set; }
         private string Url { get; set; }
 
-        internal Listing(Reddit reddit, string url, IWebAgent webAgent)
+        internal Listing(Reddit reddit, string url, IAsyncWebAgent webAgent)
         {
             WebAgent = webAgent;
             Reddit = reddit;

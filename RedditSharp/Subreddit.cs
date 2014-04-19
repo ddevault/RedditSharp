@@ -40,7 +40,7 @@ namespace RedditSharp
         private Reddit Reddit { get; set; }
 
         [JsonIgnore]
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         [JsonIgnore]
         public Wiki Wiki { get; private set; }
@@ -358,7 +358,8 @@ namespace RedditSharp
         {
         }
 
-        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        protected internal Subreddit(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;

@@ -24,9 +24,10 @@ namespace RedditSharp
         private Reddit Reddit { get; set; }
 
         [JsonIgnore]
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
-        public Post(Reddit reddit, JToken post, IWebAgent webAgent) : base(reddit, webAgent, post)
+        public Post(Reddit reddit, JToken post, IAsyncWebAgent webAgent)
+            : base(reddit, webAgent, post)
         {
             Reddit = reddit;
             WebAgent = webAgent;

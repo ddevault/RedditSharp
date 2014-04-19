@@ -14,7 +14,7 @@ namespace RedditSharp
         private const string MessagesUrl = "/message/messages.json";
         private const string InboxUrl = "/message/inbox.json";
 
-        public AuthenticatedUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(reddit, json, webAgent)
+        public AuthenticatedUser(Reddit reddit, JToken json, IAsyncWebAgent webAgent) : base(reddit, json, webAgent)
         {
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
         }

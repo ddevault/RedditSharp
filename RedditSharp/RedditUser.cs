@@ -13,7 +13,7 @@ namespace RedditSharp
 
         private const int MAX_LIMIT = 100;
 
-        public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        public RedditUser(Reddit reddit, JToken json, IAsyncWebAgent webAgent) : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -24,7 +24,7 @@ namespace RedditSharp
         protected Reddit Reddit { get; set; }
 
         [JsonIgnore]
-        protected IWebAgent WebAgent { get; set; }
+        protected IAsyncWebAgent WebAgent { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

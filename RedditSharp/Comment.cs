@@ -21,9 +21,9 @@ namespace RedditSharp
         [JsonIgnore]
         private Reddit Reddit { get; set; }
         [JsonIgnore]
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
-        public Comment(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public Comment(Reddit reddit, JToken json, IAsyncWebAgent webAgent, Thing sender)
             : base(reddit, webAgent, json)
         {
             var data = json["data"];

@@ -10,7 +10,7 @@ using System.Web;
 
 namespace RedditSharp
 {
-    public sealed class WebAgent : IWebAgent
+    public sealed class WebAgent : IAsyncWebAgent
     {
         /// <summary>
         /// Additional values to append to the default RedditSharp user agent.

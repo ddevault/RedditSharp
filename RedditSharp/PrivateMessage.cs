@@ -14,7 +14,7 @@ namespace RedditSharp
         private const string CommentUrl = "/api/comment";
 
         private Reddit Reddit { get; set; }
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         [JsonProperty("body")]
         public string Body { get; set; }
@@ -85,7 +85,8 @@ namespace RedditSharp
             }
         }
 
-        public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        public PrivateMessage(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
