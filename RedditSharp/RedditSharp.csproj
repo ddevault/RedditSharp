@@ -11,6 +11,8 @@
     <RootNamespace>RedditSharp</RootNamespace>
     <AssemblyName>RedditSharp</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -20,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
@@ -47,7 +51,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Asynchronous\CreatedThing.cs" />
+    <Compile Include="Asynchronous\IWebAgent.cs" />
+    <Compile Include="Asynchronous\Thing.cs" />
     <Compile Include="AuthenticatedUser.cs" />
+    <Compile Include="Base\BaseWebAgent.cs" />
+    <Compile Include="Asynchronous\Comment.cs" />
+    <Compile Include="Asynchronous\VotableThing.cs" />
+    <Compile Include="Asynchronous\WebAgent.cs" />
+    <Compile Include="Base\Interfaces\IBaseWebAgent.cs" />
     <Compile Include="Captcha.cs" />
     <Compile Include="CaptchaFailedException.cs" />
     <Compile Include="CaptchaResponse.cs" />
@@ -88,6 +100,10 @@
     <Compile Include="WikiPage.cs" />
     <Compile Include="WikiPageRevision.cs" />
     <Compile Include="WikiPageSettings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\" />
+    <Folder Include="Synchronous\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

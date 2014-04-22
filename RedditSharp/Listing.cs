@@ -155,15 +155,15 @@ namespace RedditSharp
                     {
                         // If a smaller subset of listings are needed, adjust the limit
                         limit = MaximumLimit - Count;
-                    }
-
+                }
+                
                     if (limit > 0)
-                    {
+                {
                         // Add the limit, the maximum number of items to be returned per page
                         url += (url.Contains("?") ? "&" : "?") + "limit=" + limit;
                     }
                 }
-
+                
                 if (Count > 0)
                 {
                     // Add the count, the number of items already seen in this listing
@@ -230,7 +230,7 @@ namespace RedditSharp
                     {
                         // No listings were returned in the page
                         return false;
-                    }
+                }
                 }
                 return true;
             }

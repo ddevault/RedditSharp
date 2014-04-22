@@ -22,7 +22,7 @@ namespace RedditSharp
         [JsonIgnore]
         public RedditUser Author { get; set; }
 
-        protected internal WikiPageRevision(Reddit reddit, JToken json, IWebAgent webAgent)
+        protected internal WikiPageRevision(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
             : base(null)
         {
             Author = new RedditUser(reddit, json["author"], webAgent);

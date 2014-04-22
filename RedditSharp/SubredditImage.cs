@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 namespace RedditSharp
 {
     public class SubredditImage
@@ -6,10 +7,10 @@ namespace RedditSharp
         private const string DeleteImageUrl = "/api/delete_sr_img";
 
         private Reddit Reddit { get; set; }
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         public SubredditImage(Reddit reddit, SubredditStyle subredditStyle,
-            string cssLink, string name, IWebAgent webAgent)
+            string cssLink, string name, IAsyncWebAgent webAgent)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -19,7 +20,7 @@ namespace RedditSharp
         }
 
         public SubredditImage(Reddit reddit, SubredditStyle subreddit,
-            string cssLink, string name, string url, IWebAgent webAgent)
+            string cssLink, string name, string url, IAsyncWebAgent webAgent)
             : this(reddit, subreddit, cssLink, name, webAgent)
         {
             Url = new Uri(url);
@@ -48,6 +49,22 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            SubredditStyle.Images.Remove(this);
+        }
+
+        public async Task DeleteAsync()
+        {
+            var request = await WebAgent.CreatePostAsync(DeleteImageUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                img_name = Name,
+                uh = Reddit.User.Modhash,
+                r = SubredditStyle.Subreddit.Name
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             SubredditStyle.Images.Remove(this);
         }
     }

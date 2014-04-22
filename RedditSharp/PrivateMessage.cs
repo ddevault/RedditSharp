@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using System.Security.Authentication;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -13,7 +14,7 @@ namespace RedditSharp
         private const string CommentUrl = "/api/comment";
 
         private Reddit Reddit { get; set; }
-        private IWebAgent WebAgent { get; set; }
+        private IAsyncWebAgent WebAgent { get; set; }
 
         [JsonProperty("body")]
         public string Body { get; set; }
@@ -84,7 +85,8 @@ namespace RedditSharp
             }
         }
 
-        public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        public PrivateMessage(Reddit reddit, JToken json, IAsyncWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -128,6 +130,19 @@ namespace RedditSharp
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public async Task SetAsReadAsync()
+        {
+            var request = await WebAgent.CreatePostAsync(SetAsReadUrl);
+            await WebAgent.WritePostBodyAsync(request.GetRequestStream(), new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash,
+                api_type = "json"
+            });
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
+        }
+
         public void Reply(string message)
         {
             if (Reddit.User == null)
@@ -143,6 +158,24 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+        }
+
+        public async Task ReplyAsync(string message)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = await WebAgent.CreatePostAsync(CommentUrl);
+            var stream = await request.GetRequestStreamAsync();
+            await WebAgent.WritePostBodyAsync(stream, new
+            {
+                text = message,
+                thing_id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = await request.GetResponseAsync();
+            var data = await WebAgent.GetResponseStringAsync(response.GetResponseStream());
             var json = JObject.Parse(data);
         }
     }
