@@ -27,9 +27,23 @@ namespace TestRedditSharp
                     Console.WriteLine("Incorrect login.");
                 }
             }
-            var subreddit = Subreddit.GetRSlashAll(reddit);
-            foreach (var post in subreddit.GetPosts().Take(10))
-                Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
+            Console.Write("Create post? (y/n) [n]: ");
+            var choice = Console.ReadLine();
+            if (!string.IsNullOrEmpty(choice) && choice.ToLower()[0] == 'y')
+            {
+                Console.Write("Type a subreddit name: ");
+                var subname = Console.ReadLine();
+                var sub = reddit.GetSubreddit(subname);
+                Console.WriteLine("Making test post");
+                var post = sub.SubmitTextPost("RedditSharp test", "This is a test post sent from RedditSharp");
+                Console.WriteLine("Submitted: {0}", post.Url);
+            }
+            else
+            {
+                var subreddit = Subreddit.GetRSlashAll(reddit);
+                foreach (var post in subreddit.Posts.Take(10))
+                    Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
+            }
             Console.ReadKey(true);
         }
 

@@ -7,6 +7,9 @@ using System.Security.Authentication;
 
 namespace RedditSharp
 {
+    /// <summary>
+    /// Class to communicate with Reddit.com
+    /// </summary>
     public partial class Reddit
     {
         #region Constant Urls
@@ -36,6 +39,7 @@ namespace RedditSharp
 
         #endregion
 
+        private AuthenticatedUser _user;
 
         internal readonly IWebAgent _webAgent;
 
@@ -47,18 +51,62 @@ namespace RedditSharp
         /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
-        public AuthenticatedUser User { get; set; }
+        public AuthenticatedUser User
+        {
+            get
+            {
+                if (_user == null)
+                    InitOrUpdateUser();
+                return _user;
+            }
+
+            set
+            {
+                _user = value;
+            }
+        }
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
-        public Reddit()
+        /// <summary>
+        /// Gets the FrontPage using the current Reddit instance.
+        /// </summary>
+        public Subreddit FrontPage
         {
-            JsonSerializerSettings = new JsonSerializerSettings();
-            JsonSerializerSettings.CheckAdditionalContent = false;
-            JsonSerializerSettings.DefaultValueHandling = DefaultValueHandling.Ignore;
-            _webAgent = new WebAgent();
+            get { return Subreddit.GetFrontPage(this); }
         }
 
+        /// <summary>
+        /// Gets /r/All using the current Reddit instance.
+        /// </summary>
+        public Subreddit RSlashAll
+        {
+            get { return Subreddit.GetRSlashAll(this); }
+        }
+
+        public Reddit()
+        {
+            JsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    CheckAdditionalContent = false,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                };
+            _webAgent = new WebAgent();
+            CaptchaSolver = new ConsoleCaptchaSolver();
+        }
+
+        public Reddit(string username, string password, bool useSsl = true) : this()
+        {
+            this.LogIn(username, password, useSsl);
+        }
+
+        /// <summary>
+        /// Logs in the current Reddit instance.
+        /// </summary>
+        /// <param name="username">The username of the user to log on to.</param>
+        /// <param name="password">The password of the user to log on to.</param>
+        /// <param name="useSsl">Whether to use SSL or not. (default: true)</param>
+        /// <returns></returns>
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
             if (Type.GetType("Mono.Runtime") != null)
@@ -66,7 +114,7 @@ namespace RedditSharp
             _webAgent.Cookies = new CookieContainer();
             HttpWebRequest request;
             if (useSsl)
-                request = _webAgent.CreatePost(SslLoginUrl, false);
+                request = _webAgent.CreatePost(SslLoginUrl);
             else
                 request = _webAgent.CreatePost(LoginUrl);
             var stream = request.GetRequestStream();
@@ -95,7 +143,9 @@ namespace RedditSharp
             var json = JObject.Parse(result)["json"];
             if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
-            GetMe();
+            
+            InitOrUpdateUser();
+
             return User;
         }
 
@@ -108,15 +158,29 @@ namespace RedditSharp
             return new RedditUser(this, json, _webAgent);
         }
 
-        public AuthenticatedUser GetMe()
+        /// <summary>
+        /// Initializes the User property if it's null,
+        /// otherwise replaces the existing user object
+        /// with a new one fetched from reddit servers.
+        /// </summary>
+        public void InitOrUpdateUser()
         {
             var request = _webAgent.CreateGet(MeUrl);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             User = new AuthenticatedUser(this, json, _webAgent);
+        }
+
+        #region Obsolete Getter Methods
+
+        [Obsolete("Use User property instead")]
+        public AuthenticatedUser GetMe()
+        {
             return User;
         }
+
+        #endregion Obsolete Getter Methods
 
         public Subreddit GetSubreddit(string name)
         {
@@ -124,26 +188,26 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            return (Subreddit)GetThing(string.Format(SubredditAboutUrl, name));
+            return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
-        public JToken GetToken(string url)
+        public JToken GetToken(Uri uri)
         {
+            var url = uri.AbsoluteUri;
+
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
 
-            var prependDomain = !url.Contains(DomainUrl);
-
-            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url), prependDomain);
+            var request = _webAgent.CreateGet(string.Format(GetPostUrl, url));
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
 
             return json[0]["data"]["children"].First;
         }
-        public Post GetPost(string url)
+        public Post GetPost(Uri uri)
         {
-            return new Post(this, this.GetToken(url), _webAgent);
+            return new Post(this, this.GetToken(uri), _webAgent);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
@@ -204,7 +268,7 @@ namespace RedditSharp
 
         public Thing GetThingByFullname(string fullname)
         {
-            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname), true);
+            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -219,7 +283,7 @@ namespace RedditSharp
                     linkName = linkName.Substring(3);
                 if (name.StartsWith("t1_"))
                     name = name.Substring(3);
-                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name), true);
+                var request = _webAgent.CreateGet(string.Format(GetCommentUrl, subreddit, linkName, name));
                 var response = request.GetResponse();
                 var data = _webAgent.GetResponseString(response.GetResponseStream());
                 var json = JToken.Parse(data);
@@ -233,13 +297,13 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected internal Thing GetThing(string url, bool prependDomain = true)
+        protected internal T GetThing<T>(string url) where T: Thing
         {
-            var request = _webAgent.CreateGet(url, prependDomain);
+            var request = _webAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return Thing.Parse(this, json, _webAgent);
+            return (T)Thing.Parse(this, json, _webAgent);
         }
 
         #endregion

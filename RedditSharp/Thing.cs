@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 
 namespace RedditSharp
 {
@@ -24,6 +25,20 @@ namespace RedditSharp
             }
         }
 
+        // if we can't determine the type of thing by "kind", try by type
+        public static Thing Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        {
+            Thing result = Parse(reddit, json, webAgent);
+            if (result == null)
+            {
+                if (typeof(T) == typeof(WikiPageRevision))
+                {
+                    return new WikiPageRevision(reddit, json, webAgent);
+                }
+            }
+            return result;
+        }
+
         internal Thing(JToken json)
         {
             if (json == null)
@@ -32,6 +47,7 @@ namespace RedditSharp
             FullName = data["name"].ValueOrDefault<string>();
             Id = data["id"].ValueOrDefault<string>();
             Kind = json["kind"].ValueOrDefault<string>();
+            FetchedAt = DateTime.Now;
         }
 
         public string Shortlink
@@ -42,5 +58,21 @@ namespace RedditSharp
         public string Id { get; set; }
         public string FullName { get; set; }
         public string Kind { get; set; }
+
+        /// <summary>
+        /// The time at which this object was fetched from reddit servers.
+        /// </summary>
+        public DateTime FetchedAt { get; private set; }
+
+        /// <summary>
+        /// Gets the time since last fetch from reddit servers.
+        /// </summary>
+        public TimeSpan TimeSinceFetch
+        {
+            get
+            {
+                return DateTime.Now - FetchedAt;
+            }
+        }
     }
 }

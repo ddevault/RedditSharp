@@ -4,17 +4,21 @@ using System;
 
 namespace RedditSharp
 {
-    public class UnixTimestampConverter : JsonConverter
+    class UrlParser : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(double) || objectType == typeof(DateTime);
+            return objectType == typeof(String) || objectType == typeof(Uri);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var token = JToken.Load(reader);
-            return token.Value<long>().UnixTimeStampToDateTime();
+
+            if (token.Type == JTokenType.String)
+                return new Uri(token.Value<string>(), UriKind.RelativeOrAbsolute);
+            else
+                return token.Value<Uri>();
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
