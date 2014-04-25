@@ -27,7 +27,9 @@ namespace RedditSharp
         /// www.reddit.com by default
         /// </summary>
         public static string RootDomain { get; set; }
-
+        
+        public string AccessToken { get; set; }
+        
         public CookieContainer Cookies { get; set; }
         public string AuthCookie { get; set; }
 
@@ -50,6 +52,10 @@ namespace RedditSharp
             {
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
+            }
+            if (!string.IsNullOrEmpty(AccessToken))// use OAuth
+            {
+                request.Headers.Set("Authorization","bearer " + AccessToken)
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
