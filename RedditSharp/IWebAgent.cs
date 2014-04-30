@@ -7,6 +7,7 @@ namespace RedditSharp
     {
         CookieContainer Cookies { get; set; }
         string AuthCookie { get; set; }
+        string AccessToken { get; set; }
         HttpWebRequest CreateRequest(string url, string method);
         HttpWebRequest CreateGet(string url);
         HttpWebRequest CreatePost(string url);
