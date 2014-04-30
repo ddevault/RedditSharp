@@ -10,21 +10,39 @@ namespace TestRedditSharp
     {
         static void Main(string[] args)
         {
-            var reddit = new Reddit();
-            while (reddit.User == null)
+            Reddit reddit = null;
+            var authenticated = false;
+            while (!authenticated)
             {
-                Console.Write("Username: ");
-                var username = Console.ReadLine();
-                Console.Write("Password: ");
-                var password = ReadPassword();
-                try
+                Console.Write("OAuth? (y/n) [n]: ");
+                var oaChoice = Console.ReadLine();
+                if (!string.IsNullOrEmpty(oaChoice) && oaChoice.ToLower()[0] == 'y')
                 {
-                    Console.WriteLine("Logging in...");
-                    reddit.LogIn(username, password);
+                    Console.Write("OAuth token: ");
+                    var token = Console.ReadLine();
+                    reddit = new Reddit(token);
+                    reddit.InitOrUpdateUser();
+                    authenticated = reddit.User != null;
+                    if (!authenticated)
+                        Console.WriteLine("Invalid token");
                 }
-                catch (AuthenticationException)
+                else
                 {
-                    Console.WriteLine("Incorrect login.");
+                    Console.Write("Username: ");
+                    var username = Console.ReadLine();
+                    Console.Write("Password: ");
+                    var password = ReadPassword();
+                    try
+                    {
+                        Console.WriteLine("Logging in...");
+                        reddit = new Reddit(username, password);
+                        authenticated = reddit.User != null;
+                    }
+                    catch (AuthenticationException)
+                    {
+                        Console.WriteLine("Incorrect login.");
+                        authenticated = false;
+                    }
                 }
             }
             Console.Write("Create post? (y/n) [n]: ");

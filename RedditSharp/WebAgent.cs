@@ -22,6 +22,8 @@ namespace RedditSharp
         /// </summary>
         public static bool EnableRateLimit { get; set; }
 
+        public static string Protocol { get; set; }
+
         /// <summary>
         /// The root domain RedditSharp uses to address Reddit.
         /// www.reddit.com by default
@@ -44,7 +46,7 @@ namespace RedditSharp
             lastRequest = DateTime.Now;
             HttpWebRequest request;
             if (prependDomain)
-                request = (HttpWebRequest)WebRequest.Create(String.Format("http://{0}{1}", RootDomain, url));
+                request = (HttpWebRequest)WebRequest.Create(String.Format("{0}://{1}{2}", Protocol, RootDomain, url));
             else
                 request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;

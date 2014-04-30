@@ -25,7 +25,7 @@ namespace RedditSharp
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}.json";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
-        private const string OAuthDomainUrl = "https://oauth.reddit.com";
+        private const string OAuthDomainUrl = "oauth.reddit.com";
 
         #endregion
 
@@ -35,6 +35,7 @@ namespace RedditSharp
         {
             WebAgent.UserAgent = "";
             WebAgent.EnableRateLimit = true;
+            WebAgent.Protocol = "http";
             WebAgent.RootDomain = "www.reddit.com";
         }
 
@@ -88,9 +89,11 @@ namespace RedditSharp
         }
 
         public Reddit(string accessToken)
+            : this()
         {
+            WebAgent.Protocol = "https";
             WebAgent.RootDomain = OAuthDomainUrl;
-            _webAgent = new WebAgent();
+            //_webAgent = new WebAgent();
             _webAgent.AccessToken = accessToken;
         }
 
