@@ -40,8 +40,6 @@ namespace RedditSharp
 
         #endregion
 
-        private AuthenticatedUser _user;
-
         internal readonly IWebAgent _webAgent;
 
         /// <summary>
@@ -52,20 +50,7 @@ namespace RedditSharp
         /// <summary>
         /// The authenticated user for this instance.
         /// </summary>
-        public AuthenticatedUser User
-        {
-            get
-            {
-                if (_user == null)
-                    InitOrUpdateUser();
-                return _user;
-            }
-
-            set
-            {
-                _user = value;
-            }
-        }
+        public AuthenticatedUser User { get; set; }
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
