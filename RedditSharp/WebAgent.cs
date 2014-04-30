@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,26 +22,50 @@ namespace RedditSharp
         /// </summary>
         public static bool EnableRateLimit { get; set; }
 
+        public static RateLimitMode RateLimit { get; set; }
+
+        public enum RateLimitMode
+        {
+            Pace, Burst, None
+        }
+
         /// <summary>
         /// The root domain RedditSharp uses to address Reddit.
         /// www.reddit.com by default
         /// </summary>
         public static string RootDomain { get; set; }
-        
+
         public string AccessToken { get; set; }
-        
+
         public CookieContainer Cookies { get; set; }
         public string AuthCookie { get; set; }
 
-        private static DateTime lastRequest = DateTime.MinValue;
+        private static DateTime _lastRequest;
+        private static DateTime _burstStart;
+        private static int _requestsThisBurst;
 
         public HttpWebRequest CreateRequest(string url, string method)
         {
             var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
-
-            while (EnableRateLimit && (DateTime.Now - lastRequest).TotalSeconds < 2)// Rate limiting
-                Thread.Sleep(250);
-            lastRequest = DateTime.Now;
+            switch (RateLimit)
+            {
+                case RateLimitMode.Pace:
+                    while ((DateTime.Now - _lastRequest).TotalSeconds < 2)// Rate limiting
+                        Thread.Sleep(250);
+                    _lastRequest = DateTime.Now;
+                    break;
+                case RateLimitMode.Burst:
+                    if (_requestsThisBurst == 0)//this is first request
+                        _burstStart = DateTime.Now;
+                    if (_requestsThisBurst >= 30) //limit has been reached
+                    {
+                        while ((DateTime.UtcNow - _burstStart).TotalSeconds < 60)
+                            Thread.Sleep(250);
+                        _burstStart = DateTime.Now;
+                    }
+                    _requestsThisBurst++;
+                    break;
+            }
             HttpWebRequest request;
             if (prependDomain)
                 request = (HttpWebRequest)WebRequest.Create(String.Format("http://{0}{1}", RootDomain, url));
@@ -55,7 +79,7 @@ namespace RedditSharp
             }
             if (!string.IsNullOrEmpty(AccessToken))// use OAuth
             {
-                request.Headers.Set("Authorization","bearer " + AccessToken);
+                request.Headers.Set("Authorization", "bearer " + AccessToken);
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
