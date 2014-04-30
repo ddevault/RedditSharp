@@ -29,7 +29,7 @@ namespace RedditSharp
         public static RateLimitMode RateLimit { get; set; }
 
         /// <summary>
-        /// The rate limiting method to use
+        /// The method by which the WebAgent will limit request rate
         /// </summary>
         public enum RateLimitMode
         {
@@ -42,7 +42,7 @@ namespace RedditSharp
             /// </summary>
             Burst,
             /// <summary>
-            /// Does not restrict request rate
+            /// Does not restrict request rate. ***NOT RECOMMENDED***
             /// </summary>
             None
         }
