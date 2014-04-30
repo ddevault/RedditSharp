@@ -34,7 +34,7 @@ namespace RedditSharp
         static Reddit()
         {
             WebAgent.UserAgent = "";
-            WebAgent.EnableRateLimit = true;
+            WebAgent.RateLimit = WebAgent.RateLimitMode.Pace;
             WebAgent.RootDomain = "www.reddit.com";
         }
 
@@ -94,6 +94,13 @@ namespace RedditSharp
                 };
             _webAgent = new WebAgent();
             CaptchaSolver = new ConsoleCaptchaSolver();
+        }
+
+        public Reddit(WebAgent.RateLimitMode limitMode)
+        {
+            WebAgent.UserAgent = "";
+            WebAgent.RateLimit = limitMode;
+            WebAgent.RootDomain = "www.reddit.com";
         }
 
         public Reddit(string username, string password, bool useSsl = true)
