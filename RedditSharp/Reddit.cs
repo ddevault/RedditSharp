@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
@@ -96,11 +96,12 @@ namespace RedditSharp
             CaptchaSolver = new ConsoleCaptchaSolver();
         }
 
-        public Reddit(string username, string password, bool useSsl = true) : this()
+        public Reddit(string username, string password, bool useSsl = true)
+            : this()
         {
             this.LogIn(username, password, useSsl);
         }
-        
+
         public Reddit(string accessToken)
         {
             WebAgent.RootDomain = OAuthDomainUrl;
@@ -151,7 +152,7 @@ namespace RedditSharp
             var json = JObject.Parse(result)["json"];
             if (json["errors"].Count() != 0)
                 throw new AuthenticationException("Incorrect login.");
-            
+
             InitOrUpdateUser();
 
             return User;
@@ -248,7 +249,7 @@ namespace RedditSharp
                     ComposePrivateMessage(subject, body, to, captchaId, captchaResponse.Answer);
             }
         }
-        
+
         /// <summary>
         /// Registers a new Reddit user
         /// </summary>
@@ -305,7 +306,7 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected internal T GetThing<T>(string url) where T: Thing
+        protected internal T GetThing<T>(string url) where T : Thing
         {
             var request = _webAgent.CreateGet(url);
             var response = request.GetResponse();
