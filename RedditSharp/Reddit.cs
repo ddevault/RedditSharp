@@ -106,7 +106,6 @@ namespace RedditSharp
             WebAgent.RootDomain = OAuthDomainUrl;
             _webAgent = new WebAgent();
             _webAgent.AccessToken = accessToken;
-            User = AuthProvider.GetUser(accessToken);
         }
 
         /// <summary>
