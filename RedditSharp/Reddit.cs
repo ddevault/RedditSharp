@@ -100,7 +100,6 @@ namespace RedditSharp
         {
             WebAgent.Protocol = "https";
             WebAgent.RootDomain = OAuthDomainUrl;
-            //_webAgent = new WebAgent();
             _webAgent.AccessToken = accessToken;
         }
 
