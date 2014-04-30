@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Text;
@@ -12,7 +10,6 @@ namespace RedditSharp
     public class AuthProvider
     {
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
-        private const string sslRoot = "https://ssl.reddit.com/";
         private const string OauthGetMeUrl = "https://oauth.reddit.com/api/v1/me";
 
         [Flags]
