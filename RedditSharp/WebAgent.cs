@@ -22,6 +22,8 @@ namespace RedditSharp
         /// </summary>
         public static bool EnableRateLimit { get; set; }
 
+        public static string Protocol { get; set; }
+
         /// <summary>
         /// It is strongly advised that you leave this set to Burst or Pace. Reddit bans excessive
         /// requests with extreme predjudice.
@@ -89,7 +91,7 @@ namespace RedditSharp
             }
             HttpWebRequest request;
             if (prependDomain)
-                request = (HttpWebRequest)WebRequest.Create(String.Format("http://{0}{1}", RootDomain, url));
+                request = (HttpWebRequest)WebRequest.Create(String.Format("{0}://{1}{2}", Protocol, RootDomain, url));
             else
                 request = (HttpWebRequest)WebRequest.Create(url);
             request.CookieContainer = Cookies;
