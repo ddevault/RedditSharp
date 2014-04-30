@@ -34,7 +34,7 @@ namespace RedditSharp
         static Reddit()
         {
             WebAgent.UserAgent = "";
-            WebAgent.RateLimit = WebAgent.RateLimitMode.Pace;//Same as old functionality
+            WebAgent.RateLimit = WebAgent.RateLimitMode.Pace;
             WebAgent.RootDomain = "www.reddit.com";
         }
 
