@@ -22,11 +22,29 @@ namespace RedditSharp
         /// </summary>
         public static bool EnableRateLimit { get; set; }
 
+        /// <summary>
+        /// It is strongly advised that you leave this set to Burst or Pace. Reddit bans excessive
+        /// requests with extreme predjudice.
+        /// </summary>
         public static RateLimitMode RateLimit { get; set; }
 
+        /// <summary>
+        /// The rate limiting method to use
+        /// </summary>
         public enum RateLimitMode
         {
-            Pace, Burst, None
+            /// <summary>
+            /// Limits requests to one every two seconds
+            /// </summary>
+            Pace,
+            /// <summary>
+            /// Restricts requests to thirty per minute
+            /// </summary>
+            Burst,
+            /// <summary>
+            /// Does not restrict request rate
+            /// </summary>
+            None
         }
 
         /// <summary>
@@ -35,6 +53,9 @@ namespace RedditSharp
         /// </summary>
         public static string RootDomain { get; set; }
 
+        /// <summary>
+        /// Used to make calls against Reddit's API using OAuth23
+        /// </summary>
         public string AccessToken { get; set; }
 
         public CookieContainer Cookies { get; set; }
@@ -79,7 +100,7 @@ namespace RedditSharp
             }
             if (!string.IsNullOrEmpty(AccessToken))// use OAuth
             {
-                request.Headers.Set("Authorization", "bearer " + AccessToken);
+                request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
