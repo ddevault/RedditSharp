@@ -55,7 +55,7 @@ namespace RedditSharp
             }
             if (!string.IsNullOrEmpty(AccessToken))// use OAuth
             {
-                request.Headers.Set("Authorization","bearer " + AccessToken)
+                request.Headers.Set("Authorization","bearer " + AccessToken);
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
