@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Net;
 using System.Security.Authentication;
 using System.Text;
@@ -81,7 +79,7 @@ namespace RedditSharp
                 ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             _webAgent.Cookies = new CookieContainer();
 
-            var request = _webAgent.CreatePost(AccessUrl, false);
+            var request = _webAgent.CreatePost(AccessUrl);
 
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
@@ -124,7 +122,7 @@ namespace RedditSharp
         /// <returns></returns>
         public AuthenticatedUser GetUser(string accessToken)
         {
-            var request = _webAgent.CreateGet(OauthGetMeUrl, false);
+            var request = _webAgent.CreateGet(OauthGetMeUrl);
             request.Headers["Authorization"] = String.Format("bearer {0}", accessToken);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
