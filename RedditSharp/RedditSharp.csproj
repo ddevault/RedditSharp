@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticatedUser.cs" />
+    <Compile Include="AuthProvider.cs" />
     <Compile Include="Captcha.cs" />
     <Compile Include="CaptchaFailedException.cs" />
     <Compile Include="CaptchaResponse.cs" />
