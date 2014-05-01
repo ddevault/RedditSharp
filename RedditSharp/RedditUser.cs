@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -13,11 +13,12 @@ namespace RedditSharp
 
         private const int MAX_LIMIT = 100;
 
-        public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        public RedditUser(Reddit reddit, JToken json, IWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this, reddit.JsonSerializerSettings);
         }
 
         [JsonIgnore]
@@ -106,7 +107,7 @@ namespace RedditSharp
         public Listing<Post> GetPosts(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
         {
             if ((limit < 1) || (limit > 100))
-               throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
+                throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
             string linksUrl = string.Format(LinksUrl, Name);
             linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
