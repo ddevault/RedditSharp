@@ -18,6 +18,7 @@ namespace RedditSharp
         private const string LoginUrl = "/api/login/username";
         private const string UserInfoUrl = "/user/{0}/about.json";
         private const string MeUrl = "/api/me.json";
+        private const string OAuthMeUrl = "/api/v1/me.json";
         private const string SubredditAboutUrl = "/r/{0}/about.json";
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
@@ -73,7 +74,7 @@ namespace RedditSharp
 
         public Reddit()
         {
-            JsonSerializerSettings = new JsonSerializerSettings()
+            JsonSerializerSettings = new JsonSerializerSettings
                 {
                     CheckAdditionalContent = false,
                     DefaultValueHandling = DefaultValueHandling.Ignore
@@ -92,7 +93,7 @@ namespace RedditSharp
         public Reddit(string username, string password, bool useSsl = true)
             : this()
         {
-            this.LogIn(username, password, useSsl);
+            LogIn(username, password, useSsl);
         }
 
         public Reddit(string accessToken)
@@ -101,6 +102,7 @@ namespace RedditSharp
             WebAgent.Protocol = "https";
             WebAgent.RootDomain = OAuthDomainUrl;
             _webAgent.AccessToken = accessToken;
+            InitOrUpdateUser();
         }
 
         /// <summary>
@@ -168,7 +170,7 @@ namespace RedditSharp
         /// </summary>
         public void InitOrUpdateUser()
         {
-            var request = _webAgent.CreateGet(MeUrl);
+            var request = _webAgent.CreateGet(string.IsNullOrEmpty(_webAgent.AccessToken) ? MeUrl : OAuthMeUrl);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
@@ -210,7 +212,7 @@ namespace RedditSharp
         }
         public Post GetPost(Uri uri)
         {
-            return new Post(this, this.GetToken(uri), _webAgent);
+            return new Post(this, GetToken(uri), _webAgent);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
