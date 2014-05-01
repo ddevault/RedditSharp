@@ -43,7 +43,7 @@ namespace RedditSharp
         {
             if (json == null)
                 return;
-            var data = json["data"];
+            var data = json["name"] == null ? json["data"] : json;
             FullName = data["name"].ValueOrDefault<string>();
             Id = data["id"].ValueOrDefault<string>();
             Kind = json["kind"].ValueOrDefault<string>();
