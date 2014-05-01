@@ -12,6 +12,9 @@ namespace RedditSharp
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
         private const string OauthGetMeUrl = "https://oauth.reddit.com/api/v1/me";
 
+        public static string OAuthToken { get; set; }
+        public static string RefreshToken { get; set; }
+
         [Flags]
         public enum Scope
         {
@@ -107,7 +110,12 @@ namespace RedditSharp
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
             if (json["access_token"] != null)
+            {
+                if (json["refresh_token"] != null)
+                    RefreshToken = json["refresh_token"].ToString();
+                OAuthToken = json["access_token"].ToString();
                 return json["access_token"].ToString();
+            }
             if (json["error"] != null)
             {
                 throw new AuthenticationException("Could not log in: " + json["error"]);
@@ -120,6 +128,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="accessToken">Obtained using GetOAuthToken</param>
         /// <returns></returns>
+        [Obsolete("Reddit.InitOrUpdateUser is preferred")]
         public AuthenticatedUser GetUser(string accessToken)
         {
             var request = _webAgent.CreateGet(OauthGetMeUrl);
