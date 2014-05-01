@@ -17,7 +17,7 @@ namespace RedditSharp
         {
             Reddit = reddit;
             WebAgent = webAgent;
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this, reddit.JsonSerializerSettings);
         }
 
         [JsonIgnore]
