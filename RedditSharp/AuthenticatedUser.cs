@@ -13,10 +13,11 @@ namespace RedditSharp
         private const string ModMailUrl = "/message/moderator.json";
         private const string MessagesUrl = "/message/messages.json";
         private const string InboxUrl = "/message/inbox.json";
+        private const string SentUrl = "/message/sent.json";
 
         public AuthenticatedUser(Reddit reddit, JToken json, IWebAgent webAgent) : base(reddit, json, webAgent)
         {
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this, reddit.JsonSerializerSettings);
         }
 
         public Listing<Subreddit> ModeratorSubreddits
@@ -74,6 +75,15 @@ namespace RedditSharp
                 return new Listing<PrivateMessage>(Reddit, InboxUrl, WebAgent);
             }
         }
+        
+        public Listing<PrivateMessage> Sent
+        {
+            get
+            {
+                return new Listing<PrivateMessage>(Reddit, SentUrl, WebAgent);
+            }
+        }
+
 
         #region Obsolete Getter Methods
 
