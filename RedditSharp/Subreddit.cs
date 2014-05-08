@@ -521,6 +521,10 @@ namespace RedditSharp
                 data.Captcha = captchaResponse.Answer;
                 return Submit(data);
             }
+            else if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "ALREADY_SUB")
+            {
+                throw new DuplicateLinkException(String.Format("Post failed when submitting.  The following link has already been submitted: {0}", SubmitLinkUrl));
+            }
 
             return new Post(Reddit, json["json"], WebAgent);
         }
