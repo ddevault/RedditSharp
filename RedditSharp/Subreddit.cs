@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
@@ -239,11 +239,13 @@ namespace RedditSharp
         /// This constructor only exists for internal use and serialization.
         /// You would be wise not to use it.
         /// </summary>
-        public Subreddit() : base(null)
+        public Subreddit()
+            : base(null)
         {
         }
 
-        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent)
+            : base(json)
         {
             Reddit = reddit;
             WebAgent = webAgent;
@@ -480,16 +482,16 @@ namespace RedditSharp
             var request = WebAgent.CreatePost(BanUserUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
                                    {
-                api_type = "json",
-                uh = Reddit.User.Modhash,
-                r = Name,
-                type = "banned",
-                id = "#banned",
-                name = user,
-                note = reason,
-                action = "add",
-                container = FullName
-            });
+                                       api_type = "json",
+                                       uh = Reddit.User.Modhash,
+                                       r = Name,
+                                       type = "banned",
+                                       id = "#banned",
+                                       name = user,
+                                       note = reason,
+                                       action = "add",
+                                       container = FullName
+                                   });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
@@ -534,7 +536,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="title">The title of the submission</param>
         /// <param name="url">The url of the submission link</param>
-        public Post SubmitPost(string title, string url, string captchaId = "", string captchaAnswer = "")
+        public Post SubmitPost(string title, string url, string captchaId = "", string captchaAnswer = "", bool resubmit = false)
         {
             return
                 Submit(
@@ -544,6 +546,7 @@ namespace RedditSharp
                         UserHash = Reddit.User.Modhash,
                         Title = title,
                         URL = url,
+                        Resubmit = resubmit,
                         Iden = captchaId,
                         Captcha = captchaAnswer
                     });

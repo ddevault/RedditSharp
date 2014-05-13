@@ -1,4 +1,4 @@
-﻿namespace RedditSharp
+namespace RedditSharp
 {
     internal abstract class SubmitData
     {
@@ -22,6 +22,9 @@
 
         [RedditAPIName("captcha")]
         internal string Captcha { get; set; }
+
+        [RedditAPIName("resubmit")]
+        internal bool Resubmit { get; set; }
 
         protected SubmitData()
         {
