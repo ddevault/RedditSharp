@@ -1,4 +1,5 @@
 using System;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web;
+using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
@@ -67,9 +69,72 @@ namespace RedditSharp
         private static DateTime _burstStart;
         private static int _requestsThisBurst;
 
-        public HttpWebRequest CreateRequest(string url, string method)
+        public JToken CreateAndExecuteRequest(string url)
         {
-            var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+            Uri uri;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
+            {
+                if (!Uri.TryCreate(String.Format("{0}://{1}{2}", Protocol, RootDomain, url), UriKind.Absolute, out uri))
+                    throw new Exception("Could not parse Uri");
+            }
+            var request = CreateGet(uri);
+            try { return ExecuteRequest(request); }
+            catch (Exception)
+            {
+                var tempProtocol = Protocol;
+                var tempRootDomain = RootDomain;
+                Protocol = "http";
+                RootDomain = "www.reddit.com";
+                var retval = CreateAndExecuteRequest(url);
+                Protocol = tempProtocol;
+                RootDomain = tempRootDomain;
+                return retval;
+            }
+        }
+
+        /// <summary>
+        /// Executes the web request and handles errors in the response
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public JToken ExecuteRequest(HttpWebRequest request)
+        {
+            EnforceRateLimit();
+            var response = request.GetResponse();
+            var result = GetResponseString(response.GetResponseStream());
+
+            var json = JToken.Parse(result);
+            try
+            {
+                if (json["json"] != null)
+                {
+                    json = json["json"]; //get json object if there is a root node
+                }
+                if (json["error"] != null)
+                {
+                    switch (json["error"].ToString())
+                    {
+                        case "404":
+                            throw new Exception("File Not Found");
+                        case "403":
+                            throw new Exception("Restricted");
+                        case "invalid_grant":
+                            //Refresh authtoken
+                            //AccessToken = authProvider.GetRefreshToken();
+                            //ExecuteRequest(request);
+                            break;
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return json;
+
+        }
+
+        private static void EnforceRateLimit()
+        {
             switch (RateLimit)
             {
                 case RateLimitMode.Pace:
@@ -89,6 +154,13 @@ namespace RedditSharp
                     _requestsThisBurst++;
                     break;
             }
+        }
+
+        public HttpWebRequest CreateRequest(string url, string method)
+        {
+            EnforceRateLimit();
+            var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+
             HttpWebRequest request;
             if (prependDomain)
                 request = (HttpWebRequest)WebRequest.Create(String.Format("{0}://{1}{2}", Protocol, RootDomain, url));
@@ -100,7 +172,26 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (!string.IsNullOrEmpty(AccessToken))// use OAuth
+            if (RootDomain == "oauth.reddit.com")// use OAuth
+            {
+                request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
+            }
+            request.Method = method;
+            request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
+            return request;
+        }
+
+        private HttpWebRequest CreateRequest(Uri uri, string method)
+        {
+            EnforceRateLimit();
+            var request = (HttpWebRequest)WebRequest.Create(uri);
+            request.CookieContainer = Cookies;
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
+                request.Headers.Set("Cookie", cookieHeader);
+            }
+            if (RootDomain == "oauth.reddit.com")// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
@@ -110,6 +201,11 @@ namespace RedditSharp
         }
 
         public HttpWebRequest CreateGet(string url)
+        {
+            return CreateRequest(url, "GET");
+        }
+
+        private HttpWebRequest CreateGet(Uri url)
         {
             return CreateRequest(url, "GET");
         }
@@ -142,9 +238,7 @@ namespace RedditSharp
             }
             for (int i = 0; i < additionalFields.Length; i += 2)
             {
-                var entry = Convert.ToString(additionalFields[i + 1]);
-                if (entry == null)
-                    entry = string.Empty;
+                var entry = Convert.ToString(additionalFields[i + 1]) ?? string.Empty;
                 value += additionalFields[i] + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             value = value.Remove(value.Length - 1); // Remove trailing &
