@@ -477,6 +477,21 @@ namespace RedditSharp
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public void RemoveContributor(string id)
+        {
+            var request = WebAgent.CreatePost(LeaveModerationUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "contributor",
+                id
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
         public void BanUser(string user, string reason)
         {
             var request = WebAgent.CreatePost(BanUserUrl);
