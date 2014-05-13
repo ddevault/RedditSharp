@@ -10,7 +10,7 @@ namespace RedditSharp
     /// <summary>
     /// Class to communicate with Reddit.com
     /// </summary>
-    public partial class Reddit
+    public class Reddit
     {
         #region Constant Urls
 
@@ -53,6 +53,15 @@ namespace RedditSharp
         /// The authenticated user for this instance.
         /// </summary>
         public AuthenticatedUser User { get; set; }
+
+        /// <summary>
+        /// Sets the Rate Limiting Mode of the underlying WebAgent
+        /// </summary>
+        public WebAgent.RateLimitMode RateLimit
+        {
+            get { return WebAgent.RateLimit; }
+            set { WebAgent.RateLimit = value; }
+        }
 
         internal JsonSerializerSettings JsonSerializerSettings { get; set; }
 
