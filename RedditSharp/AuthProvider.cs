@@ -6,7 +6,6 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-
     public class AuthProvider
     {
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
@@ -67,7 +66,7 @@ namespace RedditSharp
         /// <returns></returns>
         public string GetAuthUrl(string state, Scope scope, bool permanent = false)
         {
-            return String.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type=code&state={1}&redirect_uri={2}&duration={3}&scope={4}", _clientId, state, _redirectUri, permanent ? "permanent" : "temporary", scope);
+            return String.Format("https://ssl.reddit.com/api/v1/authorize?client_id={0}&response_type=code&state={1}&redirect_uri={2}&duration={3}&scope={4}", _clientId, state, _redirectUri, permanent ? "permanent" : "temporary", scope.ToString().Replace(" ",""));
         }
 
         /// <summary>
@@ -91,34 +90,28 @@ namespace RedditSharp
             {
                 _webAgent.WritePostBody(stream, new
                 {
-                    grant_type = "authorization_code",
-                    code,
-                    redirect_uri = _redirectUri
+                    grant_type = "refresh_token",
+                    refresh_token = code
                 });
             }
             else
             {
                 _webAgent.WritePostBody(stream, new
                 {
-                    grant_type = "refresh_token",
-                    refresh_token = code
+                    grant_type = "authorization_code",
+                    code,
+                    redirect_uri = _redirectUri
                 });
             }
 
             stream.Close();
-            var response = (HttpWebResponse)request.GetResponse();
-            var result = _webAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
+            var json = _webAgent.ExecuteRequest(request);
             if (json["access_token"] != null)
             {
                 if (json["refresh_token"] != null)
                     RefreshToken = json["refresh_token"].ToString();
                 OAuthToken = json["access_token"].ToString();
                 return json["access_token"].ToString();
-            }
-            if (json["error"] != null)
-            {
-                throw new AuthenticationException("Could not log in: " + json["error"]);
             }
             throw new AuthenticationException("Could not log in.");
         }
