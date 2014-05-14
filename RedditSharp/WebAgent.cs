@@ -143,7 +143,7 @@ namespace RedditSharp
             }
         }
 
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The CreateRequest(Uri uri, string method) method is preferred.")]
         public HttpWebRequest CreateRequest(string url, string method)
         {
             EnforceRateLimit();
@@ -188,7 +188,7 @@ namespace RedditSharp
             return request;
         }
 
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The HttpWebRequest CreateGet(Uri url) method is preferred.")]
         public HttpWebRequest CreateGet(string url)
         {
             return CreateRequest(url, "GET");
@@ -199,7 +199,7 @@ namespace RedditSharp
             return CreateRequest(url, "GET");
         }
 
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The CreatePost(Uri url) method is preferred.")]
         public HttpWebRequest CreatePost(string url)
         {
             var request = CreateRequest(url, "POST");
