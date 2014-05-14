@@ -10,11 +10,11 @@ namespace RedditSharp
         CookieContainer Cookies { get; set; }
         string AuthCookie { get; set; }
         string AccessToken { get; set; }
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The CreateRequest(Uri url, string method); method is preferred.")]
         HttpWebRequest CreateRequest(string url, string method);
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The CreateGet(Uri url); method is preferred.")]
         HttpWebRequest CreateGet(string url);
-        [Obsolete("The Uri implementation of this method is preferred.")]
+        [Obsolete("The CreatePost(Uri url); method is preferred.")]
         HttpWebRequest CreatePost(string url);
         HttpWebRequest CreateRequest(Uri url, string method);
         HttpWebRequest CreateGet(Uri url);
