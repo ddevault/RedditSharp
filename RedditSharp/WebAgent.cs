@@ -24,6 +24,7 @@ namespace RedditSharp
         /// </summary>
         public static bool EnableRateLimit { get; set; }
 
+        [Obsolete("Only used in obsolete method CreateRequest(string url, string method).")]
         public static string Protocol { get; set; }
 
         /// <summary>
@@ -55,7 +56,8 @@ namespace RedditSharp
         /// The root domain RedditSharp uses to address Reddit.
         /// www.reddit.com by default
         /// </summary>
-        public static string RootDomain { get; set; }
+        [Obsolete("Only used in obsolete method CreateRequest(string url, string method).")]
+        public static Uri RootDomain { get; set; }
 
         /// <summary>
         /// Used to make calls against Reddit's API using OAuth23
@@ -69,25 +71,14 @@ namespace RedditSharp
         private static DateTime _burstStart;
         private static int _requestsThisBurst;
 
-        public JToken CreateAndExecuteRequest(string url)
+        public JToken CreateAndExecuteRequest(Uri uri)
         {
-            Uri uri;
-            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
-            {
-                if (!Uri.TryCreate(String.Format("{0}://{1}{2}", Protocol, RootDomain, url), UriKind.Absolute, out uri))
-                    throw new Exception("Could not parse Uri");
-            }
             var request = CreateGet(uri);
             try { return ExecuteRequest(request); }
             catch (Exception)
             {
-                var tempProtocol = Protocol;
-                var tempRootDomain = RootDomain;
-                Protocol = "http";
-                RootDomain = "www.reddit.com";
-                var retval = CreateAndExecuteRequest(url);
-                Protocol = tempProtocol;
-                RootDomain = tempRootDomain;
+                var builder = new UriBuilder(uri) { Scheme = "http", Host = UriService.DomainUrl.ToString() };
+                var retval = CreateAndExecuteRequest(builder.Uri);
                 return retval;
             }
         }
@@ -104,31 +95,27 @@ namespace RedditSharp
             var result = GetResponseString(response.GetResponseStream());
 
             var json = JToken.Parse(result);
-            try
+
+            if (json["json"] != null)
             {
-                if (json["json"] != null)
+                json = json["json"]; //get json object if there is a root node
+            }
+            if (json["error"] != null)
+            {
+                switch (json["error"].ToString())
                 {
-                    json = json["json"]; //get json object if there is a root node
-                }
-                if (json["error"] != null)
-                {
-                    switch (json["error"].ToString())
-                    {
-                        case "404":
-                            throw new Exception("File Not Found");
-                        case "403":
-                            throw new Exception("Restricted");
-                        case "invalid_grant":
-                            //Refresh authtoken
-                            //AccessToken = authProvider.GetRefreshToken();
-                            //ExecuteRequest(request);
-                            break;
-                    }
+                    case "404":
+                        throw new FileNotFoundException();
+                    case "403":
+                        throw new Exception("Restricted");
+                    case "invalid_grant":
+                        //Refresh authtoken
+                        //AccessToken = authProvider.GetRefreshToken();
+                        //ExecuteRequest(request);
+                        break;
                 }
             }
-            catch
-            {
-            }
+
             return json;
 
         }
@@ -156,6 +143,7 @@ namespace RedditSharp
             }
         }
 
+        [Obsolete("The Uri implementation of this method is preferred.")]
         public HttpWebRequest CreateRequest(string url, string method)
         {
             EnforceRateLimit();
@@ -172,7 +160,7 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (RootDomain == "oauth.reddit.com")// use OAuth
+            if (RootDomain == UriService.OAuthDomainUrl)// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
@@ -181,7 +169,7 @@ namespace RedditSharp
             return request;
         }
 
-        private HttpWebRequest CreateRequest(Uri uri, string method)
+        public HttpWebRequest CreateRequest(Uri uri, string method)
         {
             EnforceRateLimit();
             var request = (HttpWebRequest)WebRequest.Create(uri);
@@ -191,7 +179,7 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (RootDomain == "oauth.reddit.com")// use OAuth
+            if (uri.Host == UriService.OAuthDomainUrl.ToString())// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
@@ -200,17 +188,26 @@ namespace RedditSharp
             return request;
         }
 
+        [Obsolete("The Uri implementation of this method is preferred.")]
         public HttpWebRequest CreateGet(string url)
         {
             return CreateRequest(url, "GET");
         }
 
-        private HttpWebRequest CreateGet(Uri url)
+        public HttpWebRequest CreateGet(Uri url)
         {
             return CreateRequest(url, "GET");
         }
 
+        [Obsolete("The Uri implementation of this method is preferred.")]
         public HttpWebRequest CreatePost(string url)
+        {
+            var request = CreateRequest(url, "POST");
+            request.ContentType = "application/x-www-form-urlencoded";
+            return request;
+        }
+
+        public HttpWebRequest CreatePost(Uri url)
         {
             var request = CreateRequest(url, "POST");
             request.ContentType = "application/x-www-form-urlencoded";
