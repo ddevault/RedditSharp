@@ -18,7 +18,6 @@ namespace RedditSharp
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
             query[paramName] = paramValue.ToString();
             uriBuilder.Query = query.ToString();
-
             return new Uri(uriBuilder.ToString());
         }
     }
