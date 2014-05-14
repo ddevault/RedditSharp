@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ namespace RedditSharp
 
         private IWebAgent WebAgent { get; set; }
         private Reddit Reddit { get; set; }
-        private string Url { get; set; }
+        private Uri Url { get; set; }
 
         /// <summary>
         /// Creates a new Listing instance
@@ -22,6 +22,19 @@ namespace RedditSharp
         /// <param name="url"></param>
         /// <param name="webAgent"></param>
         internal Listing(Reddit reddit, string url, IWebAgent webAgent)
+        {
+            WebAgent = webAgent;
+            Reddit = reddit;
+            Url = new Uri(url);
+        }
+
+        /// <summary>
+        /// Creates a new Listing instance
+        /// </summary>
+        /// <param name="reddit"></param>
+        /// <param name="url"></param>
+        /// <param name="webAgent"></param>
+        internal Listing(Reddit reddit, Uri url, IWebAgent webAgent)
         {
             WebAgent = webAgent;
             Reddit = reddit;
@@ -139,7 +152,7 @@ namespace RedditSharp
 
                 if (After != null)
                 {
-                    url += (url.Contains("?") ? "&" : "?") + "after=" + After;
+                  url=  url.AddParameter("after", After);
                 }
 
                 if (LimitPerRequest != -1)
@@ -160,15 +173,15 @@ namespace RedditSharp
                     if (limit > 0)
                     {
                         // Add the limit, the maximum number of items to be returned per page
-                        url += (url.Contains("?") ? "&" : "?") + "limit=" + limit;
+                        url = url.AddParameter("limit", limit);
                     }
                 }
 
                 if (Count > 0)
                 {
                     // Add the count, the number of items already seen in this listing
-                    // The Reddit API uses this to determine when to give values for before and after fields                
-                    url += (url.Contains("?") ? "&" : "?") + "count=" + Count;
+                    // The Reddit API uses this to determine when to give values for before and after fields             
+                    url = url.AddParameter("count", Count);
                 }
 
                 var request = Listing.WebAgent.CreateGet(url);
