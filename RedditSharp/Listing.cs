@@ -21,6 +21,7 @@ namespace RedditSharp
         /// <param name="reddit"></param>
         /// <param name="url"></param>
         /// <param name="webAgent"></param>
+        [Obsolete("The Uri version of this method is preferred.")]
         internal Listing(Reddit reddit, string url, IWebAgent webAgent)
         {
             WebAgent = webAgent;
@@ -134,13 +135,13 @@ namespace RedditSharp
                 CurrentPage = new Thing[0];
 
                 // Set the listings per page (if not specified, use the Reddit default of 25) and the maximum listings
-                LimitPerRequest = (limitPerRequest <= 0 ? DefaultListingPerRequest : limitPerRequest); 
+                LimitPerRequest = (limitPerRequest <= 0 ? DefaultListingPerRequest : limitPerRequest);
                 MaximumLimit = maximumLimit;
             }
 
             public T Current
             {
-                get 
+                get
                 {
                     return (T)CurrentPage[CurrentPageIndex];
                 }
@@ -152,7 +153,7 @@ namespace RedditSharp
 
                 if (After != null)
                 {
-                  url=  url.AddParameter("after", After);
+                    url = url.AddParameter("after", After);
                 }
 
                 if (LimitPerRequest != -1)
@@ -197,7 +198,7 @@ namespace RedditSharp
             {
                 var children = json["data"]["children"] as JArray;
                 CurrentPage = new Thing[children.Count];
-                
+
                 for (int i = 0; i < CurrentPage.Length; i++)
                     CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
 
