@@ -50,7 +50,7 @@ namespace RedditSharp
             FetchedAt = DateTime.Now;
         }
 
-        public string Shortlink
+        public virtual string Shortlink
         {
             get { return "http://redd.it/" + Id; }
         }

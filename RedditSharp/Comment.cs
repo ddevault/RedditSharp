@@ -86,6 +86,17 @@ namespace RedditSharp
         [JsonIgnore]
         public Thing Parent { get; internal set; }
 
+        public override string Shortlink
+        {
+            get
+            {
+                // Not really a "short" link, but you can't actually use short links for comments
+                return string.Format("{0}://{1}/r/{2}/comments/{3}/_/{4}", 
+                    RedditSharp.WebAgent.Protocol, RedditSharp.WebAgent.RootDomain,
+                    this.Subreddit, this.LinkId, this.Id);
+            }
+        }
+
         public Comment Reply(string message)
         {
             if (Reddit.User == null)
