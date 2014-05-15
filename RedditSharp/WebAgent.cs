@@ -159,7 +159,12 @@ namespace RedditSharp
         public HttpWebRequest CreateRequest(string url, string method)
         {
             EnforceRateLimit();
-            var prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
+            bool prependDomain;
+            // IsWellFormedUriString returns true on Mono for some reason when using a string like "/api/me"
+            if (Type.GetType("Mono.Runtime") != null)
+                prependDomain = !url.StartsWith("http://") && !url.StartsWith("https://");
+            else
+                prependDomain = !Uri.IsWellFormedUriString(url, UriKind.Absolute);
 
             HttpWebRequest request;
             if (prependDomain)

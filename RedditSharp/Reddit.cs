@@ -205,6 +205,14 @@ namespace RedditSharp
             return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
+        public Domain GetDomain(string domain)
+        {
+            if (!domain.StartsWith("http://") && !domain.StartsWith("https://"))
+                domain = "http://" + domain;
+            var uri = new Uri(domain);
+            return new Domain(this, uri, _webAgent);
+        }
+
         public JToken GetToken(Uri uri)
         {
             var url = uri.AbsoluteUri;
