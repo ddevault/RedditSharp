@@ -58,7 +58,7 @@ namespace TestRedditSharp
             }
             else
             {
-                var subreddit = reddit.GetDomain("mediacru.sh");
+                var subreddit = reddit.GetSubreddit("MediaCrush");
                 foreach (var post in subreddit.Posts.Take(10))
                     Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
             }

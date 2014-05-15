@@ -227,6 +227,7 @@ namespace RedditSharp
 
             return json[0]["data"]["children"].First;
         }
+
         public Post GetPost(Uri uri)
         {
             return new Post(this, GetToken(uri), _webAgent);

@@ -16,7 +16,13 @@ namespace RedditSharp
             var token = JToken.Load(reader);
 
             if (token.Type == JTokenType.String)
+            {
+                if (Type.GetType("Mono.Runtime") == null)
+                    return new Uri(token.Value<string>(), UriKind.RelativeOrAbsolute);
+                if (token.Value<string>().StartsWith("/"))
+                    return new Uri(token.Value<string>(), UriKind.Relative);
                 return new Uri(token.Value<string>(), UriKind.RelativeOrAbsolute);
+            }
             else
                 return token.Value<Uri>();
         }
