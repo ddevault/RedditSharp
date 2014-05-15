@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace RedditSharp
 {
-    public static class UriService
+    internal static class UriService
     {
         public static Uri GetUri(Endpoints endpoint, params object[] args)
         {
@@ -16,7 +16,7 @@ namespace RedditSharp
             return Uri.TryCreate(String.Format(endpointString, args), UriKind.RelativeOrAbsolute, out retval) ? retval : null;
         }
 
-        public enum Endpoints
+        internal enum Endpoints
         {
             #region AuthenticatedUser
             [EndPointUrl("http://www.reddit.com/reddits/mine/moderator.json")]
