@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ namespace RedditSharp
 
         private IWebAgent WebAgent { get; set; }
         private Reddit Reddit { get; set; }
-        private Uri Url { get; set; }
+        private string Url { get; set; }
 
         /// <summary>
         /// Creates a new Listing instance
@@ -21,21 +21,7 @@ namespace RedditSharp
         /// <param name="reddit"></param>
         /// <param name="url"></param>
         /// <param name="webAgent"></param>
-        [Obsolete("The Uri version of this method is preferred.")]
         internal Listing(Reddit reddit, string url, IWebAgent webAgent)
-        {
-            WebAgent = webAgent;
-            Reddit = reddit;
-            Url = new Uri(url);
-        }
-
-        /// <summary>
-        /// Creates a new Listing instance
-        /// </summary>
-        /// <param name="reddit"></param>
-        /// <param name="url"></param>
-        /// <param name="webAgent"></param>
-        internal Listing(Reddit reddit, Uri url, IWebAgent webAgent)
         {
             WebAgent = webAgent;
             Reddit = reddit;
@@ -135,13 +121,13 @@ namespace RedditSharp
                 CurrentPage = new Thing[0];
 
                 // Set the listings per page (if not specified, use the Reddit default of 25) and the maximum listings
-                LimitPerRequest = (limitPerRequest <= 0 ? DefaultListingPerRequest : limitPerRequest);
+                LimitPerRequest = (limitPerRequest <= 0 ? DefaultListingPerRequest : limitPerRequest); 
                 MaximumLimit = maximumLimit;
             }
 
             public T Current
             {
-                get
+                get 
                 {
                     return (T)CurrentPage[CurrentPageIndex];
                 }
@@ -153,7 +139,7 @@ namespace RedditSharp
 
                 if (After != null)
                 {
-                    url = url.AddParameter("after", After);
+                    url += (url.Contains("?") ? "&" : "?") + "after=" + After;
                 }
 
                 if (LimitPerRequest != -1)
@@ -174,15 +160,15 @@ namespace RedditSharp
                     if (limit > 0)
                     {
                         // Add the limit, the maximum number of items to be returned per page
-                        url = url.AddParameter("limit", limit);
+                        url += (url.Contains("?") ? "&" : "?") + "limit=" + limit;
                     }
                 }
 
                 if (Count > 0)
                 {
                     // Add the count, the number of items already seen in this listing
-                    // The Reddit API uses this to determine when to give values for before and after fields             
-                    url = url.AddParameter("count", Count);
+                    // The Reddit API uses this to determine when to give values for before and after fields                
+                    url += (url.Contains("?") ? "&" : "?") + "count=" + Count;
                 }
 
                 var request = Listing.WebAgent.CreateGet(url);
@@ -198,7 +184,7 @@ namespace RedditSharp
             {
                 var children = json["data"]["children"] as JArray;
                 CurrentPage = new Thing[children.Count];
-
+                
                 for (int i = 0; i < CurrentPage.Length; i++)
                     CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
 
