@@ -57,7 +57,7 @@ namespace RedditSharp
         /// www.reddit.com by default
         /// </summary>
         [Obsolete("Only used in obsolete method CreateRequest(string url, string method).")]
-        public static Uri RootDomain { get; set; }
+        public static string RootDomain { get; set; }
 
         /// <summary>
         /// Used to make calls against Reddit's API using OAuth23
@@ -77,7 +77,7 @@ namespace RedditSharp
             try { return ExecuteRequest(request); }
             catch (Exception)
             {
-                var builder = new UriBuilder(uri) { Scheme = "http", Host = UriService.DomainUrl.ToString() };
+                var builder = new UriBuilder(uri) { Scheme = "http", Host = UriService.GetUri(UriService.Endpoints.DomainUrl).ToString() };
                 var retval = CreateAndExecuteRequest(builder.Uri);
                 return retval;
             }
@@ -160,7 +160,7 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (RootDomain == UriService.OAuthDomainUrl)// use OAuth
+            if (RootDomain == UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).ToString())// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
@@ -179,7 +179,7 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (uri.Host == UriService.OAuthDomainUrl.ToString())// use OAuth
+            if (uri.Host == UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).ToString())// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
