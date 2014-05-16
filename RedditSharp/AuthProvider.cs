@@ -76,7 +76,7 @@ namespace RedditSharp
         /// <returns></returns>
         public Uri GetAuthUri(string state, Scope scope, bool permanent = false)
         {
-            var retval = UriService.AuthorizeUri;
+            var retval = UriService.GetUri(UriService.Endpoints.AuthorizeUri);
             retval = retval.AddParameter("client_id", _clientId);
             retval = retval.AddParameter("response_type", "code");
             retval = retval.AddParameter("state", state);
@@ -98,7 +98,7 @@ namespace RedditSharp
                 ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             _webAgent.Cookies = new CookieContainer();
 
-            var request = _webAgent.CreatePost(UriService.AccessUrl);
+            var request = _webAgent.CreatePost(UriService.GetUri(UriService.Endpoints.AccessUrl));
 
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
@@ -141,7 +141,7 @@ namespace RedditSharp
         [Obsolete("Reddit.InitOrUpdateUser is preferred")]
         public AuthenticatedUser GetUser(string accessToken)
         {
-            var request = _webAgent.CreateGet(UriService.OauthGetMeUrl);
+            var request = _webAgent.CreateGet(UriService.GetUri(UriService.Endpoints.OauthGetMeUrl));
             request.Headers["Authorization"] = String.Format("bearer {0}", accessToken);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
