@@ -109,7 +109,7 @@ namespace RedditSharp
             : this()
         {
             WebAgent.Protocol = "https";
-            WebAgent.RootDomain = UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).ToString();
+            WebAgent.RootDomain = UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).Host;
             _webAgent.AccessToken = accessToken;
             InitOrUpdateUser();
         }
