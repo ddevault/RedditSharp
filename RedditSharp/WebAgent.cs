@@ -1,5 +1,4 @@
 using System;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -77,7 +76,7 @@ namespace RedditSharp
             try { return ExecuteRequest(request); }
             catch (Exception)
             {
-                var builder = new UriBuilder(uri) { Scheme = "http", Host = UriService.GetUri(UriService.Endpoints.DomainUrl).ToString() };
+                var builder = new UriBuilder(uri) { Scheme = "http", Host = UriService.GetUri(UriService.Endpoints.DomainUrl).ToString() };//try http
                 var retval = CreateAndExecuteRequest(builder.Uri);
                 return retval;
             }
@@ -160,7 +159,7 @@ namespace RedditSharp
                 var cookieHeader = Cookies.GetCookieHeader(new Uri("http://reddit.com"));
                 request.Headers.Set("Cookie", cookieHeader);
             }
-            if (RootDomain == UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).ToString())// use OAuth
+            if (RootDomain == UriService.GetUri(UriService.Endpoints.OAuthDomainUrl).Host)// use OAuth
             {
                 request.Headers.Set("Authorization", "bearer " + AccessToken);//Must be included in OAuth calls
             }
