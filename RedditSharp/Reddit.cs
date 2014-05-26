@@ -282,10 +282,7 @@ namespace RedditSharp
 
         public Thing GetThingByFullname(string fullname)
         {
-            var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
-            var response = request.GetResponse();
-            var data = _webAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
+            var json = _webAgent.CreateAndExecuteRequest(UriService.GetUri(UriService.Endpoints.GetThingUrl, fullname));
             return Thing.Parse(this, json["data"]["children"][0], _webAgent);
         }
 
