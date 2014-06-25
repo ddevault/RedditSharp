@@ -18,6 +18,8 @@ namespace RedditSharp
         private const string HideUrl = "/api/hide";
         private const string UnhideUrl = "/api/unhide";
         private const string SetFlairUrl = "/api/flair";
+        private const string MarkNSFW = "/api/marknsfw";
+        private const string UnmarkNSFW = "/api/unmarknsfw";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -242,6 +244,34 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
+        public void MarkNSFW()
+        {
+            var request = Reddit.CreatePost(MarkNSFWUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
+        }
+
+        public void UnmarkNSFW()
+        {
+            var request = Reddit.CreatePost(UnmarkNSFWUrl);
+            var stream = request.GetRequestStream();
+            Reddit.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = Reddit.GetResponseString(response.GetResponseStream());
         }
 
         #region Obsolete Getter Methods
