@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
@@ -18,6 +18,8 @@ namespace RedditSharp
         private const string HideUrl = "/api/hide";
         private const string UnhideUrl = "/api/unhide";
         private const string SetFlairUrl = "/api/flair";
+        private const string MarkNSFWUrl = "/api/marknsfw";
+        private const string UnmarkNSFWUrl = "/api/unmarknsfw";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -149,9 +151,11 @@ namespace RedditSharp
             return new Comment(Reddit, comment, WebAgent, this);
         }
 
-        public void Approve()
+        private string SimpleAction(string endpoint)
         {
-            var request = WebAgent.CreatePost(ApproveUrl);
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(endpoint);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
             {
@@ -161,21 +165,17 @@ namespace RedditSharp
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
+            return data;
+        }
+
+        public void Approve()
+        {
+            var data = SimpleAction(ApproveUrl);
         }
 
         public void Remove()
         {
-            var request = WebAgent.CreatePost(RemoveUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                id = FullName,
-                spam = false,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var data = SimpleAction(RemoveUrl);
         }
 
         public void RemoveSpam()
@@ -195,53 +195,27 @@ namespace RedditSharp
         
         public void Del()
         {
-            if (Reddit.User == null)
-                throw new AuthenticationException("No user logged in.");
-            else
-            {
-                var request = WebAgent.CreatePost(DelUrl);
-                var stream = request.GetRequestStream();
-                WebAgent.WritePostBody(stream, new
-                {
-                    id = FullName,
-                    uh = Reddit.User.Modhash
-                });
-                stream.Close();
-                var response = request.GetResponse();
-                var data = WebAgent.GetResponseString(response.GetResponseStream());
-            }
+            var data = SimpleAction(ApproveUrl);
         }
 
         public void Hide()
         {
-            if (Reddit.User == null)
-                throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(HideUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var data = SimpleAction(HideUrl);
         }
 
         public void Unhide()
         {
-            if (Reddit.User == null)
-                throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(UnhideUrl);
-            var stream = request.GetRequestStream();
-            WebAgent.WritePostBody(stream, new
-            {
-                id = FullName,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var data = SimpleAction(UnhideUrl);
+        }
+
+        public void MarkNSFW()
+        {
+            var data = SimpleAction(MarkNSFWUrl);
+        }
+
+        public void UnmarkNSFW()
+        {
+            var data = SimpleAction(UnmarkNSFWUrl);
         }
 
         #region Obsolete Getter Methods
