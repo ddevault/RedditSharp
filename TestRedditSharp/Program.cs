@@ -58,8 +58,10 @@ namespace TestRedditSharp
             }
             else
             {
-                var subreddit = reddit.GetSubreddit("WQHD_Wallpaper");
-                foreach (var post in subreddit.GetTop(FromTime.Week).Take(10))
+                Console.Write("Type a subreddit name: ");
+                var subname = Console.ReadLine();
+                var sub = reddit.GetSubreddit(subname);
+                foreach (var post in sub.GetTop(FromTime.Week).Take(10))
                     Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
             }
             Console.ReadKey(true);
