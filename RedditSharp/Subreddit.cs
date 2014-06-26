@@ -90,10 +90,8 @@ namespace RedditSharp
         {
             if (Name == "/")
             {
-                //Console.WriteLine("/top.json?t=" + Enum.GetName(typeof(FromTime), timePeriod));
                 return new Listing<Post>(Reddit, "/top.json?t=" + Enum.GetName(typeof(FromTime), timePeriod).ToLower(), WebAgent);
             }
-            //Console.WriteLine(string.Format(SubredditTopUrl, Name, Enum.GetName(typeof(FromTime), timePeriod)));
             return new Listing<Post>(Reddit, string.Format(SubredditTopUrl, Name, Enum.GetName(typeof(FromTime), timePeriod)).ToLower(), WebAgent);
         }
 
