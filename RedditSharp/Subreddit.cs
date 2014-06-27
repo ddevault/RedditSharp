@@ -13,6 +13,7 @@ namespace RedditSharp
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
         private const string SubredditHotUrl = "/r/{0}/hot.json";
+        private const string SubredditTopUrl = "/r/{0}/top.json?t={1}";
         private const string SubscribeUrl = "/api/subscribe";
         private const string GetSettingsUrl = "/r/{0}/about/edit.json";
         private const string GetReducedSettingsUrl = "/r/{0}/about.json";
@@ -84,6 +85,15 @@ namespace RedditSharp
 
         [JsonIgnore]
         public string Name { get; set; }
+
+        public Listing<Post> GetTop(FromTime timePeriod)
+        {
+            if (Name == "/")
+            {
+                return new Listing<Post>(Reddit, "/top.json?t=" + Enum.GetName(typeof(FromTime), timePeriod).ToLower(), WebAgent);
+            }
+            return new Listing<Post>(Reddit, string.Format(SubredditTopUrl, Name, Enum.GetName(typeof(FromTime), timePeriod)).ToLower(), WebAgent);
+        }
 
         public Listing<Post> Posts
         {
@@ -294,11 +304,11 @@ namespace RedditSharp
             var request = WebAgent.CreatePost(SubscribeUrl);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
-                {
-                    action = "sub",
-                    sr = FullName,
-                    uh = Reddit.User.Modhash
-                });
+            {
+                action = "sub",
+                sr = FullName,
+                uh = Reddit.User.Modhash
+            });
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
@@ -496,17 +506,17 @@ namespace RedditSharp
         {
             var request = WebAgent.CreatePost(BanUserUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
-                                   {
-                                       api_type = "json",
-                                       uh = Reddit.User.Modhash,
-                                       r = Name,
-                                       type = "banned",
-                                       id = "#banned",
-                                       name = user,
-                                       note = reason,
-                                       action = "add",
-                                       container = FullName
-                                   });
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "banned",
+                id = "#banned",
+                name = user,
+                note = reason,
+                action = "add",
+                container = FullName
+            });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
