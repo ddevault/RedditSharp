@@ -6,7 +6,7 @@ using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class Subreddit : Thing
     {
@@ -245,18 +245,10 @@ namespace RedditSharp
             }
         }
 
-        /// <summary>
-        /// This constructor only exists for internal use and serialization.
-        /// You would be wise not to use it.
-        /// </summary>
-        public Subreddit()
-            : base(null)
-        {
-        }
 
-        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent)
-            : base(json)
+        public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
+            base.Init(json);
             Reddit = reddit;
             WebAgent = webAgent;
             Wiki = new Wiki(reddit, this, webAgent);
@@ -267,6 +259,8 @@ namespace RedditSharp
             if (Name.StartsWith("r/"))
                 Name = Name.Substring(2);
             Name = Name.TrimEnd('/');
+
+            return this;
         }
 
         public static Subreddit GetRSlashAll(Reddit reddit)
@@ -553,7 +547,7 @@ namespace RedditSharp
                 throw new DuplicateLinkException(String.Format("Post failed when submitting.  The following link has already been submitted: {0}", SubmitLinkUrl));
             }
 
-            return new Post(Reddit, json["json"], WebAgent);
+            return new Post().Init(Reddit, json["json"], WebAgent);
         }
 
         /// <summary>

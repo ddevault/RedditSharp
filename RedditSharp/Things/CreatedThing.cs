@@ -1,18 +1,21 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class CreatedThing : Thing
     {
         private Reddit Reddit { get; set; }
 
-        public CreatedThing(Reddit reddit, JToken json) : base(json)
+        protected CreatedThing Init(Reddit reddit, JToken json)
         {
+            base.Init(json);
             Reddit = reddit;
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            return this;
         }
+
 
         [JsonProperty("created")]
         [JsonConverter(typeof(UnixTimestampConverter))]

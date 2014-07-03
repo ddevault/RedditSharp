@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using System.Security.Authentication;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class PrivateMessage : Thing
     {
@@ -84,8 +84,9 @@ namespace RedditSharp
             }
         }
 
-        public PrivateMessage(Reddit reddit, JToken json, IWebAgent webAgent) : base(json)
+        public PrivateMessage Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
+            base.Init(json);
             Reddit = reddit;
             WebAgent = webAgent;
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
@@ -98,11 +99,12 @@ namespace RedditSharp
                     {
                         var replies = new List<PrivateMessage>();
                         foreach (var reply in data["replies"]["data"]["children"])
-                            replies.Add(new PrivateMessage(reddit, reply, webAgent));
+                            replies.Add(new PrivateMessage().Init(reddit, reply, webAgent));
                         Replies = replies.ToArray();
                     }
                 }
             }
+            return this;
         }
 
         #region Obsolete Getter Methods

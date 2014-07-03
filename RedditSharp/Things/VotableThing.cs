@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class VotableThing : CreatedThing
     {
@@ -22,11 +22,13 @@ namespace RedditSharp
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        public VotableThing(Reddit reddit, IWebAgent webAgent, JToken json) : base(reddit, json)
+        protected VotableThing Init(Reddit reddit, IWebAgent webAgent, JToken json)
         {
+            base.Init(reddit, json);
             Reddit = reddit;
             WebAgent = webAgent;
             JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
+            return this;
         }
 
         [JsonProperty("downs")]
