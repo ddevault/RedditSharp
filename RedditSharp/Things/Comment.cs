@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -24,12 +25,39 @@ namespace RedditSharp.Things
 
         public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
+            var data = CommonInit(reddit, json, webAgent, sender);
+            ParseComments(reddit, json, webAgent, sender);
+            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        {
+            var data = CommonInit(reddit, json, webAgent, sender);
+            await ParseCommentsAsync(reddit, json, webAgent, sender);
+            await JsonConvert.PopulateObjectAsync(data.ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        {
             base.Init(reddit, webAgent, json);
             var data = json["data"];
-            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             Reddit = reddit;
             WebAgent = webAgent;
+            this.Parent = sender;
 
+            // Handle Reddit's API being horrible
+            if (data["context"] != null)
+            {
+                var context = data["context"].Value<string>();
+                LinkId = context.Split('/')[4];
+            }
+         
+            return data;
+        }
+
+        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        {
             // Parse sub comments
             // TODO: Consider deserializing this properly
             var subComments = new List<Comment>();
@@ -39,16 +67,19 @@ namespace RedditSharp.Things
                     subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
             }
             Comments = subComments.ToArray();
+        }
 
-            this.Parent = sender;
-
-            // Handle Reddit's API being horrible
-            if (data["context"] != null)
+        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        {
+            // Parse sub comments
+            // TODO: Consider deserializing this properly
+            var subComments = new List<Comment>();
+            if (data["replies"] != null && data["replies"].Any())
             {
-                var context = data["context"].Value<string>();
-                LinkId = context.Split('/')[4];
+                foreach (var comment in data["replies"]["data"]["children"])
+                    subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
             }
-            return this;
+            Comments = subComments.ToArray();            
         }
 
         [JsonProperty("author")]

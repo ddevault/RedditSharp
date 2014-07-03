@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -86,10 +87,22 @@ namespace RedditSharp.Things
 
         public PrivateMessage Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
+            CommonInit(reddit, json, webAgent);
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+        public async Task<PrivateMessage> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            CommonInit(reddit, json, webAgent);
+            await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
             base.Init(json);
             Reddit = reddit;
             WebAgent = webAgent;
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             var data = json["data"];
             if (data["replies"] != null && data["replies"].Any())
             {
@@ -104,7 +117,6 @@ namespace RedditSharp.Things
                     }
                 }
             }
-            return this;
         }
 
         #region Obsolete Getter Methods

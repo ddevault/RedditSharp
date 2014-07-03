@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -17,10 +18,22 @@ namespace RedditSharp.Things
 
         public new AuthenticatedUser Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
-            base.Init(reddit, json, webAgent);
+            CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
                 reddit.JsonSerializerSettings);
             return this;
+        }
+        public async new Task<AuthenticatedUser> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            CommonInit(reddit, json, webAgent);
+            await JsonConvert.PopulateObjectAsync(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
+                reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            base.Init(reddit, json, webAgent);
         }
 
         public Listing<Subreddit> ModeratorSubreddits

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -248,19 +249,37 @@ namespace RedditSharp.Things
 
         public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
-            base.Init(json);
-            Reddit = reddit;
-            WebAgent = webAgent;
-            Wiki = new Wiki(reddit, this, webAgent);
+            CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            SetName();
+
+            return this;
+        }
+        public async Task<Subreddit> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            CommonInit(reddit, json, webAgent);
+            await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            SetName();
+
+            return this;
+        }
+
+        private void SetName()
+        {
             Name = Url.ToString();
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);
             if (Name.StartsWith("r/"))
                 Name = Name.Substring(2);
             Name = Name.TrimEnd('/');
+        }
 
-            return this;
+        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            base.Init(json);
+            Reddit = reddit;
+            WebAgent = webAgent;
+            Wiki = new Wiki(reddit, this, webAgent);
         }
 
         public static Subreddit GetRSlashAll(Reddit reddit)

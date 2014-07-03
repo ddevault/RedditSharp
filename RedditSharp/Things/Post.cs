@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -29,11 +30,22 @@ namespace RedditSharp.Things
 
         public Post Init(Reddit reddit, JToken post, IWebAgent webAgent)
         {
+            CommonInit(reddit, post, webAgent);
+            JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+        public async Task<Post> InitAsync(Reddit reddit, JToken post, IWebAgent webAgent)
+        {
+            CommonInit(reddit, post, webAgent);
+            await JsonConvert.PopulateObjectAsync(post["data"].ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private void CommonInit(Reddit reddit, JToken post, IWebAgent webAgent)
+        {
             base.Init(reddit, webAgent, post);
             Reddit = reddit;
             WebAgent = webAgent;
-            JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
-            return this;
         }
 
         [JsonProperty("author")]
