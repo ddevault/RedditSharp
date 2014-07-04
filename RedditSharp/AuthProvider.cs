@@ -3,6 +3,7 @@ using System.Net;
 using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Things;
 
 namespace RedditSharp
 {
@@ -130,7 +131,7 @@ namespace RedditSharp
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var thingjson = "{\"kind\": \"t2\", \"data\": " + result + "}";
             var json = JObject.Parse(thingjson);
-            return new AuthenticatedUser(new Reddit(), json, _webAgent);
+            return new AuthenticatedUser().Init(new Reddit(), json, _webAgent);
         }
     }
 }

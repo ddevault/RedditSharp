@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using RedditSharp.Things;
 
 namespace RedditSharp
 {
@@ -169,7 +170,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            return new RedditUser(this, json, _webAgent);
+            return new RedditUser().Init(this, json, _webAgent);
         }
 
         /// <summary>
@@ -183,7 +184,7 @@ namespace RedditSharp
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            User = new AuthenticatedUser(this, json, _webAgent);
+            User = new AuthenticatedUser().Init(this, json, _webAgent);
         }
 
         #region Obsolete Getter Methods
@@ -230,7 +231,7 @@ namespace RedditSharp
 
         public Post GetPost(Uri uri)
         {
-            return new Post(this, GetToken(uri), _webAgent);
+            return new Post().Init(this, GetToken(uri), _webAgent);
         }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
@@ -285,7 +286,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            return new AuthenticatedUser(this, json, _webAgent);
+            return new AuthenticatedUser().Init(this, json, _webAgent);
             // TODO: Error
         }
 

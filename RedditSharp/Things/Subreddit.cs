@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class Subreddit : Thing
     {
@@ -245,28 +246,40 @@ namespace RedditSharp
             }
         }
 
-        /// <summary>
-        /// This constructor only exists for internal use and serialization.
-        /// You would be wise not to use it.
-        /// </summary>
-        public Subreddit()
-            : base(null)
+
+        public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
+            CommonInit(reddit, json, webAgent);
+            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            SetName();
+
+            return this;
+        }
+        public async Task<Subreddit> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            CommonInit(reddit, json, webAgent);
+            await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            SetName();
+
+            return this;
         }
 
-        protected internal Subreddit(Reddit reddit, JToken json, IWebAgent webAgent)
-            : base(json)
+        private void SetName()
         {
-            Reddit = reddit;
-            WebAgent = webAgent;
-            Wiki = new Wiki(reddit, this, webAgent);
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             Name = Url.ToString();
             if (Name.StartsWith("/r/"))
                 Name = Name.Substring(3);
             if (Name.StartsWith("r/"))
                 Name = Name.Substring(2);
             Name = Name.TrimEnd('/');
+        }
+
+        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            base.Init(json);
+            Reddit = reddit;
+            WebAgent = webAgent;
+            Wiki = new Wiki(reddit, this, webAgent);
         }
 
         public static Subreddit GetRSlashAll(Reddit reddit)
@@ -553,7 +566,7 @@ namespace RedditSharp
                 throw new DuplicateLinkException(String.Format("Post failed when submitting.  The following link has already been submitted: {0}", SubmitLinkUrl));
             }
 
-            return new Post(Reddit, json["json"], WebAgent);
+            return new Post().Init(Reddit, json["json"], WebAgent);
         }
 
         /// <summary>

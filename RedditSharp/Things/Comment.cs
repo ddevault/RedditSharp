@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication;
-using Newtonsoft.Json.Linq;
-using System.Net;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Security.Authentication;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class Comment : VotableThing
     {
@@ -22,24 +23,27 @@ namespace RedditSharp
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
-            : base(reddit, webAgent, json)
+        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
-            var data = json["data"];
+            var data = CommonInit(reddit, json, webAgent, sender);
+            ParseComments(reddit, json, webAgent, sender);
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        {
+            var data = CommonInit(reddit, json, webAgent, sender);
+            await ParseCommentsAsync(reddit, json, webAgent, sender);
+            await JsonConvert.PopulateObjectAsync(data.ToString(), this, reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        {
+            base.Init(reddit, webAgent, json);
+            var data = json["data"];
             Reddit = reddit;
             WebAgent = webAgent;
-
-            // Parse sub comments
-            // TODO: Consider deserializing this properly
-            var subComments = new List<Comment>();
-            if (data["replies"] != null && data["replies"].Any())
-            {
-                foreach (var comment in data["replies"]["data"]["children"])
-                    subComments.Add(new Comment(reddit, comment, webAgent, sender));
-            }
-            Comments = subComments.ToArray();
-
             this.Parent = sender;
 
             // Handle Reddit's API being horrible
@@ -48,6 +52,34 @@ namespace RedditSharp
                 var context = data["context"].Value<string>();
                 LinkId = context.Split('/')[4];
             }
+         
+            return data;
+        }
+
+        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        {
+            // Parse sub comments
+            // TODO: Consider deserializing this properly
+            var subComments = new List<Comment>();
+            if (data["replies"] != null && data["replies"].Any())
+            {
+                foreach (var comment in data["replies"]["data"]["children"])
+                    subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
+            }
+            Comments = subComments.ToArray();
+        }
+
+        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        {
+            // Parse sub comments
+            // TODO: Consider deserializing this properly
+            var subComments = new List<Comment>();
+            if (data["replies"] != null && data["replies"].Any())
+            {
+                foreach (var comment in data["replies"]["data"]["children"])
+                    subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
+            }
+            Comments = subComments.ToArray();            
         }
 
         [JsonProperty("author")]
@@ -119,7 +151,7 @@ namespace RedditSharp
                 var json = JObject.Parse(data);
                 if (json["json"]["ratelimit"] != null)
                     throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-                return new Comment(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
+                return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
             }
             catch (WebException ex)
             {

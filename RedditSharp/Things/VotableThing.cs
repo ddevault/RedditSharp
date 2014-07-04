@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class VotableThing : CreatedThing
     {
@@ -22,11 +23,24 @@ namespace RedditSharp
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        public VotableThing(Reddit reddit, IWebAgent webAgent, JToken json) : base(reddit, json)
+        protected VotableThing Init(Reddit reddit, IWebAgent webAgent, JToken json)
         {
+            CommonInit(reddit, webAgent, json);
+            JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
+            return this;
+        }
+        protected async Task<VotableThing> InitAsync(Reddit reddit, IWebAgent webAgent, JToken json)
+        {
+            CommonInit(reddit, webAgent, json);
+            await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
+            return this;
+        }
+
+        private void CommonInit(Reddit reddit, IWebAgent webAgent, JToken json)
+        {
+            base.Init(reddit, json);
             Reddit = reddit;
             WebAgent = webAgent;
-            JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
         }
 
         [JsonProperty("downs")]

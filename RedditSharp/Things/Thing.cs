@@ -1,7 +1,7 @@
-using Newtonsoft.Json.Linq;
 using System;
+using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Things
 {
     public class Thing
     {
@@ -11,15 +11,15 @@ namespace RedditSharp
             switch (kind)
             {
                 case "t1":
-                    return new Comment(reddit, json, webAgent, null);
+                    return new Comment().Init(reddit, json, webAgent, null);
                 case "t2":
-                    return new RedditUser(reddit, json, webAgent);
+                    return new RedditUser().Init(reddit, json, webAgent);
                 case "t3":
-                    return new Post(reddit, json, webAgent);
+                    return new Post().Init(reddit, json, webAgent);
                 case "t4":
-                    return new PrivateMessage(reddit, json, webAgent);
+                    return new PrivateMessage().Init(reddit, json, webAgent);
                 case "t5":
-                    return new Subreddit(reddit, json, webAgent);
+                    return new Subreddit().Init(reddit, json, webAgent);
                 default:
                     return null;
             }
@@ -33,13 +33,13 @@ namespace RedditSharp
             {
                 if (typeof(T) == typeof(WikiPageRevision))
                 {
-                    return new WikiPageRevision(reddit, json, webAgent);
+                    return new WikiPageRevision().Init(reddit, json, webAgent);
                 }
             }
             return result;
         }
 
-        internal Thing(JToken json)
+        internal void Init(JToken json)
         {
             if (json == null)
                 return;
