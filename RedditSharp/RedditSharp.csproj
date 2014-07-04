@@ -53,12 +53,12 @@
   <ItemGroup>
     <Compile Include="Things\AuthenticatedUser.cs" />
     <Compile Include="AuthProvider.cs" />
-    <Compile Include="Captcha.cs" />
-    <Compile Include="CaptchaFailedException.cs" />
-    <Compile Include="CaptchaResponse.cs" />
-    <Compile Include="ConsoleCaptchaSolver.cs" />
-    <Compile Include="DuplicateLinkException.cs" />
-    <Compile Include="ICaptchaSolver.cs" />
+    <Compile Include="Captcha\Captcha.cs" />
+    <Compile Include="Captcha\CaptchaFailedException.cs" />
+    <Compile Include="Captcha\CaptchaResponse.cs" />
+    <Compile Include="Captcha\ConsoleCaptchaSolver.cs" />
+    <Compile Include="Exceptions\DuplicateLinkException.cs" />
+    <Compile Include="Captcha\ICaptchaSolver.cs" />
     <Compile Include="Things\Comment.cs" />
     <Compile Include="Things\CreatedThing.cs" />
     <Compile Include="Extensions.cs" />
@@ -75,7 +75,7 @@
     <Compile Include="Reddit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RedditAPINameAttribute.cs" />
-    <Compile Include="RedditException.cs" />
+    <Compile Include="Exceptions\RedditException.cs" />
     <Compile Include="Things\RedditUser.cs" />
     <Compile Include="SubmitData.cs" />
     <Compile Include="Things\Subreddit.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="UnixTimestampConverter.cs" />
     <Compile Include="UrlParser.cs" />
     <Compile Include="Things\VotableThing.cs" />
-    <Compile Include="RateLimitException.cs" />
+    <Compile Include="Exceptions\RateLimitException.cs" />
     <Compile Include="WebAgent.cs" />
     <Compile Include="Wiki.cs" />
     <Compile Include="WikiPage.cs" />
