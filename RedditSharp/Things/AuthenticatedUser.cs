@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -16,14 +17,14 @@ namespace RedditSharp.Things
         private const string InboxUrl = "/message/inbox.json";
         private const string SentUrl = "/message/sent.json";
 
-        public new AuthenticatedUser Init(Reddit reddit, JToken json, IWebAgent webAgent)
+        public new AuthenticatedUser Init(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
                 reddit.JsonSerializerSettings);
             return this;
         }
-        public async new Task<AuthenticatedUser> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public async new Task<AuthenticatedUser> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await JsonConvert.PopulateObjectAsync(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
@@ -31,7 +32,7 @@ namespace RedditSharp.Things
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(reddit, json, webAgent);
         }

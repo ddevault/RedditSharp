@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp
 {

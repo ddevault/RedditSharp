@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -10,13 +11,13 @@ namespace RedditSharp
         private const string SiteAdminUrl = "/api/site_admin";
         private const string DeleteHeaderImageUrl = "/api/delete_sr_header";
 
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private IWebAgent WebAgent { get; set; }
 
         [JsonIgnore]
         public Subreddit Subreddit { get; set; }
 
-        public SubredditSettings(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
+        public SubredditSettings(IReddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Subreddit = subreddit;
             Reddit = reddit;
@@ -40,7 +41,7 @@ namespace RedditSharp
             ContentOptions = ContentOptions.All;
         }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json, IWebAgent webAgent)
+        public SubredditSettings(Subreddit subreddit, IReddit reddit, JObject json, IWebAgent webAgent)
             : this(reddit, subreddit, webAgent)
         {
             var data = json["data"];

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -11,7 +12,7 @@ namespace RedditSharp
     /// <summary>
     /// Class to communicate with Reddit.com
     /// </summary>
-    public class Reddit
+    public class Reddit : IReddit
     {
         #region Constant Urls
 
@@ -48,7 +49,7 @@ namespace RedditSharp
         /// <summary>
         /// Captcha solver instance to use when solving captchas.
         /// </summary>
-        public ICaptchaSolver CaptchaSolver;
+        public ICaptchaSolver CaptchaSolver { get; set; }
 
         /// <summary>
         /// The authenticated user for this instance.
@@ -64,14 +65,14 @@ namespace RedditSharp
             set { WebAgent.RateLimit = value; }
         }
 
-        internal JsonSerializerSettings JsonSerializerSettings { get; set; }
+        public JsonSerializerSettings JsonSerializerSettings { get; set; }
 
         /// <summary>
         /// Gets the FrontPage using the current Reddit instance.
         /// </summary>
         public Subreddit FrontPage
         {
-            get { return Subreddit.GetFrontPage(this); }
+            get { return Subreddit.GetFrontPage(this, _webAgent); }
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace RedditSharp
         /// </summary>
         public Subreddit RSlashAll
         {
-            get { return Subreddit.GetRSlashAll(this); }
+            get { return Subreddit.GetRSlashAll(this, _webAgent); }
         }
 
         public Reddit()

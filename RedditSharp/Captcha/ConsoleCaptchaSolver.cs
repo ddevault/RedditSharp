@@ -1,4 +1,5 @@
 ﻿using System;
+using RedditSharp.Contracts;
 
 namespace RedditSharp
 {

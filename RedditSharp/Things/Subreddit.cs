@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -38,7 +39,7 @@ namespace RedditSharp.Things
         private const string CommentsUrl = "/r/{0}/comments.json";
 
         [JsonIgnore]
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
@@ -247,7 +248,7 @@ namespace RedditSharp.Things
         }
 
 
-        public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
+        public Subreddit Init(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
@@ -255,7 +256,7 @@ namespace RedditSharp.Things
 
             return this;
         }
-        public async Task<Subreddit> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public async Task<Subreddit> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
@@ -274,7 +275,7 @@ namespace RedditSharp.Things
             Name = Name.TrimEnd('/');
         }
 
-        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(json);
             Reddit = reddit;
@@ -282,7 +283,7 @@ namespace RedditSharp.Things
             Wiki = new Wiki(reddit, this, webAgent);
         }
 
-        public static Subreddit GetRSlashAll(Reddit reddit)
+        public static Subreddit GetRSlashAll(IReddit reddit, IWebAgent webAgent)
         {
             var rSlashAll = new Subreddit
             {
@@ -291,12 +292,12 @@ namespace RedditSharp.Things
                 Url = new Uri("/r/all", UriKind.Relative),
                 Name = "all",
                 Reddit = reddit,
-                WebAgent = reddit._webAgent
+                WebAgent = webAgent
             };
             return rSlashAll;
         }
 
-        public static Subreddit GetFrontPage(Reddit reddit)
+        public static Subreddit GetFrontPage(IReddit reddit, IWebAgent webAgent)
         {
             var frontPage = new Subreddit
             {
@@ -305,7 +306,7 @@ namespace RedditSharp.Things
                 Url = new Uri("/", UriKind.Relative),
                 Name = "/",
                 Reddit = reddit,
-                WebAgent = reddit._webAgent
+                WebAgent = webAgent
             };
             return frontPage;
         }

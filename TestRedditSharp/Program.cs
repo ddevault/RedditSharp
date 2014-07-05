@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RedditSharp;
 using System.Security.Authentication;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace TestRedditSharp
@@ -11,7 +12,7 @@ namespace TestRedditSharp
     {
         static void Main(string[] args)
         {
-            Reddit reddit = null;
+            IReddit reddit = null;
             var authenticated = false;
             while (!authenticated)
             {

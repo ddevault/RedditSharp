@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -13,7 +14,7 @@ namespace RedditSharp
         internal const int DefaultListingPerRequest = 25;
 
         private IWebAgent WebAgent { get; set; }
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private string Url { get; set; }
 
         /// <summary>
@@ -22,7 +23,7 @@ namespace RedditSharp
         /// <param name="reddit"></param>
         /// <param name="url"></param>
         /// <param name="webAgent"></param>
-        internal Listing(Reddit reddit, string url, IWebAgent webAgent)
+        internal Listing(IReddit reddit, string url, IWebAgent webAgent)
         {
             WebAgent = webAgent;
             Reddit = reddit;

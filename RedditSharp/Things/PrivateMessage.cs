@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -13,7 +14,7 @@ namespace RedditSharp.Things
         private const string SetAsReadUrl = "/api/read_message";
         private const string CommentUrl = "/api/comment";
 
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private IWebAgent WebAgent { get; set; }
 
         [JsonProperty("body")]
@@ -85,20 +86,20 @@ namespace RedditSharp.Things
             }
         }
 
-        public PrivateMessage Init(Reddit reddit, JToken json, IWebAgent webAgent)
+        public PrivateMessage Init(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<PrivateMessage> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public async Task<PrivateMessage> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(json);
             Reddit = reddit;

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -9,7 +10,7 @@ namespace RedditSharp
 
     public class Wiki
     {
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private Subreddit Subreddit { get; set; }
         private IWebAgent WebAgent { get; set; }
 
@@ -44,7 +45,7 @@ namespace RedditSharp
             }
         }
 
-        protected internal Wiki(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
+        protected internal Wiki(IReddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Reddit = reddit;
             Subreddit = subreddit;

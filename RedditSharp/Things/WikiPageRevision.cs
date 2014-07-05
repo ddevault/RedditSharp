@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -25,21 +26,21 @@ namespace RedditSharp.Things
 
         protected internal WikiPageRevision() { }
 
-        internal WikiPageRevision Init(Reddit reddit, JToken json, IWebAgent webAgent)
+        internal WikiPageRevision Init(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json.ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }        
 
-        internal async Task<WikiPageRevision> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        internal async Task<WikiPageRevision> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await JsonConvert.PopulateObjectAsync(json.ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(json);
             Author = new RedditUser().Init(reddit, json["author"], webAgent);

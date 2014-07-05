@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\IReddit.cs" />
+    <Compile Include="Contracts\IAuthProvider.cs" />
     <Compile Include="Things\AuthenticatedUser.cs" />
     <Compile Include="AuthProvider.cs" />
     <Compile Include="Captcha\Captcha.cs" />
@@ -58,12 +60,12 @@
     <Compile Include="Captcha\CaptchaResponse.cs" />
     <Compile Include="Captcha\ConsoleCaptchaSolver.cs" />
     <Compile Include="Exceptions\DuplicateLinkException.cs" />
-    <Compile Include="Captcha\ICaptchaSolver.cs" />
+    <Compile Include="Contracts\ICaptchaSolver.cs" />
     <Compile Include="Things\Comment.cs" />
     <Compile Include="Things\CreatedThing.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FlairTemplate.cs" />
-    <Compile Include="IWebAgent.cs" />
+    <Compile Include="Contracts\IWebAgent.cs" />
     <Compile Include="LinkData.cs" />
     <Compile Include="Listing.cs" />
     <Compile Include="ModeratorPermission.cs" />

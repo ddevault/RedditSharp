@@ -1,14 +1,16 @@
 ﻿using System;
+using RedditSharp.Contracts;
+
 namespace RedditSharp
 {
     public class SubredditImage
     {
         private const string DeleteImageUrl = "/api/delete_sr_img";
 
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private IWebAgent WebAgent { get; set; }
 
-        public SubredditImage(Reddit reddit, SubredditStyle subredditStyle,
+        public SubredditImage(IReddit reddit, SubredditStyle subredditStyle,
             string cssLink, string name, IWebAgent webAgent)
         {
             Reddit = reddit;
@@ -18,7 +20,7 @@ namespace RedditSharp
             CssLink = cssLink;
         }
 
-        public SubredditImage(Reddit reddit, SubredditStyle subreddit,
+        public SubredditImage(IReddit reddit, SubredditStyle subreddit,
             string cssLink, string name, string url, IWebAgent webAgent)
             : this(reddit, subreddit, cssLink, name, webAgent)
         {

@@ -1,11 +1,12 @@
 using System;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
     public class Thing
     {
-        public static Thing Parse(Reddit reddit, JToken json, IWebAgent webAgent)
+        public static Thing Parse(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             var kind = json["kind"].ValueOrDefault<string>();
             switch (kind)
@@ -26,7 +27,7 @@ namespace RedditSharp.Things
         }
 
         // if we can't determine the type of thing by "kind", try by type
-        public static Thing Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        public static Thing Parse<T>(IReddit reddit, JToken json, IWebAgent webAgent) where T : Thing
         {
             Thing result = Parse(reddit, json, webAgent);
             if (result == null)

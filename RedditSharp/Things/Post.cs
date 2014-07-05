@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -23,25 +24,25 @@ namespace RedditSharp.Things
         private const string UnmarkNSFWUrl = "/api/unmarknsfw";
 
         [JsonIgnore]
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Post Init(Reddit reddit, JToken post, IWebAgent webAgent)
+        public Post Init(IReddit reddit, JToken post, IWebAgent webAgent)
         {
             CommonInit(reddit, post, webAgent);
             JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<Post> InitAsync(Reddit reddit, JToken post, IWebAgent webAgent)
+        public async Task<Post> InitAsync(IReddit reddit, JToken post, IWebAgent webAgent)
         {
             CommonInit(reddit, post, webAgent);
             await JsonConvert.PopulateObjectAsync(post["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken post, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken post, IWebAgent webAgent)
         {
             base.Init(reddit, webAgent, post);
             Reddit = reddit;
