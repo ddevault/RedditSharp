@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using RedditSharp.Contracts;
 using RedditSharp.Things;
 
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class Domain
     {

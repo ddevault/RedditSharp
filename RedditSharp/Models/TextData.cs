@@ -1,4 +1,6 @@
-﻿namespace RedditSharp
+﻿using RedditSharp.Helpers;
+
+namespace RedditSharp.Models
 {
     internal class TextData : SubmitData
     {

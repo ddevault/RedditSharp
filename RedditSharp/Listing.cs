@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 using RedditSharp.Things;
 
 namespace RedditSharp

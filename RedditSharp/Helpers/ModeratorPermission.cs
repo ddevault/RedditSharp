@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Helpers
 {
     [Flags]
     public enum ModeratorPermission

@@ -1,4 +1,4 @@
-﻿namespace RedditSharp
+﻿namespace RedditSharp.CaptchaHandling
 {
     public class CaptchaResponse
     {

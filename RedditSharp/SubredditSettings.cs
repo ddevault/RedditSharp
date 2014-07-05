@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 using RedditSharp.Things;
 
 namespace RedditSharp

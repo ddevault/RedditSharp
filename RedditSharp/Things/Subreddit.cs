@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.CaptchaHandling;
 using RedditSharp.Contracts;
+using RedditSharp.Exceptions;
+using RedditSharp.Helpers;
+using RedditSharp.Models;
 
 namespace RedditSharp.Things
 {

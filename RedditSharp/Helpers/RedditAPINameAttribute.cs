@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RedditSharp
+namespace RedditSharp.Helpers
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     internal class RedditAPINameAttribute : Attribute

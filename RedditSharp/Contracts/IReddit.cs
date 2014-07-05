@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Models;
 using RedditSharp.Things;
 
 namespace RedditSharp.Contracts

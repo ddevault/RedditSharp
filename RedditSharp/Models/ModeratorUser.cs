@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class ModeratorUser
     {

@@ -1,4 +1,4 @@
-﻿namespace RedditSharp
+﻿namespace RedditSharp.Models
 {
     public class UserFlairTemplate // TODO: Consider using this class to set templates as well
     {

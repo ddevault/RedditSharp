@@ -4,7 +4,9 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using RedditSharp.CaptchaHandling;
 using RedditSharp.Contracts;
+using RedditSharp.Models;
 using RedditSharp.Things;
 
 namespace RedditSharp

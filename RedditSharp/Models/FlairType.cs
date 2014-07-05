@@ -1,4 +1,4 @@
-﻿namespace RedditSharp
+﻿namespace RedditSharp.Models
 {
     public enum FlairType
     {

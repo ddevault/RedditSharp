@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace RedditSharp
+namespace RedditSharp.Exceptions
 {
     /// <summary>
     /// Represents an error that occurred during accessing or manipulating data on Reddit.

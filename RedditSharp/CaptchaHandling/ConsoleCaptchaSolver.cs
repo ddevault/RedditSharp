@@ -1,7 +1,8 @@
 ﻿using System;
+using RedditSharp.CaptchaHandling;
 using RedditSharp.Contracts;
 
-namespace RedditSharp
+namespace RedditSharp.CaptchaHandling
 {
     public class ConsoleCaptchaSolver : ICaptchaSolver
     {

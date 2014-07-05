@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RedditSharp
+namespace RedditSharp.Helpers
 {
     public static class UnixTimeStamp
     {
