@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace RedditSharp
+namespace RedditSharp.Exceptions
 {
     /// <summary>
     /// Exception that gets thrown if you try and submit a duplicate link to a SubReddit

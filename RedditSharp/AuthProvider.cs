@@ -3,11 +3,12 @@ using System.Net;
 using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
 {
-    public class AuthProvider
+    public class AuthProvider : IAuthProvider
     {
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
         private const string OauthGetMeUrl = "https://oauth.reddit.com/api/v1/me";

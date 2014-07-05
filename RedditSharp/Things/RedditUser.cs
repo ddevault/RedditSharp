@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 
 namespace RedditSharp.Things
 {
@@ -14,14 +16,14 @@ namespace RedditSharp.Things
 
         private const int MAX_LIMIT = 100;
 
-        public RedditUser Init(Reddit reddit, JToken json, IWebAgent webAgent)
+        public RedditUser Init(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             JsonConvert.PopulateObject(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
                 reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<RedditUser> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public async Task<RedditUser> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await JsonConvert.PopulateObjectAsync(json["name"] == null ? json["data"].ToString() : json.ToString(), this,
@@ -29,7 +31,7 @@ namespace RedditSharp.Things
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
+        private void CommonInit(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(json);
             Reddit = reddit;
@@ -37,7 +39,7 @@ namespace RedditSharp.Things
         }
 
         [JsonIgnore]
-        protected Reddit Reddit { get; set; }
+        protected IReddit Reddit { get; set; }
 
         [JsonIgnore]
         protected IWebAgent WebAgent { get; set; }

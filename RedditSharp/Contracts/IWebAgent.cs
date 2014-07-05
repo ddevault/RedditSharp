@@ -2,7 +2,7 @@ using System.IO;
 using System.Net;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp
+namespace RedditSharp.Contracts
 {
     public interface IWebAgent
     {

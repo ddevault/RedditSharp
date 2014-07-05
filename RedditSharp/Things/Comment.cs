@@ -7,6 +7,9 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
+using RedditSharp.Exceptions;
+using RedditSharp.Helpers;
 
 namespace RedditSharp.Things
 {
@@ -19,18 +22,18 @@ namespace RedditSharp.Things
         private const string SetAsReadUrl = "/api/read_message";
 
         [JsonIgnore]
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public Comment Init(IReddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             ParseComments(reddit, json, webAgent, sender);
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public async Task<Comment> InitAsync(IReddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             await ParseCommentsAsync(reddit, json, webAgent, sender);
@@ -38,7 +41,7 @@ namespace RedditSharp.Things
             return this;
         }
 
-        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        private JToken CommonInit(IReddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
             base.Init(reddit, webAgent, json);
             var data = json["data"];
@@ -56,7 +59,7 @@ namespace RedditSharp.Things
             return data;
         }
 
-        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private void ParseComments(IReddit reddit, JToken data, IWebAgent webAgent, Thing sender)
         {
             // Parse sub comments
             // TODO: Consider deserializing this properly
@@ -69,7 +72,7 @@ namespace RedditSharp.Things
             Comments = subComments.ToArray();
         }
 
-        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private async Task ParseCommentsAsync(IReddit reddit, JToken data, IWebAgent webAgent, Thing sender)
         {
             // Parse sub comments
             // TODO: Consider deserializing this properly

@@ -1,4 +1,6 @@
-﻿namespace RedditSharp
+﻿using RedditSharp.CaptchaHandling;
+
+namespace RedditSharp.Contracts
 {
     public interface ICaptchaSolver
     {

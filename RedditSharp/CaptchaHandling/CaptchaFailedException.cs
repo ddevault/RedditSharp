@@ -1,6 +1,7 @@
 ﻿using System;
+using RedditSharp.Exceptions;
 
-namespace RedditSharp
+namespace RedditSharp.CaptchaHandling
 {
     public class CaptchaFailedException : RedditException
     {

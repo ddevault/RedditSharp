@@ -2,27 +2,29 @@
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 
 namespace RedditSharp.Things
 {
     public class CreatedThing : Thing
     {
-        private Reddit Reddit { get; set; }
+        private Contracts.IReddit Reddit { get; set; }
 
-        protected CreatedThing Init(Reddit reddit, JToken json)
+        protected CreatedThing Init(IReddit reddit, JToken json)
         {
             CommonInit(reddit, json);
             JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        protected async Task<CreatedThing> InitAsync(Reddit reddit, JToken json)
+        protected async Task<CreatedThing> InitAsync(IReddit reddit, JToken json)
         {
             CommonInit(reddit, json);
             await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
 
-        private void CommonInit(Reddit reddit, JToken json)
+        private void CommonInit(Contracts.IReddit reddit, JToken json)
         {
             base.Init(json);
             Reddit = reddit;

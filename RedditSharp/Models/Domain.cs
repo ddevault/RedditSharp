@@ -1,9 +1,10 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class Domain
     {
@@ -13,7 +14,7 @@ namespace RedditSharp
         private const string FrontPageUrl = "/.json";
 
         [JsonIgnore]
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
@@ -45,7 +46,7 @@ namespace RedditSharp
             }
         }
 
-        protected internal Domain(Reddit reddit, Uri domain, IWebAgent webAgent)
+        protected internal Domain(IReddit reddit, Uri domain, IWebAgent webAgent)
         {
             Reddit = reddit;
             WebAgent = webAgent;

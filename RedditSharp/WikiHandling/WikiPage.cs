@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using RedditSharp.Contracts;
+using RedditSharp.Helpers;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -23,7 +25,7 @@ namespace RedditSharp
         [JsonIgnore]
         public RedditUser RevisionBy { get; set; }
 
-        protected internal WikiPage(Reddit reddit, JToken json, IWebAgent webAgent)
+        protected internal WikiPage(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             RevisionBy = new RedditUser().Init(reddit, json["revision_by"], webAgent);
             JsonConvert.PopulateObject(json.ToString(), this, reddit.JsonSerializerSettings);

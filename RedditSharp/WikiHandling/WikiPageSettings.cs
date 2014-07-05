@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -21,7 +22,7 @@ namespace RedditSharp
         {
         }
 
-        protected internal WikiPageSettings(Reddit reddit, JToken json, IWebAgent webAgent)
+        protected internal WikiPageSettings(IReddit reddit, JToken json, IWebAgent webAgent)
         {
             var editors = json["editors"].ToArray();
             Editors = editors.Select(x => new RedditUser().Init(reddit, x, webAgent));

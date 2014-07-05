@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Web;
+using RedditSharp.Contracts;
 using RedditSharp.Things;
 
 namespace RedditSharp
@@ -10,17 +11,17 @@ namespace RedditSharp
         private const string UploadImageUrl = "/api/upload_sr_img";
         private const string UpdateCssUrl = "/api/subreddit_stylesheet";
 
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
         private IWebAgent WebAgent { get; set; }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, IWebAgent webAgent)
+        public SubredditStyle(IReddit reddit, Subreddit subreddit, IWebAgent webAgent)
         {
             Reddit = reddit;
             Subreddit = subreddit;
             WebAgent = webAgent;
         }
 
-        public SubredditStyle(Reddit reddit, Subreddit subreddit, JToken json, IWebAgent webAgent) : this(reddit, subreddit, webAgent)
+        public SubredditStyle(IReddit reddit, Subreddit subreddit, JToken json, IWebAgent webAgent) : this(reddit, subreddit, webAgent)
         {
             Images = new List<SubredditImage>();
             var data = json["data"];

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Contracts;
 
 namespace RedditSharp.Things
 {
@@ -21,22 +22,22 @@ namespace RedditSharp.Things
         private IWebAgent WebAgent { get; set; }
 
         [JsonIgnore]
-        private Reddit Reddit { get; set; }
+        private IReddit Reddit { get; set; }
 
-        protected VotableThing Init(Reddit reddit, IWebAgent webAgent, JToken json)
+        protected VotableThing Init(IReddit reddit, IWebAgent webAgent, JToken json)
         {
             CommonInit(reddit, webAgent, json);
             JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
             return this;
         }
-        protected async Task<VotableThing> InitAsync(Reddit reddit, IWebAgent webAgent, JToken json)
+        protected async Task<VotableThing> InitAsync(IReddit reddit, IWebAgent webAgent, JToken json)
         {
             CommonInit(reddit, webAgent, json);
             await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
             return this;
         }
 
-        private void CommonInit(Reddit reddit, IWebAgent webAgent, JToken json)
+        private void CommonInit(IReddit reddit, IWebAgent webAgent, JToken json)
         {
             base.Init(reddit, json);
             Reddit = reddit;
