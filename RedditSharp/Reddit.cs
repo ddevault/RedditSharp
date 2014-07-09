@@ -84,10 +84,10 @@ namespace RedditSharp
         public Reddit()
         {
             JsonSerializerSettings = new JsonSerializerSettings
-            {
-                CheckAdditionalContent = false,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
+                {
+                    CheckAdditionalContent = false,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                };
             _webAgent = new WebAgent();
             CaptchaSolver = new ConsoleCaptchaSolver();
         }
