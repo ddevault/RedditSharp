@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Authentication;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace RedditSharp
 {
@@ -148,7 +149,7 @@ namespace RedditSharp
             if (json["json"]["ratelimit"] != null)
                 throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
             var comment = json["json"]["data"]["things"][0];
-            return new Comment(Reddit, comment, WebAgent, this);
+            return (Comment)Reddit.GetThingByFullname((string)comment["data"]["id"]); //Ugly way to do it because we need to make 2 requests, but it works
         }
 
         private string SimpleAction(string endpoint)
