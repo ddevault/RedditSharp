@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Authentication;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System.IO;
 
 namespace RedditSharp
 {
