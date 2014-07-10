@@ -23,7 +23,7 @@ namespace RedditSharp
         private const string SubredditAboutUrl = "/r/{0}/about.json";
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
-        private const string GetThingUrl = "/by_id/{0}.json";
+        private const string GetThingUrl = "/api/info.json?id={0}";
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}.json";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
