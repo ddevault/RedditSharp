@@ -83,11 +83,14 @@ namespace TestRedditSharp
             {
                 if (cki.Key == ConsoleKey.Backspace)
                 {
-                    //rollback the cursor and write a space so it looks backspaced to the user
-                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                    Console.Write(" ");
-                    Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
-                    passbits.Pop();
+                    if (passbits.Count() > 0)
+                    {
+                        //rollback the cursor and write a space so it looks backspaced to the user
+                        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                        passbits.Pop();
+                    }
                 }
                 else
                 {
