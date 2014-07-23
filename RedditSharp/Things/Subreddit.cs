@@ -155,7 +155,7 @@ namespace RedditSharp.Things
 
         public Listing<Post> Search(string terms)
         {
-            return new Listing<Post>(Reddit, string.Format(SearchUrl, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
         }
 
         public SubredditSettings Settings
