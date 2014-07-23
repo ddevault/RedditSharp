@@ -36,6 +36,7 @@ namespace RedditSharp.Things
         private const string SubmitLinkUrl = "/api/submit";
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
         private const string CommentsUrl = "/r/{0}/comments.json";
+        private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -152,6 +153,11 @@ namespace RedditSharp.Things
             }
         }
 
+        public Listing<Post> Search(string terms)
+        {
+            return new Listing<Post>(Reddit, string.Format(SearchUrl, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
+        }
+
         public SubredditSettings Settings
         {
             get
@@ -246,7 +252,6 @@ namespace RedditSharp.Things
             }
         }
 
-
         public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
@@ -255,6 +260,7 @@ namespace RedditSharp.Things
 
             return this;
         }
+
         public async Task<Subreddit> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
