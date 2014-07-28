@@ -9,7 +9,7 @@ using RedditSharp.Things;
 namespace RedditSharp
 {
     /// <summary>
-    /// Class to communicate with Reddit.com
+    /// Provides means of communication with the Reddit.com service.
     /// </summary>
     public class Reddit
     {
@@ -56,7 +56,7 @@ namespace RedditSharp
         public AuthenticatedUser User { get; set; }
 
         /// <summary>
-        /// Sets the Rate Limiting Mode of the underlying WebAgent
+        /// Sets the Rate Limiting Mode of the underlying WebAgent.
         /// </summary>
         public WebAgent.RateLimitMode RateLimit
         {
@@ -82,17 +82,24 @@ namespace RedditSharp
             get { return Subreddit.GetRSlashAll(this); }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RedditSharp.Reddit class.
+        /// </summary>
         public Reddit()
         {
             JsonSerializerSettings = new JsonSerializerSettings
-                {
-                    CheckAdditionalContent = false,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                };
+            {
+                CheckAdditionalContent = false,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
             _webAgent = new WebAgent();
             CaptchaSolver = new ConsoleCaptchaSolver();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RedditSharp.Reddit class.
+        /// </summary>
+        /// <param name="limitMode">The Rate Limiting mode of the underlying WebAgent.</param>
         public Reddit(WebAgent.RateLimitMode limitMode)
         {
             WebAgent.UserAgent = "";
@@ -100,12 +107,22 @@ namespace RedditSharp
             WebAgent.RootDomain = "www.reddit.com";
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RedditSharp.Reddit class with the given credentials, and then logs in.
+        /// </summary>
+        /// <param name="username">The username of the Reddit account to log in with.</param>
+        /// <param name="password">The password of the Reddit account to log in with.</param>
+        /// <param name="useSsl">Whether to use Reddit's SSL security for communications.</param>
         public Reddit(string username, string password, bool useSsl = true)
             : this()
         {
             LogIn(username, password, useSsl);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the RedditSharp.Reddit class with the given pre-obtained access token.
+        /// </summary>
+        /// <param name="accessToken">The access token with which underlying WebAgent can communicate with Reddit.</param>
         public Reddit(string accessToken)
             : this()
         {
@@ -121,7 +138,7 @@ namespace RedditSharp
         /// <param name="username">The username of the user to log on to.</param>
         /// <param name="password">The password of the user to log on to.</param>
         /// <param name="useSsl">Whether to use SSL or not. (default: true)</param>
-        /// <returns></returns>
+        /// <returns>An instance of the RedditSharp.Things.AuthenticatedUser class representing the logged-in user.</returns>
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
             if (Type.GetType("Mono.Runtime") != null)
@@ -164,6 +181,11 @@ namespace RedditSharp
             return User;
         }
 
+        /// <summary>
+        /// Gets an instance of the RedditSharp.Things.RedditUser class representing the Reddit user with the given name.
+        /// </summary>
+        /// <param name="name">The username of the Reddit user to obtain information about.</param>
+        /// <returns>An instance of the RedditSharp.Things.RedditUser class representing the Reddit user with the name given in the <paramref name="name"/> parameter.</returns>
         public RedditUser GetUser(string name)
         {
             var request = _webAgent.CreateGet(string.Format(UserInfoUrl, name));
@@ -197,6 +219,11 @@ namespace RedditSharp
 
         #endregion Obsolete Getter Methods
 
+        /// <summary>
+        /// Gets an instance of a RedditSharp.Things.Subreddit class representing the subreddit with the given name.
+        /// </summary>
+        /// <param name="name">The name of the Subreddit to obtain information about.</param>
+        /// <returns>An instance of the RedditSharp.Things.Subreddit class representing the Subreddit with the name given in the <paramref name="name"/> parameter.</returns>
         public Subreddit GetSubreddit(string name)
         {
             if (name.StartsWith("r/"))
@@ -206,6 +233,11 @@ namespace RedditSharp
             return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
+        /// <summary>
+        /// Gets an instance of the RedditSharp.Things.Domain class representing the Reddit domain with the given name.
+        /// </summary>
+        /// <param name="domain">The domain name to obtain information about.</param>
+        /// <returns>An instance of the RedditSharp.Things.Domain class representing the Reddit domain with the domain name given in the <paramref name="domain"/> parameter.</returns>
         public Domain GetDomain(string domain)
         {
             if (!domain.StartsWith("http://") && !domain.StartsWith("https://"))
@@ -214,6 +246,11 @@ namespace RedditSharp
             return new Domain(this, uri, _webAgent);
         }
 
+        /// <summary>
+        /// Gets a JSON token from the specified Uri.
+        /// </summary>
+        /// <param name="uri">The Uri from which to parse the JSON data from.</param>
+        /// <returns>An instance of the JToken class representing the JSON data obtained from the Uri specified in the <paramref name="uri"/> parameter.</returns>
         public JToken GetToken(Uri uri)
         {
             var url = uri.AbsoluteUri;
@@ -229,11 +266,24 @@ namespace RedditSharp
             return json[0]["data"]["children"].First;
         }
 
+        /// <summary>
+        /// Gets an instance of the RedditSharp.Things.Post class representing a post on Reddit at the Uri provided.
+        /// </summary>
+        /// <param name="uri">The Uri at which the Reddit post is found.</param>
+        /// <returns>An instance of the RedditSharp.Things.Post class representing a post on Reddit found at the Uri specified in the <paramref name="uri"/> parameter.</returns>
         public Post GetPost(Uri uri)
         {
             return new Post().Init(this, GetToken(uri), _webAgent);
         }
 
+        /// <summary>
+        /// Composes a private message on Reddit.
+        /// </summary>
+        /// <param name="subject">The subject of the Private Message.</param>
+        /// <param name="body">The message body of the Private Message. This can be formatted with Markdown.</param>
+        /// <param name="to">The recipient of the Private Message. This can be the username of a Reddit user, or the name of a Reddit subreddit, including the <c>/r/</c> prefix, eg. <c>/r/AskReddit</c>.</param>
+        /// <param name="captchaId">The ID of the Captcha associated with sending the Captcha.</param>
+        /// <param name="captchaAnswer">The solved text of the Captcha associated with sending the Captcha.</param>
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
         {
             if (User == null)
@@ -266,12 +316,12 @@ namespace RedditSharp
         }
 
         /// <summary>
-        /// Registers a new Reddit user
+        /// Registers a new Reddit user and returns an instance of the RedditSharp.Things.AuthenticatedUser class describing the new user.
         /// </summary>
         /// <param name="userName">The username for the new account.</param>
         /// <param name="passwd">The password for the new account.</param>
         /// <param name="email">The optional recovery email for the new account.</param>
-        /// <returns>The newly created user account</returns>
+        /// <returns>An instance of the RedditSharp.Things.AuthenticatedUser class describing the new user named in the <paramref name="userName"/> parameter.</returns>
         public AuthenticatedUser RegisterAccount(string userName, string passwd, string email = "")
         {
             var request = _webAgent.CreatePost(RegisterAccountUrl);
@@ -290,6 +340,11 @@ namespace RedditSharp
             // TODO: Error
         }
 
+        /// <summary>
+        /// Gets a Reddit thing with the given full name.
+        /// </summary>
+        /// <param name="fullname">THe full name of the Reddit thing to obtain information about.</param>
+        /// <returns>An instance of the RedditSharp.Things.Thing class describing the Reddit thing with the full name given in the <paramref name="fullname"/> parameter.</returns>
         public Thing GetThingByFullname(string fullname)
         {
             var request = _webAgent.CreateGet(string.Format(GetThingUrl, fullname));
@@ -299,6 +354,17 @@ namespace RedditSharp
             return Thing.Parse(this, json["data"]["children"][0], _webAgent);
         }
 
+        /// <summary>
+        /// Gets an instance of the RedditSharp.Things.Comment class describing a comment found at the given location.
+        /// </summary>
+        /// <param name="subreddit">The full name of the subreddit, without the <c>/r/</c> prefix.</param>
+        /// <param name="name">The name of the comment thing to obtain information about.</param>
+        /// <param name="linkName">The name of the post thing on which the comment is posted.</param>
+        /// <returns>An instance of the RedditSharp.Things.Comment class describing a comment found 
+        /// at the location specified with the <paramref name="name"/> and <paramref name="linkName"/> parameters.</returns>
+        /// <remarks>Note that it isn't even necessary to provide the subreddit in the Uri. 
+        /// The only change is that the subreddit style is not displayed on the resultant URL.
+        /// For an example, see http://www.reddit.com/comments/27eh97/foo/ci01pzf. </remarks>
         public Comment GetComment(string subreddit, string name, string linkName)
         {
             try
