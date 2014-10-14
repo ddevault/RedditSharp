@@ -35,7 +35,7 @@ namespace RedditSharp.Things
         internal async Task<WikiPageRevision> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
-            await JsonConvert.PopulateObjectAsync(json.ToString(), this, reddit.JsonSerializerSettings);
+            await Task.Factory.StartNew(() => JsonConvert.PopulateObject(json.ToString(), this, reddit.JsonSerializerSettings));
             return this;
         }
 

@@ -18,7 +18,7 @@ namespace RedditSharp.Things
         protected async Task<CreatedThing> InitAsync(Reddit reddit, JToken json)
         {
             CommonInit(reddit, json);
-            await JsonConvert.PopulateObjectAsync(json["data"].ToString(), this, reddit.JsonSerializerSettings);
+            await Task.Factory.StartNew(() => JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings));
             return this;
         }
 
