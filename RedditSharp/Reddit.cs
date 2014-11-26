@@ -93,22 +93,19 @@ namespace RedditSharp
             CaptchaSolver = new ConsoleCaptchaSolver();
         }
 
-        public Reddit(WebAgent.RateLimitMode limitMode)
-            : this()
+        public Reddit(WebAgent.RateLimitMode limitMode) : this()
         {
             WebAgent.UserAgent = "";
             WebAgent.RateLimit = limitMode;
             WebAgent.RootDomain = "www.reddit.com";
         }
 
-        public Reddit(string username, string password, bool useSsl = true)
-            : this()
+        public Reddit(string username, string password, bool useSsl = true) : this()
         {
             LogIn(username, password, useSsl);
         }
 
-        public Reddit(string accessToken)
-            : this()
+        public Reddit(string accessToken) : this()
         {
             WebAgent.Protocol = "https";
             WebAgent.RootDomain = OAuthDomainUrl;
