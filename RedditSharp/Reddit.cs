@@ -94,6 +94,7 @@ namespace RedditSharp
         }
 
         public Reddit(WebAgent.RateLimitMode limitMode)
+            : this()
         {
             WebAgent.UserAgent = "";
             WebAgent.RateLimit = limitMode;
