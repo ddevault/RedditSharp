@@ -161,8 +161,7 @@ namespace RedditSharp.Things
             var json = JObject.Parse(data);
             if (json["json"]["ratelimit"] != null)
                 throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-            var comment = json["json"]["data"]["things"][0];
-            return (Comment)Reddit.GetThingByFullname((string)comment["data"]["id"]); //Ugly way to do it because we need to make 2 requests, but it works
+            return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
         }
 
         private string SimpleAction(string endpoint)
