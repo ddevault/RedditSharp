@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -64,18 +65,7 @@ namespace RedditSharp.Things
         {
             get
             {
-                var comments = new List<Comment>();
-
-                var request = WebAgent.CreateGet(string.Format(GetCommentsUrl, Id));
-                var response = request.GetResponse();
-                var data = WebAgent.GetResponseString(response.GetResponseStream());
-                var json = JArray.Parse(data);
-
-                var postJson = json.Last()["data"]["children"];
-                foreach (var comment in postJson)
-                    comments.Add(new Comment().Init(Reddit, comment, WebAgent, this));
-
-                return comments.ToArray();
+                return ListComments().ToArray();
             }
         }
 
@@ -205,7 +195,7 @@ namespace RedditSharp.Things
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
-        
+
         public void Del()
         {
             var data = SimpleAction(ApproveUrl);
@@ -273,8 +263,8 @@ namespace RedditSharp.Things
             JToken post = Reddit.GetToken(this.Url);
             JsonConvert.PopulateObject(post["data"].ToString(), this, Reddit.JsonSerializerSettings);
         }
-        
-         public void SetFlair(string flairText, string flairClass)
+
+        public void SetFlair(string flairText, string flairClass)
         {
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
@@ -294,6 +284,32 @@ namespace RedditSharp.Things
             var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(result);
             LinkFlairText = flairText;
+        }
+
+        public List<Comment> ListComments(int? limit = null)
+        {
+            var url = string.Format(GetCommentsUrl, Id);
+
+            if (limit.HasValue)
+            {
+                var query = HttpUtility.ParseQueryString(string.Empty);
+                query.Add("limit", limit.Value.ToString());
+                url = string.Format("{0}?{1}", url, query);
+            }
+
+            var request = WebAgent.CreateGet(url);
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JArray.Parse(data);
+            var postJson = json.Last()["data"]["children"];
+
+            var comments = new List<Comment>();
+            foreach (var comment in postJson)
+            {
+                comments.Add(new Comment().Init(Reddit, comment, WebAgent, this));
+            }
+
+            return comments;
         }
     }
 }
