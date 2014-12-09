@@ -319,18 +319,15 @@ namespace RedditSharp
             }
         }
 
-        public Listing<T> SearchByUrl<T>(string url)
-            where T : Thing
+        public Listing<T> SearchByUrl<T>(string url) where T : Thing
         {
             var urlSearchQuery = string.Format(UrlSearchPattern, url);
             return Search<T>(urlSearchQuery);
         }
 
-        public Listing<T> Search<T>(string query)
-            where T : Thing
+        public Listing<T> Search<T>(string query) where T : Thing
         {
             return new Listing<T>(this, string.Format(SearchUrl, query, "relevance", "all"), _webAgent);
-
         }
 
         #region Helpers
