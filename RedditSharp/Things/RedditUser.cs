@@ -11,6 +11,8 @@ namespace RedditSharp.Things
         private const string CommentsUrl = "/user/{0}/comments.json";
         private const string LinksUrl = "/user/{0}/submitted.json";
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
+        private const string LikedUrl = "/user/{0}/liked.json";
+        private const string DislikedUrl = "/user/{0}/disliked.json";
 
         private const int MAX_LIMIT = 100;
 
@@ -66,6 +68,50 @@ namespace RedditSharp.Things
             get
             {
                 return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
+            }
+        }
+
+        public bool isVotingViewable
+        {
+            get
+            {
+                //Attempt to access resource, return false if failed due to access restriction.
+                try
+                {
+                    var testAccess = System.Linq.Enumerable.First(LikedPosts);
+                }
+                //Rethrow errors not relating to Access
+                catch(System.Net.WebException e)
+                {
+                    if(e.Status==System.Net.WebExceptionStatus.ProtocolError)
+                    {
+                        var response = e.Response as System.Net.HttpWebResponse;
+                        if (response != null && response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                            return false;
+                    }
+                    throw;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                return true;
+            }
+        }
+
+        public Listing<Post> LikedPosts
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(LikedUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> DislikedPosts
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(DislikedUrl, Name), WebAgent);
             }
         }
 

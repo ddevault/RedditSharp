@@ -15,8 +15,6 @@ namespace RedditSharp.Things
         private const string MessagesUrl = "/message/messages.json";
         private const string InboxUrl = "/message/inbox.json";
         private const string SentUrl = "/message/sent.json";
-        private const string LikedUrl = "/user/{0}/liked.json";
-        private const string DislikedUrl = "/user/{0}/disliked.json";
 
         public new AuthenticatedUser Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
@@ -36,22 +34,6 @@ namespace RedditSharp.Things
         private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(reddit, json, webAgent);
-        }
-
-        public Listing<Post> LikedPosts
-        {
-            get
-            {
-                return new Listing<Post>(Reddit, string.Format(LikedUrl, Name), WebAgent);
-            }
-        }
-
-        public Listing<Post> DislikedPosts
-        {
-            get
-            {
-                return new Listing<Post>(Reddit, string.Format(DislikedUrl, Name), WebAgent);
-            }
         }
 
         public Listing<Subreddit> ModeratorSubreddits
