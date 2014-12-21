@@ -178,17 +178,22 @@ namespace RedditSharp.Things
 
         public void Remove()
         {
-            var data = SimpleAction(RemoveUrl);
+            RemoveImpl(false);
         }
 
         public void RemoveSpam()
+        {
+            RemoveImpl(true);
+        }
+
+        private void RemoveImpl(bool spam)
         {
             var request = WebAgent.CreatePost(RemoveUrl);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
             {
                 id = FullName,
-                spam = true,
+                spam = spam,
                 uh = Reddit.User.Modhash
             });
             stream.Close();
