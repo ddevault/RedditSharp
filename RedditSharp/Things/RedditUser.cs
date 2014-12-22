@@ -71,34 +71,6 @@ namespace RedditSharp.Things
             }
         }
 
-        public bool isVotingViewable
-        {
-            get
-            {
-                //Attempt to access resource, return false if failed due to access restriction.
-                try
-                {
-                    var testAccess = System.Linq.Enumerable.First(LikedPosts);
-                }
-                //Rethrow errors not relating to Access
-                catch(System.Net.WebException e)
-                {
-                    if(e.Status==System.Net.WebExceptionStatus.ProtocolError)
-                    {
-                        var response = e.Response as System.Net.HttpWebResponse;
-                        if (response != null && response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                            return false;
-                    }
-                    throw;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-                return true;
-            }
-        }
-
         public Listing<Post> LikedPosts
         {
             get
