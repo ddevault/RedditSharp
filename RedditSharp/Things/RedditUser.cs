@@ -11,6 +11,8 @@ namespace RedditSharp.Things
         private const string CommentsUrl = "/user/{0}/comments.json";
         private const string LinksUrl = "/user/{0}/submitted.json";
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
+        private const string LikedUrl = "/user/{0}/liked.json";
+        private const string DislikedUrl = "/user/{0}/disliked.json";
 
         private const int MAX_LIMIT = 100;
 
@@ -66,6 +68,22 @@ namespace RedditSharp.Things
             get
             {
                 return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> LikedPosts
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(LikedUrl, Name), WebAgent);
+            }
+        }
+
+        public Listing<Post> DislikedPosts
+        {
+            get
+            {
+                return new Listing<Post>(Reddit, string.Format(DislikedUrl, Name), WebAgent);
             }
         }
 
