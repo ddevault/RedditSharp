@@ -123,8 +123,8 @@ namespace RedditSharp
         /// <param name="username">The username.</param>
         /// <param name="password">The user's password.</param>
         /// <returns>The access token</returns>
-        public string GetOAuthToken(string username, string password) 
-	    {
+        public string GetOAuthToken(string username, string password)
+        {
             if (Type.GetType("Mono.Runtime") != null)
                 ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
             _webAgent.Cookies = new CookieContainer();
@@ -134,8 +134,8 @@ namespace RedditSharp
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
 
-            _webAgent.WritePostBody(stream, new 
-		    {
+            _webAgent.WritePostBody(stream, new
+            {
                 grant_type = "password",
                 username,
                 password,
@@ -144,8 +144,8 @@ namespace RedditSharp
 
             stream.Close();
             var json = _webAgent.ExecuteRequest(request);
-            if (json["access_token"] != null) 
-		    {
+            if (json["access_token"] != null)
+            {
                 if (json["refresh_token"] != null)
                     RefreshToken = json["refresh_token"].ToString();
                 OAuthToken = json["access_token"].ToString();
