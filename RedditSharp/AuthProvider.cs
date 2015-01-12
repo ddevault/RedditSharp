@@ -118,6 +118,43 @@ namespace RedditSharp
         }
 
         /// <summary>
+        /// Gets the OAuth token for the user.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The user's password.</param>
+        /// <returns>The access token</returns>
+        public string GetOAuthToken(string username, string password)
+        {
+            if (Type.GetType("Mono.Runtime") != null)
+                ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
+            _webAgent.Cookies = new CookieContainer();
+
+            var request = _webAgent.CreatePost(AccessUrl);
+
+            request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
+            var stream = request.GetRequestStream();
+
+            _webAgent.WritePostBody(stream, new
+            {
+                grant_type = "password",
+                username,
+                password,
+                redirect_uri = _redirectUri
+            });
+
+            stream.Close();
+            var json = _webAgent.ExecuteRequest(request);
+            if (json["access_token"] != null)
+            {
+                if (json["refresh_token"] != null)
+                    RefreshToken = json["refresh_token"].ToString();
+                OAuthToken = json["access_token"].ToString();
+                return json["access_token"].ToString();
+            }
+            throw new AuthenticationException("Could not log in.");
+        }
+		
+        /// <summary>
         /// Gets a user authenticated by OAuth2.
         /// </summary>
         /// <param name="accessToken">Obtained using GetOAuthToken</param>
