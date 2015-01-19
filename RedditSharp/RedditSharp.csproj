@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SpamFilterSettings.cs" />
     <Compile Include="Things\AuthenticatedUser.cs" />
     <Compile Include="AuthProvider.cs" />
     <Compile Include="Captcha.cs" />

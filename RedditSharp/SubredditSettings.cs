@@ -38,10 +38,10 @@ namespace RedditSharp
             SubredditType = SubredditType.Public;
             ShowThumbnails = true;
             ContentOptions = ContentOptions.All;
+            SpamFilter = new SpamFilterSettings();
         }
 
-        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json, IWebAgent webAgent)
-            : this(reddit, subreddit, webAgent)
+        public SubredditSettings(Subreddit subreddit, Reddit reddit, JObject json, IWebAgent webAgent) : this(reddit, subreddit, webAgent)
         {
             var data = json["data"];
             AllowAsDefault = data["default_set"].ValueOrDefault<bool>();
@@ -55,6 +55,12 @@ namespace RedditSharp
             HeaderHoverText = data["header_hover_text"].ValueOrDefault<string>();
             NSFW = data["over_18"].ValueOrDefault<bool>();
             PublicDescription = HttpUtility.HtmlDecode(data["public_description"].ValueOrDefault<string>() ?? string.Empty);
+            SpamFilter = new SpamFilterSettings
+            {
+                LinkPostStrength = GetSpamFilterStrength(data["spam_links"].ValueOrDefault<string>()),
+                SelfPostStrength = GetSpamFilterStrength(data["spam_selfposts"].ValueOrDefault<string>()),
+                CommentStrength = GetSpamFilterStrength(data["spam_comments"].ValueOrDefault<string>())
+            };
             if (data["wikimode"] != null)
             {
                 var wikiMode = data["wikimode"].ValueOrDefault<string>();
@@ -123,6 +129,7 @@ namespace RedditSharp
         public bool ShowThumbnails { get; set; }
         public int WikiEditAge { get; set; }
         public ContentOptions ContentOptions { get; set; }
+        public SpamFilterSettings SpamFilter { get; set; }
 
         public void UpdateSettings()
         {
@@ -184,6 +191,9 @@ namespace RedditSharp
                 wiki_edit_age = WikiEditAge,
                 wiki_edit_karma = WikiEditKarma,
                 wikimode,
+                spam_links = SpamFilter == null ? null : SpamFilter.LinkPostStrength.ToString().ToLowerInvariant(),
+                spam_selfposts = SpamFilter == null ? null : SpamFilter.SelfPostStrength.ToString().ToLowerInvariant(),
+                spam_comments = SpamFilter == null ? null : SpamFilter.CommentStrength.ToString().ToLowerInvariant(),
                 api_type = "json"
             }, "header-title", HeaderHoverText);
             stream.Close();
@@ -207,6 +217,21 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
+
+        private SpamFilterStrength GetSpamFilterStrength(string rawValue)
+        {
+            switch(rawValue)
+            {
+                case "low":
+                    return SpamFilterStrength.Low;
+                case "high":
+                    return SpamFilterStrength.High;
+                case "all":
+                    return SpamFilterStrength.All;
+                default:
+                    return SpamFilterStrength.High;
+            }
+        }
     }
 
     public enum WikiEditMode
@@ -228,5 +253,12 @@ namespace RedditSharp
         All,
         LinkOnly,
         SelfOnly
+    }
+
+    public enum SpamFilterStrength
+    {
+        Low,
+        High,
+        All
     }
 }
