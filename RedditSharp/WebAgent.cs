@@ -138,18 +138,18 @@ namespace RedditSharp
             switch (RateLimit)
             {
                 case RateLimitMode.Pace:
-                    while ((DateTime.Now - _lastRequest).TotalSeconds < 2)// Rate limiting
+                    while ((DateTime.UtcNow - _lastRequest).TotalSeconds < 2)// Rate limiting
                         Thread.Sleep(250);
-                    _lastRequest = DateTime.Now;
+                    _lastRequest = DateTime.UtcNow;
                     break;
                 case RateLimitMode.Burst:
                     if (_requestsThisBurst == 0)//this is first request
-                        _burstStart = DateTime.Now;
+                        _burstStart = DateTime.UtcNow;
                     if (_requestsThisBurst >= 30) //limit has been reached
                     {
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 60)
                             Thread.Sleep(250);
-                        _burstStart = DateTime.Now;
+                        _burstStart = DateTime.UtcNow;
                     }
                     _requestsThisBurst++;
                     break;

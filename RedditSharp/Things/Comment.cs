@@ -59,11 +59,11 @@ namespace RedditSharp.Things
         private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
         {
             // Parse sub comments
-            // TODO: Consider deserializing this properly
+            var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (data["replies"] != null && data["replies"].Any())
+            if (replies != null && replies.Count() > 0)
             {
-                foreach (var comment in data["replies"]["data"]["children"])
+                foreach (var comment in replies["data"]["children"])
                     subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
             }
             Comments = subComments.ToArray();
@@ -72,11 +72,11 @@ namespace RedditSharp.Things
         private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
         {
             // Parse sub comments
-            // TODO: Consider deserializing this properly
+            var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (data["replies"] != null && data["replies"].Any())
+            if (replies != null && replies.Count() > 0)
             {
-                foreach (var comment in data["replies"]["data"]["children"])
+                foreach (var comment in replies["data"]["children"])
                     subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
             }
             Comments = subComments.ToArray();            
@@ -123,9 +123,9 @@ namespace RedditSharp.Things
             get
             {
                 // Not really a "short" link, but you can't actually use short links for comments
-                return string.Format("{0}://{1}/r/{2}/comments/{3}/_/{4}", 
-                    RedditSharp.WebAgent.Protocol, RedditSharp.WebAgent.RootDomain,
-                    this.Subreddit, this.LinkId, this.Id);
+                return String.Format("{0}://{1}/r/{2}/comments/{3}/_/{4}",
+                                     RedditSharp.WebAgent.Protocol, RedditSharp.WebAgent.RootDomain,
+                                     this.Subreddit, this.Parent.Id, this.Id);
             }
         }
 
