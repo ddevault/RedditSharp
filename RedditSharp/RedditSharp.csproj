@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CloudSearchQueryBuilder.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="EnumStringAttribute.cs" />
     <Compile Include="SpamFilterSettings.cs" />
     <Compile Include="Things\AuthenticatedUser.cs" />
     <Compile Include="AuthProvider.cs" />
@@ -60,6 +63,7 @@
     <Compile Include="ConsoleCaptchaSolver.cs" />
     <Compile Include="DuplicateLinkException.cs" />
     <Compile Include="ICaptchaSolver.cs" />
+    <Compile Include="Things\CloudSearchQuery.cs" />
     <Compile Include="Things\Comment.cs" />
     <Compile Include="Things\CreatedThing.cs" />
     <Compile Include="Extensions.cs" />
@@ -79,6 +83,7 @@
     <Compile Include="RedditException.cs" />
     <Compile Include="Things\RedditUser.cs" />
     <Compile Include="SubmitData.cs" />
+    <Compile Include="Things\SortType.cs" />
     <Compile Include="Things\Subreddit.cs" />
     <Compile Include="SubredditImage.cs" />
     <Compile Include="SubredditSettings.cs" />

@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,6 +39,7 @@ namespace RedditSharp.Things
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
         private const string CommentsUrl = "/r/{0}/comments.json";
         private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
+        private const string CloudSearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}&syntax=cloudsearch";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -156,6 +159,23 @@ namespace RedditSharp.Things
         public Listing<Post> Search(string terms)
         {
             return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
+        }
+
+        public Listing<Post> CloudSearch(CloudSearchQuery query, SortType sort)
+        {
+            var b = new CloudSearchQueryBuilder();
+
+            b.Add("title", query.Title);
+            
+            if ((query.DateTimeFrom.HasValue && !query.DateTimeTo.HasValue) || (!query.DateTimeFrom.HasValue && query.DateTimeTo.HasValue))
+                throw new ArgumentException("Both Datetime to and datetime from has to have a value if you are querying on date.");
+            
+            if (query.DateTimeFrom.HasValue)
+                b.Add("timestamp", query.DateTimeFrom, query.DateTimeTo);
+
+            var fullQuery = string.Format(CloudSearchUrl, Name, HttpUtility.UrlEncode(b.ToString()), EnumStringAttribute.EnumToString(sort), "all");
+
+            return new Listing<Post>(Reddit, fullQuery, WebAgent);
         }
 
         public SubredditSettings Settings
