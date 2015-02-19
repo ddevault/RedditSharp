@@ -21,6 +21,7 @@ namespace RedditSharp.Things
         private const string SetFlairUrl = "/api/flair";
         private const string MarkNSFWUrl = "/api/marknsfw";
         private const string UnmarkNSFWUrl = "/api/unmarknsfw";
+        private const string ContestModeUrl = "/api/set_contest_mode";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -182,6 +183,24 @@ namespace RedditSharp.Things
             return data;
         }
 
+        private string SimpleActionToggle(string endpoint, bool value)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(endpoint);
+            var stream = request.GetRequestStream();
+            WebAgent.WritePostBody(stream, new
+            {
+                id = FullName,
+                state = value,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            return data;
+        }
+
         public void Approve()
         {
             var data = SimpleAction(ApproveUrl);
@@ -230,6 +249,11 @@ namespace RedditSharp.Things
         public void UnmarkNSFW()
         {
             var data = SimpleAction(UnmarkNSFWUrl);
+        }
+
+        public void ContestMode(bool state)
+        {
+            var data = SimpleActionToggle(ContestModeUrl, state);
         }
 
         #region Obsolete Getter Methods
