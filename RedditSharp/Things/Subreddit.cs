@@ -13,6 +13,8 @@ namespace RedditSharp.Things
     {
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
+        private const string SubredditNewBeforeUrl = "/r/{0}/new.json?sort=new&before={1}";
+        private const string SubredditNewAfterUrl = "/r/{0}/new.json?sort=new&after={1}";
         private const string SubredditHotUrl = "/r/{0}/hot.json";
         private const string SubredditTopUrl = "/r/{0}/top.json?t={1}";
         private const string SubscribeUrl = "/api/subscribe";
@@ -125,6 +127,20 @@ namespace RedditSharp.Things
                     return new Listing<Post>(Reddit, "/new.json", WebAgent);
                 return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name), WebAgent);
             }
+        }
+
+        public Listing<Post> NewBefore(string fullname)
+        {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/new.json?before=" + fullname, WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SubredditNewBeforeUrl, Name, fullname), WebAgent);
+        }
+
+        public Listing<Post> NewAfter(string fullname)
+        {
+            if (Name == "/")
+                return new Listing<Post>(Reddit, "/new.json?after=" + fullname, WebAgent);
+            return new Listing<Post>(Reddit, string.Format(SubredditNewAfterUrl, Name, fullname), WebAgent);
         }
 
         public Listing<Post> Hot
