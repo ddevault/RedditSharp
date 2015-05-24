@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using RedditSharp.Things;
+using System.Threading.Tasks;
 
 namespace RedditSharp
 {
@@ -206,6 +207,20 @@ namespace RedditSharp
             return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
+        /// <summary>
+        /// Returns the subreddit. 
+        /// </summary>
+        /// <param name="name">The name of the subreddit</param>
+        /// <returns>The Subreddit by given name</returns>
+        public async Task<Subreddit> GetSubredditAsync(string name)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            return  await GetThingAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
+        }
+
         public Domain GetDomain(string domain)
         {
             if (!domain.StartsWith("http://") && !domain.StartsWith("https://"))
@@ -331,6 +346,16 @@ namespace RedditSharp
         }
 
         #region Helpers
+
+        protected async internal Task<T>  GetThingAsync<T>(string url) where T : Thing
+        {
+            var request = _webAgent.CreateGet(url);
+            var response = request.GetResponse();
+            var data = _webAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
+            var ret =  await Thing.ParseAsync(this, json, _webAgent);
+            return (T)ret;
+        }
 
         protected internal T GetThing<T>(string url) where T : Thing
         {
