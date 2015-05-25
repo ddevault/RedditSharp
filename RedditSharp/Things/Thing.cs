@@ -104,6 +104,7 @@ namespace RedditSharp.Things
             {
                 if (typeof(T) == typeof(WikiPageRevision))
                 {
+                    return await new WikiPageRevision().InitAsync(reddit, json, webAgent);
                 }
             }
             return result;
