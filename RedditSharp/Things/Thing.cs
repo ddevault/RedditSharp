@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace RedditSharp.Things
 {
@@ -73,6 +74,40 @@ namespace RedditSharp.Things
             {
                 return DateTime.Now - FetchedAt;
             }
+        }
+
+        public static async Task<Thing> ParseAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        {
+            var kind = json["kind"].ValueOrDefault<string>();
+            switch (kind)
+            {
+                case "t1":
+                    return  await new Comment().InitAsync(reddit, json, webAgent, null);
+                case "t2":
+                    return  await new RedditUser().InitAsync(reddit, json, webAgent);
+                case "t3":
+                    return  await new Post().InitAsync(reddit, json, webAgent);
+                case "t4":
+                    return  await new PrivateMessage().InitAsync(reddit, json, webAgent);
+                case "t5":
+                    return await new Subreddit().InitAsync(reddit, json, webAgent);
+                default:
+                    return null;
+            }
+        }
+
+        // if we can't determine the type of thing by "kind", try by type
+        public static async Task<Thing> ParseAsync<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        {
+            Thing result = await ParseAsync(reddit, json, webAgent);
+            if (result == null)
+            {
+                if (typeof(T) == typeof(WikiPageRevision))
+                {
+                    return await new WikiPageRevision().InitAsync(reddit, json, webAgent);
+                }
+            }
+            return result;
         }
     }
 }
