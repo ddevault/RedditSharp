@@ -222,7 +222,7 @@ namespace RedditSharp.Things
 
         public void Del()
         {
-            var data = SimpleAction(ApproveUrl);
+            var data = SimpleAction(DelUrl);
         }
 
         public void Hide()
