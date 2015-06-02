@@ -181,7 +181,7 @@ namespace RedditSharp.Things
                 case ReportType.Spam: 
                     reportReason = "spam"; break;
                 case ReportType.VoteManipulation: 
-                    reportReason = "vote minipulation"; break;
+                    reportReason = "vote manipulation"; break;
                 case ReportType.PersonalInformation: 
                     reportReason = "personal information"; break;
                 case ReportType.BreakingReddit: 
