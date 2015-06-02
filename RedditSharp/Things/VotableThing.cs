@@ -13,9 +13,20 @@ namespace RedditSharp.Things
             Downvote = -1
         }
 
+        public enum ReportType
+        {
+            Spam = 0,
+            VoteManipulation = 1,
+            PersonalInformation = 2,
+            SexualizingMinors = 3,
+            BreakingReddit = 4,
+            Other = 5
+        }
+
         private const string VoteUrl = "/api/vote";
         private const string SaveUrl = "/api/save";
         private const string UnsaveUrl = "/api/unsave";
+        private const string ReportUrl = "/api/report";
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
@@ -158,5 +169,41 @@ namespace RedditSharp.Things
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
+        
+        public void Report(ReportType reportType, string otherReason = null)
+        {
+            var request = WebAgent.CreatePost(ReportUrl);
+            var stream = request.GetRequestStream();
+
+            string reportReason;
+            switch (reportType)
+            {
+                case ReportType.Spam: 
+                    reportReason = "spam"; break;
+                case ReportType.VoteManipulation: 
+                    reportReason = "vote minipulation"; break;
+                case ReportType.PersonalInformation: 
+                    reportReason = "personal information"; break;
+                case ReportType.BreakingReddit: 
+                    reportReason = "breaking reddit"; break;
+                case ReportType.SexualizingMinors: 
+                    reportReason = "sexualizing minors"; break;
+                default: 
+                    reportReason = "other"; break;
+            }
+
+            WebAgent.WritePostBody(stream, new
+            {
+                api_type = "json",
+                reason = reportReason,
+                other_reason = otherReason ?? "",
+                thing_id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+
     }
 }
