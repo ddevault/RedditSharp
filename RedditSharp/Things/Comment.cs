@@ -13,7 +13,6 @@ namespace RedditSharp.Things
     public class Comment : VotableThing
     {
         private const string CommentUrl = "/api/comment";
-        private const string DistinguishUrl = "/api/distinguish";
         private const string EditUserTextUrl = "/api/editusertext";
         private const string RemoveUrl = "/api/remove";
         private const string SetAsReadUrl = "/api/read_message";
@@ -108,9 +107,6 @@ namespace RedditSharp.Things
         public string LinkTitle { get; set; }
         [JsonProperty("num_reports")]
         public int? NumReports { get; set; }
-        [JsonProperty("distinguished")]
-        [JsonConverter(typeof(DistinguishConverter))]
-        public DistinguishType Distinguished { get; set; }
 
         [JsonIgnore]
         public IList<Comment> Comments { get; private set; }
@@ -165,42 +161,6 @@ namespace RedditSharp.Things
                 var error = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
                 return null;
             }
-        }
-
-        public void Distinguish(DistinguishType distinguishType)
-        {
-            if (Reddit.User == null)
-                throw new AuthenticationException("No user logged in.");
-            var request = WebAgent.CreatePost(DistinguishUrl);
-            var stream = request.GetRequestStream();
-            string how;
-            switch (distinguishType)
-            {
-                case DistinguishType.Admin:
-                    how = "admin";
-                    break;
-                case DistinguishType.Moderator:
-                    how = "yes";
-                    break;
-                case DistinguishType.None:
-                    how = "no";
-                    break;
-                default:
-                    how = "special";
-                    break;
-            }
-            WebAgent.WritePostBody(stream, new
-            {
-                how,
-                id = Id,
-                uh = Reddit.User.Modhash
-            });
-            stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(data);
-            if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
-                throw new AuthenticationException("You are not permitted to distinguish this comment.");
         }
 
         /// <summary>
@@ -267,47 +227,4 @@ namespace RedditSharp.Things
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }
-
-    public enum DistinguishType
-    {
-        Moderator,
-        Admin,
-        Special,
-        None
-    }
-
-    internal class DistinguishConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(DistinguishType) || objectType == typeof(string);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            var token = JToken.Load(reader);
-            var value = token.Value<string>();
-            if (value == null)
-                return DistinguishType.None;
-            switch (value)
-            {
-                case "moderator": return DistinguishType.Moderator;
-                case "admin": return DistinguishType.Admin;
-                case "special": return DistinguishType.Special;
-                default: return DistinguishType.None;
-            }
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var d = (DistinguishType)value;
-            if (d == DistinguishType.None)
-            {
-                writer.WriteNull();
-                return;
-            }
-            writer.WriteValue(d.ToString().ToLower());
-        }
-    }
-
 }

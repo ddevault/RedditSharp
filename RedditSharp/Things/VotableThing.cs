@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Security.Authentication;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -23,10 +26,19 @@ namespace RedditSharp.Things
             Other = 5
         }
 
+        public enum DistinguishType
+        {
+            Moderator,
+            Admin,
+            Special,
+            None
+        }
+
         private const string VoteUrl = "/api/vote";
         private const string SaveUrl = "/api/save";
         private const string UnsaveUrl = "/api/unsave";
         private const string ReportUrl = "/api/report";
+        private const string DistinguishUrl = "/api/distinguish";
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
@@ -54,12 +66,16 @@ namespace RedditSharp.Things
             WebAgent = webAgent;
         }
 
+
         [JsonProperty("downs")]
         public int Downvotes { get; set; }
         [JsonProperty("ups")]
         public int Upvotes { get; set; }
         [JsonProperty("saved")]
         public bool Saved { get; set; }
+        [JsonProperty("distinguished")]
+        [JsonConverter(typeof(DistinguishConverter))]
+        public DistinguishType Distinguished { get; set; }
 
         /// <summary>
         /// True if the logged in user has upvoted this.
@@ -169,7 +185,7 @@ namespace RedditSharp.Things
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
-        
+
         public void Report(ReportType reportType, string otherReason = null)
         {
             var request = WebAgent.CreatePost(ReportUrl);
@@ -178,17 +194,17 @@ namespace RedditSharp.Things
             string reportReason;
             switch (reportType)
             {
-                case ReportType.Spam: 
+                case ReportType.Spam:
                     reportReason = "spam"; break;
-                case ReportType.VoteManipulation: 
+                case ReportType.VoteManipulation:
                     reportReason = "vote manipulation"; break;
-                case ReportType.PersonalInformation: 
+                case ReportType.PersonalInformation:
                     reportReason = "personal information"; break;
-                case ReportType.BreakingReddit: 
+                case ReportType.BreakingReddit:
                     reportReason = "breaking reddit"; break;
-                case ReportType.SexualizingMinors: 
+                case ReportType.SexualizingMinors:
                     reportReason = "sexualizing minors"; break;
-                default: 
+                default:
                     reportReason = "other"; break;
             }
 
@@ -205,5 +221,74 @@ namespace RedditSharp.Things
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
+        public void Distinguish(DistinguishType distinguishType)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(DistinguishUrl);
+            var stream = request.GetRequestStream();
+            string how;
+            switch (distinguishType)
+            {
+                case DistinguishType.Admin:
+                    how = "admin";
+                    break;
+                case DistinguishType.Moderator:
+                    how = "yes";
+                    break;
+                case DistinguishType.None:
+                    how = "no";
+                    break;
+                default:
+                    how = "special";
+                    break;
+            }
+            WebAgent.WritePostBody(stream, new
+            {
+                how,
+                id = Id,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JObject.Parse(data);
+            if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
+                throw new AuthenticationException("You are not permitted to distinguish this comment.");
+        }
+
+        internal class DistinguishConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(DistinguishType) || objectType == typeof(string);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var token = JToken.Load(reader);
+                var value = token.Value<string>();
+                if (value == null)
+                    return DistinguishType.None;
+                switch (value)
+                {
+                    case "moderator": return DistinguishType.Moderator;
+                    case "admin": return DistinguishType.Admin;
+                    case "special": return DistinguishType.Special;
+                    default: return DistinguishType.None;
+                }
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                var d = (DistinguishType)value;
+                if (d == DistinguishType.None)
+                {
+                    writer.WriteNull();
+                    return;
+                }
+                writer.WriteValue(d.ToString().ToLower());
+            }
+        }
     }
 }
