@@ -103,10 +103,12 @@ namespace RedditSharp
 			WebAgent.RootDomain = "www.reddit.com";
         }
 
-		[Obsolete("Reddit will stop supporting cookie-based authentication in the future. Use OAuth instead.")]
+        [Obsolete("Reddit will stop supporting cookie-based authentication in the future. Use OAuth instead.")]
         public Reddit(string username, string password, bool useSsl = true) : this()
         {
+#pragma warning disable 618
             LogIn(username, password, useSsl);
+#pragma warning restore 618
         }
 
         public Reddit(string accessToken) : this()
