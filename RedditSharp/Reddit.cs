@@ -40,8 +40,8 @@ namespace RedditSharp
         {
             WebAgent.UserAgent = "";
             WebAgent.RateLimit = WebAgent.RateLimitMode.Pace;
-            WebAgent.Protocol = "http";
-            WebAgent.RootDomain = "www.reddit.com";
+            WebAgent.Protocol = "https";
+			WebAgent.RootDomain = "www.reddit.com";
         }
 
         #endregion
@@ -100,12 +100,15 @@ namespace RedditSharp
         {
             WebAgent.UserAgent = "";
             WebAgent.RateLimit = limitMode;
-            WebAgent.RootDomain = "www.reddit.com";
+			WebAgent.RootDomain = "www.reddit.com";
         }
 
+        [Obsolete("Reddit will stop supporting cookie-based authentication in the future. Use OAuth instead.")]
         public Reddit(string username, string password, bool useSsl = true) : this()
         {
+#pragma warning disable 618
             LogIn(username, password, useSsl);
+#pragma warning restore 618
         }
 
         public Reddit(string accessToken) : this()
@@ -123,6 +126,7 @@ namespace RedditSharp
         /// <param name="password">The password of the user to log on to.</param>
         /// <param name="useSsl">Whether to use SSL or not. (default: true)</param>
         /// <returns></returns>
+		[Obsolete("Reddit will stop supporting cookie-based authentication in the future. Use OAuth instead.")]
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
             if (Type.GetType("Mono.Runtime") != null)
@@ -167,6 +171,10 @@ namespace RedditSharp
 
         public RedditUser GetUser(string name)
         {
+			if (name.StartsWith("u/"))
+				name = name.Substring(2);
+			if (name.StartsWith("/u/"))
+				name = name.Substring(3);
             var request = _webAgent.CreateGet(string.Format(UserInfoUrl, name));
             var response = request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
