@@ -16,7 +16,7 @@ namespace RedditSharp.Things
         private const string DelUrl = "/api/del";
         private const string GetCommentsUrl = "/comments/{0}.json";
         private const string ApproveUrl = "/api/approve";
-		private const string DistinguishUrl = "/api/distinguish";
+	private const string DistinguishUrl = "/api/distinguish";
         private const string EditUserTextUrl = "/api/editusertext";
         private const string HideUrl = "/api/hide";
         private const string UnhideUrl = "/api/unhide";
@@ -200,41 +200,41 @@ namespace RedditSharp.Things
             var data = SimpleAction(ApproveUrl);
         }
 
-		public void Distinguish(DistinguishType distinguishType)
+	public void Distinguish(DistinguishType distinguishType)
+	{
+		if (Reddit.User == null)
+			throw new AuthenticationException("No user logged in.");
+		var request = WebAgent.CreatePost(DistinguishUrl);
+		var stream = request.GetRequestStream();
+		string how;
+		switch (distinguishType)
 		{
-			if (Reddit.User == null)
-				throw new AuthenticationException("No user logged in.");
-			var request = WebAgent.CreatePost(DistinguishUrl);
-			var stream = request.GetRequestStream();
-			string how;
-			switch (distinguishType)
-			{
-				case DistinguishType.Admin:
-					how = "admin";
-					break;
-				case DistinguishType.Moderator:
-					how = "yes";
-					break;
-				case DistinguishType.None:
-					how = "no";
-					break;
-				default:
-					how = "special";
-					break;
-			}
-			WebAgent.WritePostBody(stream, new
-			{
-				how,
-				id = Id,
-				uh = Reddit.User.Modhash
-			});
-			stream.Close();
-			var response = request.GetResponse();
-			var data = WebAgent.GetResponseString(response.GetResponseStream());
-			var json = JObject.Parse(data);
-			if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
-				throw new AuthenticationException("You are not permitted to distinguish this comment.");
+			case DistinguishType.Admin:
+				how = "admin";
+				break;
+			case DistinguishType.Moderator:
+				how = "yes";
+				break;
+			case DistinguishType.None:
+				how = "no";
+				break;
+			default:
+				how = "special";
+				break;
 		}
+		WebAgent.WritePostBody(stream, new
+		{
+			how,
+			id = Id,
+			uh = Reddit.User.Modhash
+		});
+		stream.Close();
+		var response = request.GetResponse();
+		var data = WebAgent.GetResponseString(response.GetResponseStream());
+		var json = JObject.Parse(data);
+		if (json["jquery"].Count(i => i[0].Value<int>() == 11 && i[1].Value<int>() == 12) == 0)
+			throw new AuthenticationException("You are not permitted to distinguish this comment.");
+	}
 
         public void Remove()
         {
