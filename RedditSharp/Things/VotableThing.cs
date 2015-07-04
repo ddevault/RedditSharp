@@ -71,6 +71,8 @@ namespace RedditSharp.Things
         public int Downvotes { get; set; }
         [JsonProperty("ups")]
         public int Upvotes { get; set; }
+        [JsonProperty("score")]
+        public int Score { get; set; }
         [JsonProperty("saved")]
         public bool Saved { get; set; }
         [JsonProperty("distinguished")]
