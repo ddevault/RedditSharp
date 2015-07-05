@@ -1,3 +1,4 @@
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,7 +32,7 @@ namespace RedditSharp
         private const string OAuthDomainUrl = "oauth.reddit.com";
         private const string SearchUrl = "/search.json?q={0}&restrict_sr=off&sort={1}&t={2}";
         private const string UrlSearchPattern = "url:'{0}'";
-
+        private const string CloudSearchUrl = "/search.json?q={0}&restrict_sr=on&sort={1}&t={2}&syntax=cloudsearch";
         #endregion
 
         #region Static Variables
@@ -353,6 +354,23 @@ namespace RedditSharp
         public Listing<T> Search<T>(string query) where T : Thing
         {
             return new Listing<T>(this, string.Format(SearchUrl, query, "relevance", "all"), _webAgent);
+        }
+
+         public Listing<Post> CloudSearch(CloudSearchQuery query, SortType sort)
+        {
+            var b = new CloudSearchQueryBuilder();
+
+            b.Add("title", query.Title);
+            
+            if ((query.DateTimeFrom.HasValue && !query.DateTimeTo.HasValue) || (!query.DateTimeFrom.HasValue && query.DateTimeTo.HasValue))
+                throw new ArgumentException("Both Datetime to and datetime from has to have a value if you are querying on date.");
+            
+            if (query.DateTimeFrom.HasValue)
+                b.Add("timestamp", query.DateTimeFrom, query.DateTimeTo);
+
+            var fullQuery = string.Format(CloudSearchUrl, HttpUtility.UrlEncode(b.ToString()), EnumStringAttribute.EnumToString(sort), "all");
+
+            return new Listing<Post>(this, fullQuery, _webAgent);
         }
 
         #region Helpers
