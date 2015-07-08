@@ -124,7 +124,7 @@ namespace RedditSharp.Things
             if ((limit < 1) || (limit > MAX_LIMIT))
                 throw new ArgumentOutOfRangeException("limit", "Valid range: [1," + MAX_LIMIT + "]");
             string commentsUrl = string.Format(CommentsUrl, Name);
-            commentsUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting).ToLower(), limit, Enum.GetName(typeof(FromTime), fromTime));
+            commentsUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
             return new Listing<Comment>(Reddit, commentsUrl, WebAgent);
         }
@@ -142,7 +142,7 @@ namespace RedditSharp.Things
             if ((limit < 1) || (limit > 100))
                 throw new ArgumentOutOfRangeException("limit", "Valid range: [1,100]");
             string linksUrl = string.Format(LinksUrl, Name);
-            linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting).ToLower(), limit, Enum.GetName(typeof(FromTime), fromTime));
+            linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
             return new Listing<Post>(Reddit, linksUrl, WebAgent);
         }
