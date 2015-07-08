@@ -302,10 +302,9 @@ namespace RedditSharp.Things
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
-                r = Subreddit,
                 css_class = flairClass,
                 link = FullName,
-                //name = Name,
+                name = Reddit.User.Name,
                 text = flairText,
                 uh = Reddit.User.Modhash
             });
