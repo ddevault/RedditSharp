@@ -116,9 +116,6 @@ namespace RedditSharp.Things
         [JsonProperty("selftext_html")]
         public string SelfTextHtml { get; set; }
 
-        [JsonProperty("subreddit")]
-        public string Subreddit { get; set; }
-
         [JsonProperty("thumbnail")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Thumbnail { get; set; }
@@ -302,10 +299,9 @@ namespace RedditSharp.Things
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
-                r = Subreddit,
                 css_class = flairClass,
                 link = FullName,
-                //name = Name,
+                name = Reddit.User.Name,
                 text = flairText,
                 uh = Reddit.User.Modhash
             });
