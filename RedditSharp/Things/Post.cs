@@ -116,9 +116,6 @@ namespace RedditSharp.Things
         [JsonProperty("selftext_html")]
         public string SelfTextHtml { get; set; }
 
-        [JsonProperty("subreddit")]
-        public string Subreddit { get; set; }
-
         [JsonProperty("thumbnail")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Thumbnail { get; set; }
