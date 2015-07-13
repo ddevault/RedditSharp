@@ -42,6 +42,10 @@ namespace RedditSharp
             /// </summary>
             Pace,
             /// <summary>
+            /// Restricts requests to five per ten seconds
+            /// </summary>
+            SmallBurst,
+            /// <summary>
             /// Restricts requests to thirty per minute
             /// </summary>
             Burst,
@@ -141,6 +145,17 @@ namespace RedditSharp
                     while ((DateTime.UtcNow - _lastRequest).TotalSeconds < 2)// Rate limiting
                         Thread.Sleep(250);
                     _lastRequest = DateTime.UtcNow;
+                    break;
+                case RateLimitMode.SmallBurst:
+                    if (_requestsThisBurst == 0)//this is first request
+                        _burstStart = DateTime.UtcNow;
+                    if (_requestsThisBurst >= 5) //limit has been reached
+                    {
+                        while ((DateTime.UtcNow - _burstStart).TotalSeconds < 10)
+                            Thread.Sleep(250);
+                        _burstStart = DateTime.UtcNow;
+                    }
+                    _requestsThisBurst++;
                     break;
                 case RateLimitMode.Burst:
                     if (_requestsThisBurst == 0)//this is first request
