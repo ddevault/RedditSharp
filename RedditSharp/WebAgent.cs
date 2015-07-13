@@ -152,7 +152,7 @@ namespace RedditSharp
                     if (_requestsThisBurst >= 5) //limit has been reached
                     {
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 10)
-                            Thread.Sleep(100);
+                            Thread.Sleep(250);
                         _burstStart = DateTime.UtcNow;
                     }
                     _requestsThisBurst++;
