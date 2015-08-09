@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Web;
@@ -137,6 +138,7 @@ namespace RedditSharp
 
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private static void EnforceRateLimit()
         {
             switch (RateLimit)
@@ -154,6 +156,7 @@ namespace RedditSharp
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 10)
                             Thread.Sleep(250);
                         _burstStart = DateTime.UtcNow;
+                        _requestsThisBurst = 0;
                     }
                     _requestsThisBurst++;
                     break;
@@ -165,6 +168,7 @@ namespace RedditSharp
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 60)
                             Thread.Sleep(250);
                         _burstStart = DateTime.UtcNow;
+                        _requestsThisBurst = 0;
                     }
                     _requestsThisBurst++;
                     break;
