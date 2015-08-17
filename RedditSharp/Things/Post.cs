@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
@@ -150,6 +151,14 @@ namespace RedditSharp.Things
             if (json["json"]["ratelimit"] != null)
                 throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
             return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
+        }
+
+        public string GetSubreddit()
+        {
+            Reddit reddit = new Reddit();
+            string substring = Permalink.ToString();
+            Match match = Regex.Match(substring, @"/r/.*?(?=/)");
+            return match.Value;
         }
 
         private string SimpleAction(string endpoint)

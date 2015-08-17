@@ -356,9 +356,9 @@ namespace RedditSharp
             return Search<T>(urlSearchQuery);
         }
 
-        public Listing<T> Search<T>(string query) where T : Thing
+        public Listing<T> Search<T>(string query, Sorting sort = Sorting.Relevance, TimeSorting time = TimeSorting.All) where T : Thing
         {
-            return new Listing<T>(this, string.Format(SearchUrl, query, "relevance", "all"), _webAgent);
+            return new Listing<T>(this, string.Format(SearchUrl, query, sort, time), _webAgent);
         }
 
         #region Helpers
