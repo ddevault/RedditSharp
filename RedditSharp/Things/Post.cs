@@ -124,7 +124,16 @@ namespace RedditSharp.Things
         public string Title { get; set; }
 
         [JsonProperty("subreddit")]
-        public string Subreddit { get; set; }
+        public string SubredditName { get; set; }
+
+        [JsonIgnore]
+        public Subreddit GetSubreddit
+        {
+            get
+            {
+                return Reddit.GetSubreddit("/r/" + SubredditName);
+            }
+        }
 
         [JsonProperty("url")]
         [JsonConverter(typeof(UrlParser))]
