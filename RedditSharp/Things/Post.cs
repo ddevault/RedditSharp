@@ -127,7 +127,7 @@ namespace RedditSharp.Things
         public string SubredditName { get; set; }
 
         [JsonIgnore]
-        public Subreddit GetSubreddit
+        public Subreddit Subreddit
         {
             get
             {
