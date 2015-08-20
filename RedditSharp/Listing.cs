@@ -5,6 +5,24 @@ using RedditSharp.Things;
 
 namespace RedditSharp
 {
+    public enum Sorting
+    {
+        Relevance,
+        New,
+        Top,
+        Comments
+    }
+
+    public enum TimeSorting
+    {
+        All,
+        Hour,
+        Day,
+        Week,
+        Month,
+        Year
+    }
+
     public class Listing<T> : IEnumerable<T> where T : Thing
     {
         /// <summary>
