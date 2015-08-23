@@ -210,7 +210,7 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            name = name.TrimEnd("/");
+            name = name.TrimEnd('/');
             return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
@@ -225,7 +225,7 @@ namespace RedditSharp
                 name = name.Substring(2);
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
-            name = name.TrimEnd("/");
+            name = name.TrimEnd('/');
             return await GetThingAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
