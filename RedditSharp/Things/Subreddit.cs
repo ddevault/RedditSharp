@@ -85,6 +85,18 @@ namespace RedditSharp.Things
         [JsonConverter(typeof(UrlParser))]
         public Uri Url { get; set; }
 
+        /// <summary>
+        /// Property determining whether the current logged in user is a moderator on this subreddit.
+        /// </summary>
+        [JsonProperty("user_is_moderator")]
+        public bool UserIsModerator { get; set; }
+
+        /// <summary>
+        /// Property determining whether the current logged in user is banned from the subreddit.
+        /// </summary>
+        [JsonProperty("user_is_banned")]
+        public bool UserIsBanned { get; set; }
+
         [JsonIgnore]
         public string Name { get; set; }
 
