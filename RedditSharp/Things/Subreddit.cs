@@ -309,7 +309,7 @@ namespace RedditSharp.Things
                 Url = new Uri("/r/all", UriKind.Relative),
                 Name = "all",
                 Reddit = reddit,
-                WebAgent = reddit._webAgent
+                WebAgent = reddit.WebAgent
             };
             return rSlashAll;
         }
@@ -323,7 +323,7 @@ namespace RedditSharp.Things
                 Url = new Uri("/", UriKind.Relative),
                 Name = "/",
                 Reddit = reddit,
-                WebAgent = reddit._webAgent
+                WebAgent = reddit.WebAgent
             };
             return frontPage;
         }
