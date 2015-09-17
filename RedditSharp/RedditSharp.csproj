@@ -96,6 +96,9 @@
     <Compile Include="Things\WikiPageRevision.cs" />
     <Compile Include="WikiPageSettings.cs" />
     <Compile Include="Domain.cs" />
+	<Compile Include="tbUserNote.cs" />
+	<Compile Include="ToolBoxUserNotes.cs" />
+    <Compile Include="ToolBoxUserNotesException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
