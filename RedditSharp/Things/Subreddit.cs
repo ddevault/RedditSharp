@@ -92,6 +92,13 @@ namespace RedditSharp.Things
         public bool UserIsModerator { get; set; }
 
         /// <summary>
+        /// Property giving the moderator permissions of the logged in user on this subreddit.
+        /// </summary>
+        [JsonProperty("mod_permissions")]
+        [JsonConverter(typeof(ModeratorPermissionConverter))]
+        public ModeratorPermission ModPermissions { get; set; }
+
+        /// <summary>
         /// Property determining whether the current logged in user is banned from the subreddit.
         /// </summary>
         [JsonProperty("user_is_banned")]
