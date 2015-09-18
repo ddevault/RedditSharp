@@ -264,6 +264,14 @@ namespace RedditSharp.Things
             }
         }
 
+        public IEnumerable<TBUserNote> UserNotes
+        {
+            get
+            {
+                return ToolBoxUserNotes.GetUserNotes(WebAgent, Name);
+            }
+        }
+
         public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
