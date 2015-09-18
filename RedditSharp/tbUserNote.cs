@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedditSharp
 {
-    public class tbUserNote
+    public class TBUserNote
     {
         public int NoteTypeIndex { get; set; }
         public string NoteType { get; set; }

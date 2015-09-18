@@ -264,7 +264,7 @@ namespace RedditSharp.Things
             }
         }
 
-        public IEnumerable<tbUserNote> UserNotes
+        public IEnumerable<TBUserNote> UserNotes
         {
             get
             {

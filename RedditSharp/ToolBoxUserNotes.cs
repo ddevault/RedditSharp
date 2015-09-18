@@ -11,7 +11,7 @@ namespace RedditSharp
     public static class ToolBoxUserNotes
     {
         private const string ToolBoxUserNotesWiki = "/r/{0}/wiki/usernotes";
-        public static IEnumerable<tbUserNote> GetUserNotes( IWebAgent webAgent, string subName)
+        public static IEnumerable<TBUserNote> GetUserNotes(IWebAgent webAgent, string subName)
         {
             var request = webAgent.CreateGet(String.Format(ToolBoxUserNotesWiki, subName));
             var reqResponse = webAgent.ExecuteRequest(request);
@@ -22,11 +22,10 @@ namespace RedditSharp
 
             string[] warnings = response["constants"]["warnings"].Values<string>().ToArray();
 
-            if (version < 6)
+            if (version < 6) throw new ToolBoxUserNotesException("Unsupported ToolBox version");
+
+            try
             {
-                throw new ToolBoxUserNotesException("Unsupported ToolBox version");
-            }
-            try {
                 var data = Convert.FromBase64String(response["blob"].Value<string>());
 
                 string uncompressed;
@@ -46,14 +45,14 @@ namespace RedditSharp
 
                 JObject users = JObject.Parse(uncompressed);
 
-                List<tbUserNote> toReturn = new List<tbUserNote>();
+                List<TBUserNote> toReturn = new List<TBUserNote>();
                 foreach (KeyValuePair<string, JToken> user in users)
                 {
                     var x = user.Value;
                     foreach (JToken note in x["ns"].Children())
                     {
 
-                        tbUserNote uNote = new tbUserNote();
+                        TBUserNote uNote = new TBUserNote();
                         uNote.AppliesToUsername = user.Key;
                         uNote.SubName = subName;
                         uNote.SubmitterIndex = note["m"].Value<int>();
@@ -69,17 +68,16 @@ namespace RedditSharp
                 }
                 return toReturn;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new ToolBoxUserNotesException("An error occured while processing Usernotes wiki. See inner exception for details", e);
             }
-            
         }
-        public static string UnsquashLink(string subreddit,string permalink)
+        public static string UnsquashLink(string subreddit, string permalink)
         {
-
             var link = "https://reddit.com/r/" + subreddit + "/";
-            if (string.IsNullOrEmpty(permalink)) {
+            if (string.IsNullOrEmpty(permalink))
+            {
                 return link;
             }
             var linkParams = permalink.Split(',');
@@ -94,7 +92,6 @@ namespace RedditSharp
             {
                 link += "message/messages/" + linkParams[1];
             }
-
             return link;
         }
     }
