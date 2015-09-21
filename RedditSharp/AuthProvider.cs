@@ -11,6 +11,7 @@ namespace RedditSharp
     {
         private const string AccessUrl = "https://ssl.reddit.com/api/v1/access_token";
         private const string OauthGetMeUrl = "https://oauth.reddit.com/api/v1/me";
+        private const string RevokeUrl = "https://www.reddit.com/api/v1/revoke_token";
 
         public static string OAuthToken { get; set; }
         public static string RefreshToken { get; set; }
@@ -39,7 +40,7 @@ namespace RedditSharp
             wikiedit = 0x20000,
             wikiread = 0x40000
         }
-        private readonly IWebAgent _webAgent;
+        private IWebAgent _webAgent;
         private readonly string _redirectUri;
         private readonly string _clientId;
         private readonly string _clientSecret;
@@ -56,6 +57,20 @@ namespace RedditSharp
             _clientSecret = clientSecret;
             _redirectUri = redirectUri;
             _webAgent = new WebAgent();
+        }
+        /// <summary>
+        /// Allows use of reddit's OAuth interface, using an app set up at https://ssl.reddit.com/prefs/apps/.
+        /// </summary>
+        /// <param name="clientId">Granted by reddit as part of app.</param>
+        /// <param name="clientSecret">Granted by reddit as part of app.</param>
+        /// <param name="redirectUri">Selected as part of app. Reddit will send users back here.</param>
+        /// <param name="agent">Implementation of IWebAgent to use to make requests.</param>
+        public AuthProvider(string clientId, string clientSecret, string redirectUri,IWebAgent agent)
+        {
+            _clientId = clientId;
+            _clientSecret = clientSecret;
+            _redirectUri = redirectUri;
+            _webAgent = agent;
         }
 
         /// <summary>
@@ -154,6 +169,26 @@ namespace RedditSharp
             throw new AuthenticationException("Could not log in.");
         }
 		
+        public void RevokeToken(string token, bool isRefresh)
+        {
+            string tokenType = isRefresh ? "refresh_token" : "access_token";
+            var request = _webAgent.CreatePost(RevokeUrl);
+
+            request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
+
+            var stream = request.GetRequestStream();
+
+            _webAgent.WritePostBody(stream, new
+            {
+                token = token,
+                token_type = tokenType
+            });
+
+            stream.Close();
+
+            _webAgent.ExecuteRequest(request);
+
+        }
         /// <summary>
         /// Gets a user authenticated by OAuth2.
         /// </summary>
