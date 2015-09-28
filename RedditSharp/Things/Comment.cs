@@ -15,6 +15,7 @@ namespace RedditSharp.Things
         private const string CommentUrl = "/api/comment";
         private const string EditUserTextUrl = "/api/editusertext";
         private const string RemoveUrl = "/api/remove";
+        private const string DelUrl = "/api/del";
         private const string SetAsReadUrl = "/api/read_message";
 
         [JsonIgnore]
@@ -187,6 +188,28 @@ namespace RedditSharp.Things
                 Body = newText;
             else
                 throw new Exception("Error editing text.");
+        }
+
+        private string SimpleAction(string endpoint)
+        {
+            if (Reddit.User == null)
+                throw new AuthenticationException("No user logged in.");
+            var request = WebAgent.CreatePost(endpoint);
+            var stream = request.GetRequestStream();
+            WebAgent.WritePostBody(stream, new
+            {
+                id = FullName,
+                uh = Reddit.User.Modhash
+            });
+            stream.Close();
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            return data;
+        }
+
+        public void Del()
+        {
+            var data = SimpleAction(DelUrl);
         }
 
         public void Remove()
