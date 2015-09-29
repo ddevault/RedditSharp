@@ -112,6 +112,24 @@ namespace RedditSharp.Things
         }
 
         /// <summary>
+        /// Get a listing of comments and posts from the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
+        /// and limited to <paramref name="limit"/>.
+        /// </summary>
+        /// <param name="sorting">How to sort the comments (hot, new, top, controversial).</param>
+        /// <param name="limit">How many comments to fetch per request. Max is 100.</param>
+        /// <param name="fromTime">What time frame of comments to show (hour, day, week, month, year, all).</param>
+        /// <returns>The listing of comments requested.</returns>
+        public Listing<VotableThing> GetOverview(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
+        {
+            if ((limit < 1) || (limit > MAX_LIMIT))
+                throw new ArgumentOutOfRangeException("limit", "Valid range: [1," + MAX_LIMIT + "]");
+            string overviewUrl = string.Format(OverviewUrl, Name);
+            overviewUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
+
+            return new Listing<VotableThing>(Reddit, overviewUrl, WebAgent);
+        }
+
+        /// <summary>
         /// Get a listing of comments from the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
         /// and limited to <paramref name="limit"/>.
         /// </summary>
