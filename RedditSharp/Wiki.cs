@@ -102,14 +102,24 @@ namespace RedditSharp
         public void EditPage(string page, string content, string previous = null, string reason = null)
         {
             var request = WebAgent.CreatePost(string.Format(WikiPageEditUrl, Subreddit.Name));
-            WebAgent.WritePostBody(request.GetRequestStream(), new
+            dynamic param = new 
             {
                 content = content,
-                previous = previous,
-                reason = reason,
                 page = page,
                 uh = Reddit.User.Modhash
-            });
+            };
+            List<string> addParams = new List<string>();
+            if (previous != null) 
+            {
+                addParams.Add("previous");
+                addParams.Add(previous);
+            }
+            if (reason != null) 
+            {
+                addParams.Add("reason");
+                addParams.Add(reason);
+            }
+            WebAgent.WritePostBody(request.GetRequestStream(), param,addParams.ToArray());
             var response = request.GetResponse();
         }
 
