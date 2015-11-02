@@ -179,9 +179,11 @@ namespace RedditSharp.Things
             return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
         }
 
-        public Listing<Post> Search(DateTime from, DateTime to)
+        public Listing<Post> Search(DateTime from, DateTime to, Sorting sortE = Sorting.New)
         {
-            return new Listing<Post>(Reddit, string.Format(SearchUrlDate, Name, from.DateTimeToUnixTimestamp(), to.DateTimeToUnixTimestamp(), "new"), WebAgent);
+            string sort = sortE.ToString().ToLower();
+
+            return new Listing<Post>(Reddit, string.Format(SearchUrlDate, Name, from.DateTimeToUnixTimestamp(), to.DateTimeToUnixTimestamp(), sort), WebAgent);
         }
         
         public SubredditSettings Settings
