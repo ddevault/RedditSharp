@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Utils;
 
 namespace RedditSharp.Things
 {
@@ -38,6 +39,7 @@ namespace RedditSharp.Things
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
         private const string CommentsUrl = "/r/{0}/comments.json";
         private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
+        private const string SearchUrlDate = "/r/{0}/search.json?q=timestamp:{1}..{2}&restrict_sr=on&sort={3}&syntax=cloudsearch";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -67,8 +69,8 @@ namespace RedditSharp.Things
         [JsonProperty("header_title")]
         public string HeaderTitle { get; set; }
 
-        [JsonProperty("over18")]
-        public bool? NSFW { get; set; }
+        [JsonProperty("over_18")]
+        public bool NSFW { get; set; }
 
         [JsonProperty("public_description")]
         public string PublicDescription { get; set; }
@@ -90,7 +92,7 @@ namespace RedditSharp.Things
         /// Property determining whether the current logged in user is a moderator on this subreddit.
         /// </summary>
         [JsonProperty("user_is_moderator")]
-        public bool UserIsModerator { get; set; }
+        public bool? UserIsModerator { get; set; }
 
         /// <summary>
         /// Property giving the moderator permissions of the logged in user on this subreddit.
@@ -103,7 +105,7 @@ namespace RedditSharp.Things
         /// Property determining whether the current logged in user is banned from the subreddit.
         /// </summary>
         [JsonProperty("user_is_banned")]
-        public bool UserIsBanned { get; set; }
+        public bool? UserIsBanned { get; set; }
 
         [JsonIgnore]
         public string Name { get; set; }
@@ -187,6 +189,13 @@ namespace RedditSharp.Things
             return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
         }
 
+        public Listing<Post> Search(DateTime from, DateTime to, Sorting sortE = Sorting.New)
+        {
+            string sort = sortE.ToString().ToLower();
+
+            return new Listing<Post>(Reddit, string.Format(SearchUrlDate, Name, from.DateTimeToUnixTimestamp(), to.DateTimeToUnixTimestamp(), sort), WebAgent);
+        }
+        
         public SubredditSettings Settings
         {
             get
