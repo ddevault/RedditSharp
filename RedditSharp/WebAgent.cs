@@ -73,6 +73,28 @@ namespace RedditSharp
         private static DateTime _lastRequest;
         private static DateTime _burstStart;
         private static int _requestsThisBurst;
+        /// <summary>
+        /// UTC DateTime of last request made to Reddit API
+        /// </summary>
+        public DateTime LastRequest 
+        {
+            get { return _lastRequest; }
+        }
+        /// <summary>
+        /// UTC DateTime of when the last burst started
+        /// </summary>
+        public DateTime BurstStart 
+        {
+            get { return _burstStart; }
+        }
+        /// <summary>
+        /// Number of requests made during the current burst 
+        /// </summary>
+        public int RequestsThisBurst 
+        {
+            get { return _requestsThisBurst; }
+        }
+
 
         public JToken CreateAndExecuteRequest(string url)
         {
@@ -157,8 +179,11 @@ namespace RedditSharp
                     _lastRequest = DateTime.UtcNow;
                     break;
                 case RateLimitMode.SmallBurst:
-                    if (_requestsThisBurst == 0)//this is first request
+                    if (_requestsThisBurst == 0 || (DateTime.UtcNow - _burstStart).TotalSeconds >= 10) //this is first request OR the burst expired
+                    {
                         _burstStart = DateTime.UtcNow;
+                        _requestsThisBurst = 0;
+                    }
                     if (_requestsThisBurst >= 5) //limit has been reached
                     {
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 10)
@@ -166,11 +191,15 @@ namespace RedditSharp
                         _burstStart = DateTime.UtcNow;
                         _requestsThisBurst = 0;
                     }
+                    _lastRequest = DateTime.UtcNow;
                     _requestsThisBurst++;
                     break;
                 case RateLimitMode.Burst:
-                    if (_requestsThisBurst == 0)//this is first request
+                    if (_requestsThisBurst == 0 || (DateTime.UtcNow - _burstStart).TotalSeconds >= 60) //this is first request OR the burst expired
+                    {
                         _burstStart = DateTime.UtcNow;
+                        _requestsThisBurst = 0;
+                    }
                     if (_requestsThisBurst >= 30) //limit has been reached
                     {
                         while ((DateTime.UtcNow - _burstStart).TotalSeconds < 60)
@@ -178,6 +207,7 @@ namespace RedditSharp
                         _burstStart = DateTime.UtcNow;
                         _requestsThisBurst = 0;
                     }
+                    _lastRequest = DateTime.UtcNow;
                     _requestsThisBurst++;
                     break;
             }
