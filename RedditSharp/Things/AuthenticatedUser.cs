@@ -44,11 +44,11 @@ namespace RedditSharp.Things
             }
         }
 
-        public Listing<Thing> UnreadMessages
+        public Listing<PrivateMessage> UnreadMessages
         {
             get
             {
-                return new Listing<Thing>(Reddit, UnreadMessagesUrl, WebAgent);
+                return new Listing<PrivateMessage>(Reddit, UnreadMessagesUrl, WebAgent);
             }
         }
 
@@ -109,7 +109,7 @@ namespace RedditSharp.Things
         }
 
         [Obsolete("Use UnreadMessages property instead")]
-        public Listing<Thing> GetUnreadMessages()
+        public Listing<PrivateMessage> GetUnreadMessages()
         {
             return UnreadMessages;
         }
