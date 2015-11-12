@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModActionType.cs" />
+    <Compile Include="Things\ModAction.cs" />
     <Compile Include="Utils\DateTimeExtensions.cs" />
     <Compile Include="SpamFilterSettings.cs" />
     <Compile Include="Things\AuthenticatedUser.cs" />

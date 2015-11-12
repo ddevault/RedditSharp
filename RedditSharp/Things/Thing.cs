@@ -21,6 +21,8 @@ namespace RedditSharp.Things
                     return new PrivateMessage().Init(reddit, json, webAgent);
                 case "t5":
                     return new Subreddit().Init(reddit, json, webAgent);
+                case "modaction":
+                    return new ModAction().Init(reddit, json, webAgent);
                 default:
                     return null;
             }
@@ -35,6 +37,10 @@ namespace RedditSharp.Things
                 if (typeof(T) == typeof(WikiPageRevision))
                 {
                     return new WikiPageRevision().Init(reddit, json, webAgent);
+                }
+                else if (typeof(T) == typeof(ModAction))
+                {
+                    return new ModAction().Init(reddit, json, webAgent);
                 }
             }
             return result;
@@ -82,15 +88,17 @@ namespace RedditSharp.Things
             switch (kind)
             {
                 case "t1":
-                    return  await new Comment().InitAsync(reddit, json, webAgent, null);
+                    return await new Comment().InitAsync(reddit, json, webAgent, null);
                 case "t2":
-                    return  await new RedditUser().InitAsync(reddit, json, webAgent);
+                    return await new RedditUser().InitAsync(reddit, json, webAgent);
                 case "t3":
-                    return  await new Post().InitAsync(reddit, json, webAgent);
+                    return await new Post().InitAsync(reddit, json, webAgent);
                 case "t4":
-                    return  await new PrivateMessage().InitAsync(reddit, json, webAgent);
+                    return await new PrivateMessage().InitAsync(reddit, json, webAgent);
                 case "t5":
                     return await new Subreddit().InitAsync(reddit, json, webAgent);
+                case "modaction":
+                    return await new ModAction().InitAsync(reddit, json, webAgent);
                 default:
                     return null;
             }
@@ -105,6 +113,10 @@ namespace RedditSharp.Things
                 if (typeof(T) == typeof(WikiPageRevision))
                 {
                     return await new WikiPageRevision().InitAsync(reddit, json, webAgent);
+                }
+                else if (typeof(T) == typeof(ModAction))
+                {
+                    return await new ModAction().InitAsync(reddit, json, webAgent);
                 }
             }
             return result;

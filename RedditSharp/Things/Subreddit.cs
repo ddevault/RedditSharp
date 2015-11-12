@@ -40,6 +40,7 @@ namespace RedditSharp.Things
         private const string CommentsUrl = "/r/{0}/comments.json";
         private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
         private const string SearchUrlDate = "/r/{0}/search.json?q=timestamp:{1}..{2}&restrict_sr=on&sort={3}&syntax=cloudsearch";
+        private const string ModLogUrl = "/r/{0}/about/log.json";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -661,7 +662,39 @@ namespace RedditSharp.Things
                         Captcha = captchaAnswer
                     });
         }
-
+        /// <summary>
+        /// Gets the moderation log of the current subreddit
+        /// </summary>
+        public Listing<ModAction> GetModerationLog()
+        {
+            return new Listing<ModAction>(Reddit, string.Format(ModLogUrl, this.Name), WebAgent);
+        }
+        /// <summary>
+        /// Gets the moderation log of the current subreddit filtered by the action taken
+        /// </summary>
+        /// <param name="action">ModActionType of action performed</param>
+        public Listing<ModAction> GetModerationLog(ModActionType action)
+        {
+            return new Listing<ModAction>(Reddit, string.Format(ModLogUrl + "?type={1}", Name, ModActionTypeConverter.GetRedditParamName(action)), WebAgent);
+        }
+        /// <summary>
+        /// Gets the moderation log of the current subreddit filtered by moderator(s) who performed the action
+        /// </summary>
+        /// <param name="mods">String array of mods to filter by</param>
+        public Listing<ModAction> GetModerationLog(string[] mods)
+        {
+            return new Listing<ModAction>(Reddit, string.Format(ModLogUrl + "?mod={1}", Name, string.Join(",", mods)), WebAgent);
+        }
+        /// <summary>
+        /// Gets the moderation log of the current subreddit filtered by the action taken and moderator(s) who performed the action
+        /// </summary>
+        /// <param name="action">ModActionType of action performed</param>
+        /// <param name="mods">String array of mods to filter by</param>
+        /// <returns></returns>
+        public Listing<ModAction> GetModerationLog(ModActionType action, string[] mods)
+        {
+            return new Listing<ModAction>(Reddit, string.Format(ModLogUrl + "?type={1}&mod={2}", Name, ModActionTypeConverter.GetRedditParamName(action), string.Join(",", mods)), WebAgent);
+        }
         #region Obsolete Getter Methods
 
         [Obsolete("Use Posts property instead")]
