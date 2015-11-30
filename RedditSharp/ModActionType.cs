@@ -68,7 +68,7 @@ namespace RedditSharp
             }
             else
             {
-                return Enum.Parse(typeof(ModActionType), value);
+                return Enum.Parse(typeof(ModActionType), value, true);
             }
 
         }
