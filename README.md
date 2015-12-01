@@ -49,4 +49,4 @@ RedditSharp is developed with the following workflow:
 3. That person implements that something and submits a pull request
 4. Repeat
 
-If it doesn't have a feature that you want it to have, add it! The code isn't that scary.
+If it doesn't have a feature that you want it to have, add it! The code isn't that scary. If you need help, post an issue on here and we'll try to help!
