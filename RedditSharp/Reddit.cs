@@ -32,6 +32,10 @@ namespace RedditSharp
         private const string OAuthDomainUrl = "oauth.reddit.com";
         private const string SearchUrl = "/search.json?q={0}&restrict_sr=off&sort={1}&t={2}";
         private const string UrlSearchPattern = "url:'{0}'";
+        private const string NewSubredditsUrl = "/subreddits/new.json";
+        private const string PopularSubredditsUrl = "/subreddits/popular.json";
+        private const string GoldSubredditsUrl = "/subreddits/gold.json";
+        private const string DefaultSubredditsUrl = "/subreddits/default.json";
 
         #endregion
 
@@ -396,6 +400,32 @@ namespace RedditSharp
             string time = timeE.ToString().ToLower();
             return new Listing<T>(this, string.Format(SearchUrl, query, sort, time), WebAgent);
         }
+
+
+
+        #region SubredditSearching
+
+        public Listing<Subreddit> GetNewSubreddits()
+        {
+            return new Listing<Subreddit>(this, NewSubredditsUrl, WebAgent);
+        }
+
+        public Listing<Subreddit> GetPopularSubreddits()
+        {
+            return new Listing<Subreddit>(this, PopularSubredditsUrl, WebAgent);
+        }
+
+        public Listing<Subreddit> GetGoldSubreddits()
+        {
+            return new Listing<Subreddit>(this, GoldSubredditsUrl, WebAgent);
+        }
+
+        public Listing<Subreddit> GetDefaultSubreddits()
+        {
+            return new Listing<Subreddit>(this, DefaultSubredditsUrl, WebAgent);
+        }
+
+        #endregion SubredditSearching
 
         #region Helpers
 
