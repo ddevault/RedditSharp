@@ -405,21 +405,37 @@ namespace RedditSharp
 
         #region SubredditSearching
 
+        /// <summary>
+        /// Returns a Listing of newly created subreddits.
+        /// </summary>
+        /// <returns></returns>
         public Listing<Subreddit> GetNewSubreddits()
         {
             return new Listing<Subreddit>(this, NewSubredditsUrl, WebAgent);
         }
 
+        /// <summary>
+        /// Returns a Listing of the most popular subreddits.
+        /// </summary>
+        /// <returns></returns>
         public Listing<Subreddit> GetPopularSubreddits()
         {
             return new Listing<Subreddit>(this, PopularSubredditsUrl, WebAgent);
         }
 
+        /// <summary>
+        /// Returns a Listing of Gold-only subreddits. This endpoint will not return anything if the authenticated Reddit account does not currently have gold.
+        /// </summary>
+        /// <returns></returns>
         public Listing<Subreddit> GetGoldSubreddits()
         {
             return new Listing<Subreddit>(this, GoldSubredditsUrl, WebAgent);
         }
 
+        /// <summary>
+        /// Returns the Listing of default subreddits.
+        /// </summary>
+        /// <returns></returns>
         public Listing<Subreddit> GetDefaultSubreddits()
         {
             return new Listing<Subreddit>(this, DefaultSubredditsUrl, WebAgent);
