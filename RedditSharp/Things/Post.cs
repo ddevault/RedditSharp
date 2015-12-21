@@ -19,7 +19,7 @@ namespace RedditSharp.Things
         private const string EditUserTextUrl = "/api/editusertext";
         private const string HideUrl = "/api/hide";
         private const string UnhideUrl = "/api/unhide";
-        private const string SetFlairUrl = "/api/flair";
+        private const string SetFlairUrl = "/r/{0}/api/flair";
         private const string MarkNSFWUrl = "/api/marknsfw";
         private const string UnmarkNSFWUrl = "/api/unmarknsfw";
         private const string ContestModeUrl = "/api/set_contest_mode";
@@ -307,7 +307,7 @@ namespace RedditSharp.Things
             if (Reddit.User == null)
                 throw new Exception("No user logged in.");
 
-            var request = WebAgent.CreatePost(SetFlairUrl);
+            var request = WebAgent.CreatePost(string.Format(SetFlairUrl,SubredditName));
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
