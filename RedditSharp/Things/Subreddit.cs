@@ -185,9 +185,12 @@ namespace RedditSharp.Things
             }
         }
 
-        public Listing<Post> Search(string terms)
+        public Listing<Post> Search(string terms, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All)
         {
-            return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), "relevance", "all"), WebAgent);
+            string sort = sortE.ToString().ToLower();
+            string time = timeE.ToString().ToLower();
+
+            return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), sort, time), WebAgent);
         }
 
         public Listing<Post> Search(DateTime from, DateTime to, Sorting sortE = Sorting.New)
