@@ -1,5 +1,13 @@
 # RedditSharp
 
+**Hey, listen**! The Reddit admins are making some really crappy changes to the
+API, and I need you to speak out against them. The changes
+[are here](https://www.reddit.com/r/redditdev/comments/3xdf11/introducing_new_api_terms/)
+and you should
+[message the admins](https://www.reddit.com/message/compose?to=/r/reddit.com&subject=The+planned+API+changes+are+awful&message=Hey,+the+planned+API+changes+are+pretty+awful.+You%27re+asking+users+to+reveal+far+too+much+about+themselves+and+making+the+barrier+to+entry+much+higher+for+new+developers+who+want+to+do+cool+things+with+the+Reddit+API.+You+already+ask+users+to+put+contact+information+in+their+user+agent+string,+and+that+should+be+sufficient.)
+if you disagree with them (you're welcome to change this message to something
+more personal).
+
 A partial implementation of the [Reddit](http://reddit.com) API. Includes support for many API endpoints, as well as
 LINQ-style paging of results.
 
