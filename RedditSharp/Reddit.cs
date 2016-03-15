@@ -401,7 +401,63 @@ namespace RedditSharp
             return new Listing<T>(this, string.Format(SearchUrl, query, sort, time), WebAgent);
         }
 
-
+        /// <summary>
+        /// Gets new posts from multiple subreddits.
+        /// </summary>
+        /// <param name="name">What subreddits to show posts from, separated by a plus. For example: "programming+coding+csharp"</param>
+        /// <returns>Listing of new posts from choosen subreddits.</returns>
+        public Listing<Post> GetMultiPostsNew(string name)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            name = name.TrimEnd('/');
+            return new Listing<Post>(this, string.Format("/r/{0}/new.json?sort=new", name), WebAgent);
+        }
+        /// <summary>
+        /// Gets hot posts from multiple subreddits.
+        /// </summary>
+        /// <param name="name">What subreddits to show posts from, separated by a plus. For example: "programming+coding+csharp"</param>
+        /// <returns>Listing of hot posts from choosen subreddits.</returns>
+        public Listing<Post> GetMultiPostsHot(string name)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            name = name.TrimEnd('/');
+            return new Listing<Post>(this, string.Format("/r/{0}/hot.json", name), WebAgent);
+        }
+        /// <summary>
+        /// Gets rising posts from multiple subreddits.
+        /// </summary>
+        /// <param name="name">What subreddits to show posts from, separated by a plus. For example: "programming+coding+csharp"</param>
+        /// <returns>Listing of rising posts from choosen subreddits.</returns>
+        public Listing<Post> GetMultiPostsRising(string name)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            name = name.TrimEnd('/');
+            return new Listing<Post>(this, string.Format("/r/{0}/rising.json", name), WebAgent);
+        }
+        /// <summary>
+        /// Gets rising posts from multiple subreddits.
+        /// </summary>
+        /// <param name="name">What subreddits to show posts from, separated by a plus. For example: "programming+coding+csharp"</param>
+        /// <param name="timePeriod">What time frame of comments to show (hour, day, week, month, year, all)</param>
+        /// <returns>Listing of rising posts from choosen subreddits.</returns>
+        public Listing<Post> GetMultiPostsTop(string name, FromTime timePeriod)
+        {
+            if (name.StartsWith("r/"))
+                name = name.Substring(2);
+            if (name.StartsWith("/r/"))
+                name = name.Substring(3);
+            name = name.TrimEnd('/');
+            return new Listing<Post>(this, string.Format("/r/{0}/top.json?t={1}", name, Enum.GetName(typeof(FromTime), timePeriod)).ToLower(), WebAgent);
+        }
 
         #region SubredditSearching
 
