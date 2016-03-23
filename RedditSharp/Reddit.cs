@@ -36,6 +36,7 @@ namespace RedditSharp
         private const string PopularSubredditsUrl = "/subreddits/popular.json";
         private const string GoldSubredditsUrl = "/subreddits/gold.json";
         private const string DefaultSubredditsUrl = "/subreddits/default.json";
+        private const string SearchSubredditsUrl = "/subreddits/search.json?q={0}";
 
         #endregion
 
@@ -439,6 +440,15 @@ namespace RedditSharp
         public Listing<Subreddit> GetDefaultSubreddits()
         {
             return new Listing<Subreddit>(this, DefaultSubredditsUrl, WebAgent);
+        }
+
+        /// <summary>
+        /// Returns the Listing of subreddits related to a query.
+        /// </summary>
+        /// <returns></returns>
+        public Listing<Subreddit> GetParamSubreddits(string query)
+        {
+            return new Listing<Subreddit>(this, string.Format(SearchSubredditsUrl, query),WebAgent);
         }
 
         #endregion SubredditSearching
