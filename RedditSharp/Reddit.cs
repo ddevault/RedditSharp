@@ -447,7 +447,7 @@ namespace RedditSharp
         /// Returns the Listing of subreddits related to a query.
         /// </summary>
         /// <returns></returns>
-        public Listing<Subreddit> GetParamSubreddits(string query)
+        public Listing<Subreddit> SearchSubreddits(string query)
         {
             return new Listing<Subreddit>(this, string.Format(SearchSubredditsUrl, query), WebAgent);
         }
