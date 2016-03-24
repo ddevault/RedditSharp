@@ -16,7 +16,6 @@ namespace RedditSharp
     public class Reddit
     {
         #region Constant Urls
-
         private const string SslLoginUrl = "https://ssl.reddit.com/api/login";
         private const string LoginUrl = "/api/login/username";
         private const string UserInfoUrl = "/user/{0}/about.json";
@@ -51,7 +50,7 @@ namespace RedditSharp
         }
 
         #endregion
-        
+
         internal IWebAgent WebAgent { get; set; }
         /// <summary>
         /// Captcha solver instance to use when solving captchas.
@@ -91,17 +90,18 @@ namespace RedditSharp
         }
 
         public Reddit()
-            : this(true) { }
+            : this(true)
+        { }
 
         public Reddit(bool useSsl)
         {
             DefaultWebAgent defaultAgent = new DefaultWebAgent();
 
             JsonSerializerSettings = new JsonSerializerSettings
-                {
-                    CheckAdditionalContent = false,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                };
+            {
+                CheckAdditionalContent = false,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
             DefaultWebAgent.Protocol = useSsl ? "https" : "http";
             WebAgent = defaultAgent;
             CaptchaSolver = new ConsoleCaptchaSolver();
@@ -156,7 +156,7 @@ namespace RedditSharp
                 DefaultValueHandling = DefaultValueHandling.Ignore
             };
             CaptchaSolver = new ConsoleCaptchaSolver();
-            if(initUser) InitOrUpdateUser();
+            if (initUser) InitOrUpdateUser();
         }
 
         /// <summary>
@@ -448,7 +448,7 @@ namespace RedditSharp
         /// <returns></returns>
         public Listing<Subreddit> GetParamSubreddits(string query)
         {
-            return new Listing<Subreddit>(this, string.Format(SearchSubredditsUrl, query),WebAgent);
+            return new Listing<Subreddit>(this, string.Format(SearchSubredditsUrl, query), WebAgent);
         }
 
         #endregion SubredditSearching
