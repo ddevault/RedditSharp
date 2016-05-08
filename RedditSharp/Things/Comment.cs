@@ -133,6 +133,18 @@ namespace RedditSharp.Things
             }
         }
 
+		public Thing GetParent()
+		{
+			if (this.ParentId != this.LinkId)
+			{
+				return this.Reddit.GetComment(this.Subreddit, this.ParentId, this.LinkId);
+			}
+			else
+			{
+				return this.Reddit.GetPost(this.Subreddit, this.LinkId);
+			}
+		}
+
         public Comment Reply(string message)
         {
             if (Reddit.User == null)
