@@ -26,8 +26,8 @@ namespace RedditSharp
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
         private const string GetThingUrl = "/api/info.json?id={0}";
-        private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
-        private const string GetPostUrlBase = "/r/{0}/comments/{1}/foo";
+		private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
+		private const string GetPostUrlBase = "/r/{0}/comments/{1}/foo";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
         private const string OAuthDomainUrl = "oauth.reddit.com";
@@ -291,17 +291,17 @@ namespace RedditSharp
             return json[0]["data"]["children"].First;
         }
 
-        public Post GetPost(string subreddit, string linkId)
-        {
-            if (linkId.IndexOf("_", StringComparison.Ordinal) > 0)
-            {
-                linkId = linkId.Substring(3, linkId.Length - 3);
-            }
-            var basePostUrl = string.Format(GetPostUrlBase, subreddit, linkId);
-            var url = string.Format(GetPostUrl, basePostUrl);
-            var postGet = WebAgent.CreateGet(url);
-            return GetPost(postGet.RequestUri);
-        }
+		public Post GetPost(string subreddit, string linkId)
+		{
+			if (linkId.IndexOf("_", StringComparison.Ordinal) > 0)
+			{
+				linkId = linkId.Substring(3, linkId.Length - 3);
+			}
+			var basePostUrl = string.Format("http://reddit.com" + GetPostUrlBase, subreddit, linkId);
+			var url = string.Format(GetPostUrl, basePostUrl);
+			var uri = new Uri(url);
+			return GetPost(uri);
+		}
 
         public Post GetPost(Uri uri)
         {
@@ -373,24 +373,23 @@ namespace RedditSharp
             return Thing.Parse(this, json["data"]["children"][0], WebAgent);
         }
 
-        public Comment GetComment(string subreddit, string name, string linkName)
-        {
-            try
-            {
-                if (linkName.StartsWith("t3_"))
-                    linkName = linkName.Substring(3);
-                if (name.StartsWith("t1_"))
-                    name = name.Substring(3);
+		public Comment GetComment(string subreddit, string name, string linkName)
+		{
+			try
+			{
+				if (linkName.StartsWith("t3_"))
+					linkName = linkName.Substring(3);
+				if (name.StartsWith("t1_"))
+					name = name.Substring(3);
 
-                var relativeUrl = string.Format(GetCommentUrl, subreddit, linkName, name);
-                var commentGet = WebAgent.CreateGet(relativeUrl);
-                return GetComment(commentGet.RequestUri);
-            }
-            catch (WebException)
-            {
-                return null;
-            }
-        }
+				var url = string.Format("http://reddit.com" + GetCommentUrl, subreddit, linkName, name);
+				return GetComment(new Uri(url));
+			}
+			catch (WebException)
+			{
+				return null;
+			}
+		}
 
         public Comment GetComment(Uri uri)
         {
