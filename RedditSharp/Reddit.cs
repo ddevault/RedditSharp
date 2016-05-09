@@ -390,7 +390,8 @@ namespace RedditSharp
                     name = name.Substring(3);
 
                 var url = string.Format(GetCommentUrl, subreddit, linkName, name);
-				return GetComment(url);
+	            var fullUrl = string.Format(GetPostUrl, url);
+				return GetComment(fullUrl);
             }
             catch (WebException)
             {
