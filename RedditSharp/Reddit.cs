@@ -278,21 +278,21 @@ namespace RedditSharp
 
         public JToken GetToken(Uri uri)
         {
-	        return GetToken(uri.AbsoluteUri);
+            return GetToken(uri.AbsoluteUri);
         }
 
-	    public JToken GetToken(string url)
-		{
-			if (url.EndsWith("/"))
-				url = url.Remove(url.Length - 1);
+        public JToken GetToken(string url)
+        {
+            if (url.EndsWith("/"))
+                url = url.Remove(url.Length - 1);
 
-			var request = WebAgent.CreateGet(string.Format(GetPostUrl, url));
-			var response = request.GetResponse();
-			var data = WebAgent.GetResponseString(response.GetResponseStream());
-			var json = JToken.Parse(data);
+            var request = WebAgent.CreateGet(string.Format(GetPostUrl, url));
+            var response = request.GetResponse();
+            var data = WebAgent.GetResponseString(response.GetResponseStream());
+            var json = JToken.Parse(data);
 
-			return json[0]["data"]["children"].First;
-	    }
+            return json[0]["data"]["children"].First;
+        }
 
         public Post GetPost(string subreddit, string linkId)
         {
@@ -307,13 +307,13 @@ namespace RedditSharp
 
         public Post GetPost(Uri uri)
         {
-	        return GetPost(uri.AbsoluteUri);
+            return GetPost(uri.AbsoluteUri);
         }
 
-	    public Post GetPost(string url)
-		{
-			return new Post().Init(this, GetToken(url), WebAgent);
-	    }
+        public Post GetPost(string url)
+        {
+            return new Post().Init(this, GetToken(url), WebAgent);
+        }
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
         {
@@ -390,8 +390,8 @@ namespace RedditSharp
                     name = name.Substring(3);
 
                 var url = string.Format(GetCommentUrl, subreddit, linkName, name);
-	            var fullUrl = string.Format(GetPostUrl, url);
-				return GetComment(fullUrl);
+                var fullUrl = string.Format(GetPostUrl, url);
+                return GetComment(fullUrl);
             }
             catch (WebException)
             {
@@ -399,10 +399,10 @@ namespace RedditSharp
             }
         }
 
-	    public Comment GetComment(Uri uri)
-	    {
-		    return GetComment(uri.AbsoluteUri);
-	    }
+        public Comment GetComment(Uri uri)
+        {
+            return GetComment(uri.AbsoluteUri);
+        }
 
         public Comment GetComment(string url)
         {
