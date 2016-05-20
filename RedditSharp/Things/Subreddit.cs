@@ -14,6 +14,7 @@ namespace RedditSharp.Things
     {
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
+        private const string SubredditNewBeforeUrl = "/r/{0}/new.json?sort=new&before={1}";
         private const string SubredditHotUrl = "/r/{0}/hot.json";
         private const string SubredditRisingUrl = "/r/{0}/rising.json";
         private const string SubredditTopUrl = "/r/{0}/top.json?t={1}";
@@ -38,6 +39,7 @@ namespace RedditSharp.Things
         private const string SubmitLinkUrl = "/api/submit";
         private const string FlairListUrl = "/r/{0}/api/flairlist.json";
         private const string CommentsUrl = "/r/{0}/comments.json";
+        private const string CommentsBeforeUrl = "/r/{0}/comments.json?before={1}";
         private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
         private const string SearchUrlDate = "/r/{0}/search.json?q=timestamp:{1}..{2}&restrict_sr=on&sort={3}&syntax=cloudsearch";
         private const string ModLogUrl = "/r/{0}/about/log.json";
@@ -199,7 +201,25 @@ namespace RedditSharp.Things
 
             return new Listing<Post>(Reddit, string.Format(SearchUrlDate, Name, from.DateTimeToUnixTimestamp(), to.DateTimeToUnixTimestamp(), sort), WebAgent);
         }
-        
+
+        public Listing<Post> GetNewPostsBefore(Post p)
+        {
+            if (Name == "/")
+            {
+                return new Listing<Post>(Reddit, "/new.json?sort_by=new&before=" + p.FullName, WebAgent);
+            }
+            return new Listing<Post>(Reddit, string.Format(SubredditNewBeforeUrl, Name, p.FullName).ToLower(), WebAgent);
+        }
+
+        public Listing<Comment> GetNewCommentsBefore(Comment c)
+        {
+            if (Name == "/")
+            {
+                return new Listing<Comment>(Reddit, "/comments.json?before=" + c.FullName, WebAgent);
+            }
+            return new Listing<Comment>(Reddit, string.Format(CommentsBeforeUrl, Name, c.FullName).ToLower(), WebAgent);
+        }
+
         public SubredditSettings Settings
         {
             get
