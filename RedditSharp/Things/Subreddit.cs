@@ -41,6 +41,7 @@ namespace RedditSharp.Things
         private const string SearchUrl = "/r/{0}/search.json?q={1}&restrict_sr=on&sort={2}&t={3}";
         private const string SearchUrlDate = "/r/{0}/search.json?q=timestamp:{1}..{2}&restrict_sr=on&sort={3}&syntax=cloudsearch";
         private const string ModLogUrl = "/r/{0}/about/log.json";
+        private const string ContributorsUrl = "/r/{0}/about/contributors.json";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -299,6 +300,14 @@ namespace RedditSharp.Things
             get
             {
                 return ToolBoxUserNotes.GetUserNotes(WebAgent, Name);
+            }
+        }
+
+        public Listing<Contributor> Contributors
+        {
+            get
+            {
+                return new Listing<Contributor>( Reddit, string.Format( ContributorsUrl, Name ), WebAgent );
             }
         }
 

@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ModActionType.cs" />
+    <Compile Include="Things\Contributor.cs" />
     <Compile Include="Things\ModAction.cs" />
     <Compile Include="Utils\DateTimeExtensions.cs" />
     <Compile Include="SpamFilterSettings.cs" />
