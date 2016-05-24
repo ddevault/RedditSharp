@@ -42,6 +42,10 @@ namespace RedditSharp.Things
                 {
                     return new ModAction().Init(reddit, json, webAgent);
                 }
+                else if (typeof(T) == typeof(Contributor)) 
+                {
+                    return new Contributor().Init(reddit, json, webAgent);
+                }
             }
             return result;
         }
