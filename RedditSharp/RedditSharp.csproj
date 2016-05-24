@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpWebReqProxy.cs" />
     <Compile Include="ModActionType.cs" />
     <Compile Include="Things\Contributor.cs" />
     <Compile Include="Things\ModAction.cs" />

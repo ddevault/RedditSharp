@@ -105,6 +105,7 @@ namespace RedditSharp
                     throw new Exception("Could not parse Uri");
             }
             var request = CreateGet(uri);
+            request.InitWebReqProxy();
             try { return ExecuteRequest(request); }
             catch (Exception)
             {
@@ -228,6 +229,7 @@ namespace RedditSharp
                 request = (HttpWebRequest)WebRequest.Create(String.Format("{0}://{1}{2}", Protocol, RootDomain, url));
             else
                 request = (HttpWebRequest)WebRequest.Create(url);
+            request.InitWebReqProxy();
             request.CookieContainer = Cookies;
             if (Type.GetType("Mono.Runtime") != null)
             {
@@ -247,6 +249,7 @@ namespace RedditSharp
         {
             EnforceRateLimit();
             var request = (HttpWebRequest)WebRequest.Create(uri);
+            request.InitWebReqProxy();
             request.CookieContainer = Cookies;
             if (Type.GetType("Mono.Runtime") != null)
             {
@@ -264,17 +267,22 @@ namespace RedditSharp
 
         public HttpWebRequest CreateGet(string url)
         {
-            return CreateRequest(url, "GET");
+            var request = CreateRequest(url, "GET");
+            request.InitWebReqProxy();
+            return request;
         }
 
         private HttpWebRequest CreateGet(Uri url)
         {
-            return CreateRequest(url, "GET");
+            var request = CreateRequest(url, "GET");
+            request.InitWebReqProxy();
+            return request;
         }
 
         public HttpWebRequest CreatePost(string url)
         {
             var request = CreateRequest(url, "POST");
+            request.InitWebReqProxy();
             request.ContentType = "application/x-www-form-urlencoded";
             return request;
         }

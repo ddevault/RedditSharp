@@ -98,7 +98,7 @@ namespace RedditSharp
             _webAgent.Cookies = new CookieContainer();
 
             var request = _webAgent.CreatePost(AccessUrl);
-
+            request.InitWebReqProxy();
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
 
@@ -145,7 +145,7 @@ namespace RedditSharp
             _webAgent.Cookies = new CookieContainer();
 
             var request = _webAgent.CreatePost(AccessUrl);
-
+            request.InitWebReqProxy();
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
             var stream = request.GetRequestStream();
 
@@ -173,7 +173,7 @@ namespace RedditSharp
         {
             string tokenType = isRefresh ? "refresh_token" : "access_token";
             var request = _webAgent.CreatePost(RevokeUrl);
-
+            request.InitWebReqProxy();
             request.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.Default.GetBytes(_clientId + ":" + _clientSecret));
 
             var stream = request.GetRequestStream();
@@ -198,6 +198,7 @@ namespace RedditSharp
         public AuthenticatedUser GetUser(string accessToken)
         {
             var request = _webAgent.CreateGet(OauthGetMeUrl);
+            request.InitWebReqProxy();
             request.Headers["Authorization"] = String.Format("bearer {0}", accessToken);
             var response = (HttpWebResponse)request.GetResponse();
             var result = _webAgent.GetResponseString(response.GetResponseStream());
