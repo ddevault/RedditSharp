@@ -177,6 +177,7 @@ namespace RedditSharp
                 request = WebAgent.CreatePost(SslLoginUrl);
             else
                 request = WebAgent.CreatePost(LoginUrl);
+            request.InitWebReqProxy();
             var stream = request.GetRequestStream();
             if (useSsl)
             {
@@ -226,6 +227,7 @@ namespace RedditSharp
         public void InitOrUpdateUser()
         {
             var request = WebAgent.CreateGet(string.IsNullOrEmpty(WebAgent.AccessToken) ? MeUrl : OAuthMeUrl);
+            request.InitWebReqProxy();
             var response = (HttpWebResponse)request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
@@ -283,6 +285,7 @@ namespace RedditSharp
                 url = url.Remove(url.Length - 1);
 
             var request = WebAgent.CreateGet(string.Format(GetPostUrl, url));
+            request.InitWebReqProxy();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -300,6 +303,7 @@ namespace RedditSharp
             if (User == null)
                 throw new Exception("User can not be null.");
             var request = WebAgent.CreatePost(ComposeMessageUrl);
+            request.InitWebReqProxy();
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -336,6 +340,7 @@ namespace RedditSharp
         public AuthenticatedUser RegisterAccount(string userName, string passwd, string email = "")
         {
             var request = WebAgent.CreatePost(RegisterAccountUrl);
+            request.InitWebReqProxy();
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
                 api_type = "json",
@@ -354,6 +359,7 @@ namespace RedditSharp
         public Thing GetThingByFullname(string fullname)
         {
             var request = WebAgent.CreateGet(string.Format(GetThingUrl, fullname));
+            request.InitWebReqProxy();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -382,6 +388,7 @@ namespace RedditSharp
         {
             var url = string.Format(GetPostUrl, uri.AbsoluteUri);
             var request = WebAgent.CreateGet(url);
+            request.InitWebReqProxy();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -459,6 +466,7 @@ namespace RedditSharp
         protected async internal Task<T> GetThingAsync<T>(string url) where T : Thing
         {
             var request = WebAgent.CreateGet(url);
+            request.InitWebReqProxy();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -469,6 +477,7 @@ namespace RedditSharp
         protected internal T GetThing<T>(string url) where T : Thing
         {
             var request = WebAgent.CreateGet(url);
+            request.InitWebReqProxy();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
