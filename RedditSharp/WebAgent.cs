@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
-    public sealed class WebAgent : IWebAgent
+    public class WebAgent : IWebAgent
     {
         /// <summary>
         /// Additional values to append to the default RedditSharp user agent.
@@ -96,7 +96,7 @@ namespace RedditSharp
         }
 
 
-        public JToken CreateAndExecuteRequest(string url)
+        public virtual JToken CreateAndExecuteRequest(string url)
         {
             Uri uri;
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
@@ -124,7 +124,7 @@ namespace RedditSharp
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public JToken ExecuteRequest(HttpWebRequest request)
+        public virtual JToken ExecuteRequest(HttpWebRequest request)
         {
             EnforceRateLimit();
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
@@ -169,7 +169,7 @@ namespace RedditSharp
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private static void EnforceRateLimit()
+        protected virtual void EnforceRateLimit()
         {
             switch (RateLimit)
             {
@@ -213,7 +213,7 @@ namespace RedditSharp
             }
         }
 
-        public HttpWebRequest CreateRequest(string url, string method)
+        public virtual HttpWebRequest CreateRequest(string url, string method)
         {
             EnforceRateLimit();
             bool prependDomain;
@@ -243,7 +243,7 @@ namespace RedditSharp
             return request;
         }
 
-        private HttpWebRequest CreateRequest(Uri uri, string method)
+        protected virtual HttpWebRequest CreateRequest(Uri uri, string method)
         {
             EnforceRateLimit();
             var request = (HttpWebRequest)WebRequest.Create(uri);
@@ -262,7 +262,7 @@ namespace RedditSharp
             return request;
         }
 
-        public HttpWebRequest CreateGet(string url)
+        public virtual HttpWebRequest CreateGet(string url)
         {
             return CreateRequest(url, "GET");
         }
@@ -272,21 +272,21 @@ namespace RedditSharp
             return CreateRequest(url, "GET");
         }
 
-        public HttpWebRequest CreatePost(string url)
+        public virtual HttpWebRequest CreatePost(string url)
         {
             var request = CreateRequest(url, "POST");
             request.ContentType = "application/x-www-form-urlencoded";
             return request;
         }
 
-        public string GetResponseString(Stream stream)
+        public virtual string GetResponseString(Stream stream)
         {
             var data = new StreamReader(stream).ReadToEnd();
             stream.Close();
             return data;
         }
 
-        public void WritePostBody(Stream stream, object data, params string[] additionalFields)
+        public virtual void WritePostBody(Stream stream, object data, params string[] additionalFields)
         {
             var type = data.GetType();
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
