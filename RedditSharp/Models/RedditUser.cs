@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class RedditUser : Thing
+    public class RedditUser : Model
     {
         private const string OverviewUrl = "/user/{0}.json";
         private const string CommentsUrl = "/user/{0}/comments.json";
@@ -63,11 +63,11 @@ namespace RedditSharp.Things
         [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime Created { get; set; }
 
-        public Listing<VotableThing> Overview
+        public Listing<VotableModel> Overview
         {
             get
             {
-                return new Listing<VotableThing>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
+                return new Listing<VotableModel>(Reddit, string.Format(OverviewUrl, Name), WebAgent);
             }
         }
 
@@ -119,14 +119,14 @@ namespace RedditSharp.Things
         /// <param name="limit">How many comments to fetch per request. Max is 100.</param>
         /// <param name="fromTime">What time frame of comments to show (hour, day, week, month, year, all).</param>
         /// <returns>The listing of comments requested.</returns>
-        public Listing<VotableThing> GetOverview(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
+        public Listing<VotableModel> GetOverview(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
         {
             if ((limit < 1) || (limit > MAX_LIMIT))
                 throw new ArgumentOutOfRangeException("limit", "Valid range: [1," + MAX_LIMIT + "]");
             string overviewUrl = string.Format(OverviewUrl, Name);
             overviewUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
-            return new Listing<VotableThing>(Reddit, overviewUrl, WebAgent);
+            return new Listing<VotableModel>(Reddit, overviewUrl, WebAgent);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace RedditSharp.Things
         #region Obsolete Getter Methods
 
         [Obsolete("Use Overview property instead")]
-        public Listing<VotableThing> GetOverview()
+        public Listing<VotableModel> GetOverview()
         {
             return Overview;
         }

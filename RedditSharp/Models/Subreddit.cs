@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RedditSharp.Utils;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Subreddit : Thing
+    public class Subreddit : Model
     {
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
@@ -170,11 +170,11 @@ namespace RedditSharp.Things
             }
         }
 
-        public Listing<VotableThing> ModQueue
+        public Listing<VotableModel> ModQueue
         {
             get
             {
-                return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
+                return new Listing<VotableModel>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
             }
         }
 
@@ -728,7 +728,7 @@ namespace RedditSharp.Things
         }
 
         [Obsolete("Use ModQueue property instead")]
-        public Listing<VotableThing> GetModQueue()
+        public Listing<VotableModel> GetModQueue()
         {
             return ModQueue;
         }

@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
-using RedditSharp.Things;
+using RedditSharp.Models;
 using System.Threading.Tasks;
 using DefaultWebAgent = RedditSharp.WebAgent;
 
@@ -351,13 +351,13 @@ namespace RedditSharp
             // TODO: Error
         }
 
-        public Thing GetThingByFullname(string fullname)
+        public Model GetThingByFullname(string fullname)
         {
             var request = WebAgent.CreateGet(string.Format(GetThingUrl, fullname));
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return Thing.Parse(this, json["data"]["children"][0], WebAgent);
+            return Model.Parse(this, json["data"]["children"][0], WebAgent);
         }
 
         public Comment GetComment(string subreddit, string name, string linkName)
@@ -390,13 +390,13 @@ namespace RedditSharp
             return new Comment().Init(this, json[1]["data"]["children"][0], WebAgent, sender);
         }
 
-        public Listing<T> SearchByUrl<T>(string url) where T : Thing
+        public Listing<T> SearchByUrl<T>(string url) where T : Model
         {
             var urlSearchQuery = string.Format(UrlSearchPattern, url);
             return Search<T>(urlSearchQuery);
         }
 
-        public Listing<T> Search<T>(string query, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All) where T : Thing
+        public Listing<T> Search<T>(string query, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All) where T : Model
         {
             string sort = sortE.ToString().ToLower();
             string time = timeE.ToString().ToLower();
@@ -456,23 +456,23 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected async internal Task<T> GetThingAsync<T>(string url) where T : Thing
+        protected async internal Task<T> GetThingAsync<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            var ret = await Thing.ParseAsync(this, json, WebAgent);
+            var ret = await Model.ParseAsync(this, json, WebAgent);
             return (T)ret;
         }
 
-        protected internal T GetThing<T>(string url) where T : Thing
+        protected internal T GetThing<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return (T)Thing.Parse(this, json, WebAgent);
+            return (T)Model.Parse(this, json, WebAgent);
         }
 
         #endregion

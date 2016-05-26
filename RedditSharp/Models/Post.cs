@@ -7,9 +7,9 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Post : VotableThing
+    public class Post : VotableModel
     {
         private const string CommentUrl = "/api/comment";
         private const string RemoveUrl = "/api/remove";

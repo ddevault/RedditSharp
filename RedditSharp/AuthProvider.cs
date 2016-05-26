@@ -3,7 +3,7 @@ using System.Net;
 using System.Security.Authentication;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using RedditSharp.Things;
+using RedditSharp.Models;
 
 namespace RedditSharp
 {

@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
-using RedditSharp.Things;
+using RedditSharp.Models;
 
 namespace RedditSharp
 {

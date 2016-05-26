@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
     public class AuthenticatedUser : RedditUser
     {
@@ -44,19 +44,19 @@ namespace RedditSharp.Things
             }
         }
 
-        public Listing<Thing> UnreadMessages
+        public Listing<Model> UnreadMessages
         {
             get
             {
-                return new Listing<Thing>(Reddit, UnreadMessagesUrl, WebAgent);
+                return new Listing<Model>(Reddit, UnreadMessagesUrl, WebAgent);
             }
         }
 
-        public Listing<VotableThing> ModerationQueue
+        public Listing<VotableModel> ModerationQueue
         {
             get
             {
-                return new Listing<VotableThing>(Reddit, ModQueueUrl, WebAgent);
+                return new Listing<VotableModel>(Reddit, ModQueueUrl, WebAgent);
             }
         }
 
@@ -109,15 +109,15 @@ namespace RedditSharp.Things
         }
 
         [Obsolete("Use UnreadMessages property instead")]
-        public Listing<Thing> GetUnreadMessages()
+        public Listing<Model> GetUnreadMessages()
         {
             return UnreadMessages;
         }
 
         [Obsolete("Use ModerationQueue property instead")]
-        public Listing<VotableThing> GetModerationQueue()
+        public Listing<VotableModel> GetModerationQueue()
         {
-            return new Listing<VotableThing>(Reddit, ModQueueUrl, WebAgent);
+            return new Listing<VotableModel>(Reddit, ModQueueUrl, WebAgent);
         }
 
         public Listing<Post> GetUnmoderatedLinks()

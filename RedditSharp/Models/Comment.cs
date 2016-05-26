@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Comment : VotableThing
+    public class Comment : VotableModel
     {
         private const string CommentUrl = "/api/comment";
         private const string EditUserTextUrl = "/api/editusertext";
@@ -23,14 +23,14 @@ namespace RedditSharp.Things
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             ParseComments(reddit, json, webAgent, sender);
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             await ParseCommentsAsync(reddit, json, webAgent, sender);
@@ -38,7 +38,7 @@ namespace RedditSharp.Things
             return this;
         }
 
-        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             base.Init(reddit, webAgent, json);
             var data = json["data"];
@@ -56,7 +56,7 @@ namespace RedditSharp.Things
             return data;
         }
 
-        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Model sender)
         {
             // Parse sub comments
             var replies = data["data"]["replies"];
@@ -69,7 +69,7 @@ namespace RedditSharp.Things
             Comments = subComments.ToArray();
         }
 
-        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Model sender)
         {
             // Parse sub comments
             var replies = data["data"]["replies"];
@@ -113,7 +113,7 @@ namespace RedditSharp.Things
         public IList<Comment> Comments { get; private set; }
 
         [JsonIgnore]
-        public Thing Parent { get; internal set; }
+        public Model Parent { get; internal set; }
 
         public override string Shortlink
         {
