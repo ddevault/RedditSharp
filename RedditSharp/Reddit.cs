@@ -25,7 +25,7 @@ namespace RedditSharp
         private const string SubredditAboutUrl = "/r/{0}/about.json";
         private const string ComposeMessageUrl = "/api/compose";
         private const string RegisterAccountUrl = "/api/register";
-        private const string GetThingUrl = "/api/info.json?id={0}";
+        private const string GetModelUrl = "/api/info.json?id={0}";
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
@@ -249,7 +249,7 @@ namespace RedditSharp
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
             name = name.TrimEnd('/');
-            return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
+            return GetModel<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace RedditSharp
             if (name.StartsWith("/r/"))
                 name = name.Substring(3);
             name = name.TrimEnd('/');
-            return await GetThingAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
+            return await GetModelAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
         }
 
         public Domain GetDomain(string domain)
@@ -351,9 +351,9 @@ namespace RedditSharp
             // TODO: Error
         }
 
-        public Model GetThingByFullname(string fullname)
+        public Model GetModelByFullname(string fullname)
         {
-            var request = WebAgent.CreateGet(string.Format(GetThingUrl, fullname));
+            var request = WebAgent.CreateGet(string.Format(GetModelUrl, fullname));
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
@@ -426,7 +426,7 @@ namespace RedditSharp
         }
 
         /// <summary>
-        /// Returns a Listing of Gold-only subreddits. This endpoint will not return anything if the authenticated Reddit account does not currently have gold.
+        /// Returns a Listing of Gold-only subreddits. This endpoint will not return anyModel if the authenticated Reddit account does not currently have gold.
         /// </summary>
         /// <returns></returns>
         public Listing<Subreddit> GetGoldSubreddits()
@@ -456,7 +456,7 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected async internal Task<T> GetThingAsync<T>(string url) where T : Model
+        protected async internal Task<T> GetModelAsync<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
@@ -466,7 +466,7 @@ namespace RedditSharp
             return (T)ret;
         }
 
-        protected internal T GetThing<T>(string url) where T : Model
+        protected internal T GetModel<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();

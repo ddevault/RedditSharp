@@ -48,7 +48,7 @@ namespace RedditSharp.Models
         {
             get
             {
-                return Reddit.GetThingByFullname(TargetThingFullname);
+                return Reddit.GetModelByFullname(TargetThingFullname);
             }
         }
 
