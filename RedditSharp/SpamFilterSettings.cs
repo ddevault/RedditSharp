@@ -1,4 +1,6 @@
-﻿namespace RedditSharp
+﻿using RedditSharp.Models;
+
+namespace RedditSharp
 {
     public class SpamFilterSettings
     {

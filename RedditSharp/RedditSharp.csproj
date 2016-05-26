@@ -84,9 +84,9 @@
     <Compile Include="Models\RedditUser.cs" />
     <Compile Include="SubmitData.cs" />
     <Compile Include="Models\Subreddit.cs" />
-    <Compile Include="SubredditImage.cs" />
-    <Compile Include="SubredditSettings.cs" />
-    <Compile Include="SubredditStyle.cs" />
+    <Compile Include="Models\SubredditImage.cs" />
+    <Compile Include="Models\SubredditSettings.cs" />
+    <Compile Include="Models\SubredditStyle.cs" />
     <Compile Include="TextData.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="UnixTimeStamp.cs" />
