@@ -289,13 +289,22 @@ namespace RedditSharp
         public virtual void WritePostBody(Stream stream, object data, params string[] additionalFields)
         {
             var type = data.GetType();
+            string value = GetDataProperties(data, additionalFields, type);
+            value = value.Remove(value.Length - 1); // Remove trailing &
+            var raw = Encoding.UTF8.GetBytes(value);
+            stream.Write(raw, 0, raw.Length);
+            stream.Close();
+        }
+
+        private string GetDataProperties(object data, string[] additionalFields, Type type)
+        {
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             string value = "";
             foreach (var property in properties)
             {
-                var attr = property.GetCustomAttributes(typeof(RedditAPINameAttribute), false).FirstOrDefault() as RedditAPINameAttribute;
-                string name = attr == null ? property.Name : attr.Name;
-                var entry = Convert.ToString(property.GetValue(data, null));
+                RedditAPINameAttribute attr = GetCustomAttributes(property);
+                string name = GetPropertyName(property, attr);
+                string entry = GetPropertyEntry(data, property);
                 value += name + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
             for (int i = 0; i < additionalFields.Length; i += 2)
@@ -303,10 +312,23 @@ namespace RedditSharp
                 var entry = Convert.ToString(additionalFields[i + 1]) ?? string.Empty;
                 value += additionalFields[i] + "=" + HttpUtility.UrlEncode(entry).Replace(";", "%3B").Replace("&", "%26") + "&";
             }
-            value = value.Remove(value.Length - 1); // Remove trailing &
-            var raw = Encoding.UTF8.GetBytes(value);
-            stream.Write(raw, 0, raw.Length);
-            stream.Close();
+
+            return value;
+        }
+
+        private static string GetPropertyEntry(object data, PropertyInfo property)
+        {
+            return Convert.ToString(property.GetValue(data, null));
+        }
+
+        private static RedditAPINameAttribute GetCustomAttributes(PropertyInfo property)
+        {
+            return property.GetCustomAttributes(typeof(RedditAPINameAttribute), false).FirstOrDefault() as RedditAPINameAttribute;
+        }
+
+        private static string GetPropertyName(PropertyInfo property, RedditAPINameAttribute attr)
+        {
+            return attr == null ? property.Name : attr.Name;
         }
     }
 }
