@@ -4,6 +4,7 @@ using System.Linq;
 using RedditSharp;
 using System.Security.Authentication;
 using RedditSharp.Models;
+using RedditSharp.Workers;
 
 namespace TestRedditSharp
 {
@@ -22,7 +23,8 @@ namespace TestRedditSharp
                     Console.Write("OAuth token: ");
                     var token = Console.ReadLine();
                     reddit = new Reddit(token);
-                    reddit.InitOrUpdateUser();
+                    UserWorker userWorker = new UserWorker(reddit);
+                    userWorker.InitOrUpdateUser();
                     authenticated = reddit.User != null;
                     if (!authenticated)
                         Console.WriteLine("Invalid token");
