@@ -103,7 +103,9 @@
     <Compile Include="TBUserNote.cs" />
     <Compile Include="ToolBoxUserNotes.cs" />
     <Compile Include="ToolBoxUserNotesException.cs" />
+    <Compile Include="Workers\UserWorker.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
