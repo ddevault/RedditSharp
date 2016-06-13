@@ -108,7 +108,7 @@ namespace RedditSharp.Models
         public Uri Permalink { get; set; }
 
         [JsonProperty("score")]
-        public int Score { get; set; }
+        new public int Score { get; set; }
 
         [JsonProperty("selftext")]
         public string SelfText { get; set; }
