@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RedditSharp.Workers
 {
-    class CommentWorker
+    public class CommentWorker
     {
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
         private const string GetPostUrl = "{0}.json";

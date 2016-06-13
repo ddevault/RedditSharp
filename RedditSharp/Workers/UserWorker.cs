@@ -7,7 +7,7 @@ using System.Security.Authentication;
 
 namespace RedditSharp.Workers
 {
-    class UserWorker
+    public class UserWorker
     {
         private const string SslLoginUrl = "https://ssl.reddit.com/api/login";
         private const string LoginUrl = "/api/login/username";

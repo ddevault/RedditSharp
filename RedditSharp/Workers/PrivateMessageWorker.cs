@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RedditSharp.Workers
 {
-    class PrivateMessageWorker
+    public class PrivateMessageWorker
     {
         private const string ComposeMessageUrl = "/api/compose";
 

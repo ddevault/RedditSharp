@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace RedditSharp.Workers
 {
-    class SubredditWorker
+    public class SubredditWorker
     {
         private const string SubredditAboutUrl = "/r/{0}/about.json";
 
