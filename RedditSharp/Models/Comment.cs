@@ -61,7 +61,7 @@ namespace RedditSharp.Models
             // Parse sub comments
             var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (replies != null && replies.Count() > 0)
+            if (replies != null && replies.Any())
             {
                 foreach (var comment in replies["data"]["children"])
                     subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
@@ -74,7 +74,7 @@ namespace RedditSharp.Models
             // Parse sub comments
             var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (replies != null && replies.Count() > 0)
+            if (replies != null && replies.Any())
             {
                 foreach (var comment in replies["data"]["children"])
                     subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
