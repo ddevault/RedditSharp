@@ -101,7 +101,7 @@ namespace RedditSharp.Models
         public int CommentCount { get; set; }
 
         [JsonProperty("over_18")]
-        public bool NSFW { get; set; }
+        public bool Nsfw { get; set; }
 
         [JsonProperty("permalink")]
         [JsonConverter(typeof(UrlParser))]
@@ -242,12 +242,12 @@ namespace RedditSharp.Models
             SimpleAction(UnhideUrl);
         }
 
-        public void MarkNSFW()
+        public void MarkNsfw()
         {
             SimpleAction(MarkNSFWUrl);
         }
 
-        public void UnmarkNSFW()
+        public void UnmarkNsfw()
         {
             SimpleAction(UnmarkNSFWUrl);
         }
