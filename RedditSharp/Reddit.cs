@@ -17,10 +17,7 @@ namespace RedditSharp
     {
         #region Constant Urls
         
-        private const string SubredditAboutUrl = "/r/{0}/about.json";
-        private const string ComposeMessageUrl = "/api/compose";
         private const string GetModelUrl = "/api/info.json?id={0}";
-        private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
         private const string OAuthDomainUrl = "oauth.reddit.com";
@@ -190,12 +187,8 @@ namespace RedditSharp
 
         public Subreddit GetSubreddit(string name)
         {
-            if (name.StartsWith("r/"))
-                name = name.Substring(2);
-            if (name.StartsWith("/r/"))
-                name = name.Substring(3);
-            name = name.TrimEnd('/');
-            return GetModel<Subreddit>(string.Format(SubredditAboutUrl, name));
+            SubredditWorker subredditWorker = new SubredditWorker(this);
+            return subredditWorker.GetSubreddit(name);
         }
 
         /// <summary>
@@ -205,12 +198,8 @@ namespace RedditSharp
         /// <returns>The Subreddit by given name</returns>
         public async Task<Subreddit> GetSubredditAsync(string name)
         {
-            if (name.StartsWith("r/"))
-                name = name.Substring(2);
-            if (name.StartsWith("/r/"))
-                name = name.Substring(3);
-            name = name.TrimEnd('/');
-            return await GetModelAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
+            SubredditWorker subredditWorker = new SubredditWorker(this);
+            return subredditWorker.GetSubreddit(name);
         }
 
         public Domain GetDomain(string domain)
@@ -243,33 +232,8 @@ namespace RedditSharp
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
         {
-            if (User == null)
-                throw new Exception("User can not be null.");
-            var request = WebAgent.CreatePost(ComposeMessageUrl);
-            WebAgent.WritePostBody(request.GetRequestStream(), new
-            {
-                api_type = "json",
-                subject,
-                text = body,
-                to,
-                uh = User.Modhash,
-                iden = captchaId,
-                captcha = captchaAnswer
-            });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-
-            ICaptchaSolver solver = CaptchaSolver; // Prevent race condition
-
-            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA" && solver != null)
-            {
-                captchaId = json["json"]["captcha"].ToString();
-                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(captchaId));
-
-                if (!captchaResponse.Cancel) // Keep trying until we are told to cancel
-                    ComposePrivateMessage(subject, body, to, captchaId, captchaResponse.Answer);
-            }
+            PrivateMessageWorker privateMessageWorker = new PrivateMessageWorker(this);
+            privateMessageWorker.ComposePrivateMessage(subject, body, to, captchaId, captchaAnswer);
         }
 
         /// <summary>
@@ -296,32 +260,14 @@ namespace RedditSharp
 
         public Comment GetComment(string subreddit, string name, string linkName)
         {
-            try
-            {
-                if (linkName.StartsWith("t3_"))
-                    linkName = linkName.Substring(3);
-                if (name.StartsWith("t1_"))
-                    name = name.Substring(3);
-
-                var url = string.Format(GetCommentUrl, subreddit, linkName, name);
-                return GetComment(new Uri(url));
-            }
-            catch (WebException)
-            {
-                return null;
-            }
+            CommentWorker commentWorker = new CommentWorker(this);
+            return commentWorker.GetComment(subreddit, name, linkName);
         }
 
         public Comment GetComment(Uri uri)
         {
-            var url = string.Format(GetPostUrl, uri.AbsoluteUri);
-            var request = WebAgent.CreateGet(url);
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
-
-            var sender = new Post().Init(this, json[0]["data"]["children"][0], WebAgent);
-            return new Comment().Init(this, json[1]["data"]["children"][0], WebAgent, sender);
+            CommentWorker commentWorker = new CommentWorker(this);
+            return commentWorker.GetComment(uri);
         }
 
         public Listing<T> SearchByUrl<T>(string url) where T : Model
