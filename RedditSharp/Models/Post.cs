@@ -201,7 +201,7 @@ namespace RedditSharp.Models
 
         public void Approve()
         {
-            var data = SimpleAction(ApproveUrl);
+            SimpleAction(ApproveUrl);
         }
 
         public void Remove()
@@ -225,38 +225,36 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void Del()
         {
-            var data = SimpleAction(DelUrl);
+            SimpleAction(DelUrl);
         }
 
         public void Hide()
         {
-            var data = SimpleAction(HideUrl);
+            SimpleAction(HideUrl);
         }
 
         public void Unhide()
         {
-            var data = SimpleAction(UnhideUrl);
+            SimpleAction(UnhideUrl);
         }
 
         public void MarkNSFW()
         {
-            var data = SimpleAction(MarkNSFWUrl);
+            SimpleAction(MarkNSFWUrl);
         }
 
         public void UnmarkNSFW()
         {
-            var data = SimpleAction(UnmarkNSFWUrl);
+            SimpleAction(UnmarkNSFWUrl);
         }
 
         public void ContestMode(bool state)
         {
-            var data = SimpleActionToggle(ContestModeUrl, state);
+            SimpleActionToggle(ContestModeUrl, state);
         }
 
         #region Obsolete Getter Methods
@@ -319,7 +317,7 @@ namespace RedditSharp.Models
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
+            JToken.Parse(result);
             LinkFlairText = flairText;
         }
 
