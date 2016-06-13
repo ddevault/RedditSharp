@@ -164,7 +164,7 @@ namespace RedditSharp.Models
             return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
         }
 
-        private string SimpleAction(string endpoint)
+        private void SimpleAction(string endpoint)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -176,12 +176,9 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
-        private string SimpleActionToggle(string endpoint, bool value)
+        private void SimpleActionToggle(string endpoint, bool value)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -194,9 +191,6 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
         public void Approve()
