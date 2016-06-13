@@ -315,7 +315,12 @@ namespace RedditSharp.Models
             LinkFlairText = flairText;
         }
 
-        public List<Comment> ListComments(int? limit = null)
+        public List<Comment> ListComments()
+        {
+            return ListComments(null);
+        }
+
+        private List<Comment> ListComments(int? limit)
         {
             var url = string.Format(GetCommentsUrl, Id);
 
