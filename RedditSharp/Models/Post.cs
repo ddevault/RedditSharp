@@ -101,14 +101,14 @@ namespace RedditSharp.Models
         public int CommentCount { get; set; }
 
         [JsonProperty("over_18")]
-        public bool NSFW { get; set; }
+        public bool Nsfw { get; set; }
 
         [JsonProperty("permalink")]
         [JsonConverter(typeof(UrlParser))]
         public Uri Permalink { get; set; }
 
         [JsonProperty("score")]
-        public int Score { get; set; }
+        new public int Score { get; set; }
 
         [JsonProperty("selftext")]
         public string SelfText { get; set; }
@@ -164,7 +164,7 @@ namespace RedditSharp.Models
             return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
         }
 
-        private string SimpleAction(string endpoint)
+        private void SimpleAction(string endpoint)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -176,12 +176,9 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
-        private string SimpleActionToggle(string endpoint, bool value)
+        private void SimpleActionToggle(string endpoint, bool value)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -194,14 +191,11 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
         public void Approve()
         {
-            var data = SimpleAction(ApproveUrl);
+            SimpleAction(ApproveUrl);
         }
 
         public void Remove()
@@ -225,38 +219,36 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void Del()
         {
-            var data = SimpleAction(DelUrl);
+            SimpleAction(DelUrl);
         }
 
         public void Hide()
         {
-            var data = SimpleAction(HideUrl);
+            SimpleAction(HideUrl);
         }
 
         public void Unhide()
         {
-            var data = SimpleAction(UnhideUrl);
+            SimpleAction(UnhideUrl);
         }
 
-        public void MarkNSFW()
+        public void MarkNsfw()
         {
-            var data = SimpleAction(MarkNSFWUrl);
+            SimpleAction(MarkNSFWUrl);
         }
 
-        public void UnmarkNSFW()
+        public void UnmarkNsfw()
         {
-            var data = SimpleAction(UnmarkNSFWUrl);
+            SimpleAction(UnmarkNSFWUrl);
         }
 
         public void ContestMode(bool state)
         {
-            var data = SimpleActionToggle(ContestModeUrl, state);
+            SimpleActionToggle(ContestModeUrl, state);
         }
 
         #region Obsolete Getter Methods
@@ -319,11 +311,16 @@ namespace RedditSharp.Models
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(result);
+            JToken.Parse(result);
             LinkFlairText = flairText;
         }
 
-        public List<Comment> ListComments(int? limit = null)
+        public List<Comment> ListComments()
+        {
+            return ListComments(null);
+        }
+
+        private List<Comment> ListComments(int? limit)
         {
             var url = string.Format(GetCommentsUrl, Id);
 
