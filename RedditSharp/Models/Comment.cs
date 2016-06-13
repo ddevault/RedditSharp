@@ -159,7 +159,8 @@ namespace RedditSharp.Models
             }
             catch (WebException ex)
             {
-                var error = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                var streamReader = new StreamReader(ex.Response.GetResponseStream());
+                streamReader.ReadToEnd();
                 return null;
             }
         }
@@ -190,7 +191,7 @@ namespace RedditSharp.Models
                 throw new Exception("Error editing text.");
         }
 
-        private string SimpleAction(string endpoint)
+        private void SimpleAction(string endpoint)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -202,14 +203,11 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
         public void Del()
         {
-            var data = SimpleAction(DelUrl);
+            SimpleAction(DelUrl);
         }
 
         public void Remove()
@@ -233,8 +231,6 @@ namespace RedditSharp.Models
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void SetAsRead()
@@ -246,8 +242,6 @@ namespace RedditSharp.Models
                                      uh = Reddit.User.Modhash,
                                      api_type = "json"
                                  });
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }
 }
