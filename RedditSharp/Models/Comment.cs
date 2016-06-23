@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Comment : VotableThing
+    public class Comment : VotableModel
     {
         private const string CommentUrl = "/api/comment";
         private const string EditUserTextUrl = "/api/editusertext";
@@ -23,14 +23,14 @@ namespace RedditSharp.Things
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             ParseComments(reddit, json, webAgent, sender);
             JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
             return this;
         }
-        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             await ParseCommentsAsync(reddit, json, webAgent, sender);
@@ -38,7 +38,7 @@ namespace RedditSharp.Things
             return this;
         }
 
-        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        private JToken CommonInit(Reddit reddit, JToken json, IWebAgent webAgent, Model sender)
         {
             base.Init(reddit, webAgent, json);
             var data = json["data"];
@@ -56,12 +56,12 @@ namespace RedditSharp.Things
             return data;
         }
 
-        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private void ParseComments(Reddit reddit, JToken data, IWebAgent webAgent, Model sender)
         {
             // Parse sub comments
             var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (replies != null && replies.Count() > 0)
+            if (replies != null && replies.Any())
             {
                 foreach (var comment in replies["data"]["children"])
                     subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
@@ -69,12 +69,12 @@ namespace RedditSharp.Things
             Comments = subComments.ToArray();
         }
 
-        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Thing sender)
+        private async Task ParseCommentsAsync(Reddit reddit, JToken data, IWebAgent webAgent, Model sender)
         {
             // Parse sub comments
             var replies = data["data"]["replies"];
             var subComments = new List<Comment>();
-            if (replies != null && replies.Count() > 0)
+            if (replies != null && replies.Any())
             {
                 foreach (var comment in replies["data"]["children"])
                     subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
@@ -113,7 +113,7 @@ namespace RedditSharp.Things
         public IList<Comment> Comments { get; private set; }
 
         [JsonIgnore]
-        public Thing Parent { get; internal set; }
+        public Model Parent { get; internal set; }
 
         public override string Shortlink
         {
@@ -159,7 +159,8 @@ namespace RedditSharp.Things
             }
             catch (WebException ex)
             {
-                var error = new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+                var streamReader = new StreamReader(ex.Response.GetResponseStream());
+                streamReader.ReadToEnd();
                 return null;
             }
         }
@@ -190,7 +191,7 @@ namespace RedditSharp.Things
                 throw new Exception("Error editing text.");
         }
 
-        private string SimpleAction(string endpoint)
+        private void SimpleAction(string endpoint)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
@@ -202,14 +203,11 @@ namespace RedditSharp.Things
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            return data;
         }
 
         public void Del()
         {
-            var data = SimpleAction(DelUrl);
+            SimpleAction(DelUrl);
         }
 
         public void Remove()
@@ -233,8 +231,6 @@ namespace RedditSharp.Things
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void SetAsRead()
@@ -246,8 +242,6 @@ namespace RedditSharp.Things
                                      uh = Reddit.User.Modhash,
                                      api_type = "json"
                                  });
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
     }
 }

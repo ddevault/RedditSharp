@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using RedditSharp.Things;
+using RedditSharp.Models;
 
 namespace RedditSharp
 {
@@ -23,7 +23,7 @@ namespace RedditSharp
         Year
     }
 
-    public class Listing<T> : IEnumerable<T> where T : Thing
+    public class Listing<T> : IEnumerable<T> where T : Model
     {
         /// <summary>
         /// Gets the default number of listings returned per request
@@ -116,13 +116,13 @@ namespace RedditSharp
         }
 
 #pragma warning disable 0693
-        private class ListingEnumerator<T> : IEnumerator<T> where T : Thing
+        private class ListingEnumerator<T> : IEnumerator<T> where T : Model
         {
             private Listing<T> Listing { get; set; }
             private int CurrentPageIndex { get; set; }
             private string After { get; set; }
             private string Before { get; set; }
-            private Thing[] CurrentPage { get; set; }
+            private Model[] CurrentPage { get; set; }
             private int Count { get; set; }
             private int LimitPerRequest { get; set; }
             private int MaximumLimit { get; set; }
@@ -137,7 +137,7 @@ namespace RedditSharp
             {
                 Listing = listing;
                 CurrentPageIndex = -1;
-                CurrentPage = new Thing[0];
+                CurrentPage = new Model[0];
 
                 // Set the listings per page (if not specified, use the Reddit default of 25) and the maximum listings
                 LimitPerRequest = (limitPerRequest <= 0 ? DefaultListingPerRequest : limitPerRequest); 
@@ -202,10 +202,10 @@ namespace RedditSharp
             private void Parse(JToken json)
             {
                 var children = json["data"]["children"] as JArray;
-                CurrentPage = new Thing[children.Count];
+                CurrentPage = new Model[children.Count];
                 
                 for (int i = 0; i < CurrentPage.Length; i++)
-                    CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
+                    CurrentPage[i] = Model.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
 
                 // Increase the total count of items returned
                 Count += CurrentPage.Length;
@@ -258,7 +258,7 @@ namespace RedditSharp
             {
                 After = Before = null;
                 CurrentPageIndex = -1;
-                CurrentPage = new Thing[0];
+                CurrentPage = new Model[0];
             }
         }
 #pragma warning restore

@@ -2,11 +2,11 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Thing
+    public class Model
     {
-        public static Thing Parse(Reddit reddit, JToken json, IWebAgent webAgent)
+        public static Model Parse(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             var kind = json["kind"].ValueOrDefault<string>();
             switch (kind)
@@ -29,9 +29,9 @@ namespace RedditSharp.Things
         }
 
         // if we can't determine the type of thing by "kind", try by type
-        public static Thing Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        public static Model Parse<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Model
         {
-            Thing result = Parse(reddit, json, webAgent);
+            Model result = Parse(reddit, json, webAgent);
             if (result == null)
             {
                 if (typeof(T) == typeof(WikiPageRevision))
@@ -86,7 +86,7 @@ namespace RedditSharp.Things
             }
         }
 
-        public static async Task<Thing> ParseAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public static async Task<Model> ParseAsync(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             var kind = json["kind"].ValueOrDefault<string>();
             switch (kind)
@@ -109,9 +109,9 @@ namespace RedditSharp.Things
         }
 
         // if we can't determine the type of thing by "kind", try by type
-        public static async Task<Thing> ParseAsync<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Thing
+        public static async Task<Model> ParseAsync<T>(Reddit reddit, JToken json, IWebAgent webAgent) where T : Model
         {
-            Thing result = await ParseAsync(reddit, json, webAgent);
+            Model result = await ParseAsync(reddit, json, webAgent);
             if (result == null)
             {
                 if (typeof(T) == typeof(WikiPageRevision))

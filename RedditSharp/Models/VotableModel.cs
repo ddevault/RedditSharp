@@ -5,9 +5,9 @@ using System.Security.Authentication;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class VotableThing : CreatedThing
+    public class VotableModel : CreatedModel
     {
         public enum VoteType
         {
@@ -46,13 +46,13 @@ namespace RedditSharp.Things
         [JsonIgnore]
         private Reddit Reddit { get; set; }
 
-        protected VotableThing Init(Reddit reddit, IWebAgent webAgent, JToken json)
+        protected VotableModel Init(Reddit reddit, IWebAgent webAgent, JToken json)
         {
             CommonInit(reddit, webAgent, json);
             JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings);
             return this;
         }
-        protected async Task<VotableThing> InitAsync(Reddit reddit, IWebAgent webAgent, JToken json)
+        protected async Task<VotableModel> InitAsync(Reddit reddit, IWebAgent webAgent, JToken json)
         {
             CommonInit(reddit, webAgent, json);
             await Task.Factory.StartNew(() => JsonConvert.PopulateObject(json["data"].ToString(), this, Reddit.JsonSerializerSettings));

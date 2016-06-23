@@ -1,5 +1,5 @@
 ﻿using System;
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class SubredditImage
     {

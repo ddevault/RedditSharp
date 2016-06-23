@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using RedditSharp;
 using System.Security.Authentication;
-using RedditSharp.Things;
+using RedditSharp.Models;
+using RedditSharp.Workers;
 
 namespace TestRedditSharp
 {
@@ -22,7 +23,8 @@ namespace TestRedditSharp
                     Console.Write("OAuth token: ");
                     var token = Console.ReadLine();
                     reddit = new Reddit(token);
-                    reddit.InitOrUpdateUser();
+                    UserWorker userWorker = new UserWorker(reddit);
+                    userWorker.InitOrUpdateUser();
                     authenticated = reddit.User != null;
                     if (!authenticated)
                         Console.WriteLine("Invalid token");
@@ -65,9 +67,9 @@ namespace TestRedditSharp
                 foreach (var post in sub.GetTop(FromTime.Week).Take(10))
                     Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
             }*/
-            Comment comment = (Comment)reddit.GetThingByFullname("t1_ciif2g7");
-            Post post = (Post)reddit.GetThingByFullname("t3_298g7j");
-            PrivateMessage pm = (PrivateMessage)reddit.GetThingByFullname("t4_20oi3a"); // Use your own PM here, as you don't have permission to view this one
+            Comment comment = (Comment)reddit.GetModelByFullname("t1_ciif2g7");
+            Post post = (Post)reddit.GetModelByFullname("t3_298g7j");
+            PrivateMessage pm = (PrivateMessage)reddit.GetModelByFullname("t4_20oi3a"); // Use your own PM here, as you don't have permission to view this one
             Console.WriteLine(comment.Body);
             Console.WriteLine(post.Title);
             Console.WriteLine(pm.Body);

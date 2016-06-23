@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using System.Web;
-using RedditSharp.Things;
 
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class SubredditStyle
     {

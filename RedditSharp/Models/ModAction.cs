@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class ModAction : Thing
+    public class ModAction : Model
     {
 
         [JsonProperty("action")]
@@ -44,11 +44,11 @@ namespace RedditSharp.Things
         }
 
         [JsonIgnore]
-        public Thing TargetThing
+        public Model TargetThing
         {
             get
             {
-                return Reddit.GetThingByFullname(TargetThingFullname);
+                return Reddit.GetModelByFullname(TargetThingFullname);
             }
         }
 

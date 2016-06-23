@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class WikiPageRevision : Thing
+    public class WikiPageRevision : Model
     {
         [JsonProperty("id")]
         new public string Id { get; private set; }

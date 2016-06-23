@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class PrivateMessage : Thing
+    public class PrivateMessage : Model
     {
         private const string SetAsReadUrl = "/api/read_message";
         private const string CommentUrl = "/api/comment";

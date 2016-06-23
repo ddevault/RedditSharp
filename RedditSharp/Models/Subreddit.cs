@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RedditSharp.Utils;
 
-namespace RedditSharp.Things
+namespace RedditSharp.Models
 {
-    public class Subreddit : Thing
+    public class Subreddit : Model
     {
         private const string SubredditPostUrl = "/r/{0}.json";
         private const string SubredditNewUrl = "/r/{0}/new.json?sort=new";
@@ -170,11 +170,11 @@ namespace RedditSharp.Things
             }
         }
 
-        public Listing<VotableThing> ModQueue
+        public Listing<VotableModel> ModQueue
         {
             get
             {
-                return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
+                return new Listing<VotableModel>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
             }
         }
 
@@ -388,9 +388,6 @@ namespace RedditSharp.Things
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // Discard results
         }
 
         public void Unsubscribe()
@@ -406,9 +403,6 @@ namespace RedditSharp.Things
                 uh = Reddit.User.Modhash
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // Discard results
         }
 
         public void ClearFlairTemplates(FlairType flairType)
@@ -422,8 +416,6 @@ namespace RedditSharp.Things
                 r = Name
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void AddFlairTemplate(string cssClass, FlairType flairType, string text, bool userEditable)
@@ -441,9 +433,6 @@ namespace RedditSharp.Things
                 api_type = "json"
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
         }
 
         public string GetFlairText(string user)
@@ -477,8 +466,6 @@ namespace RedditSharp.Things
                 name = user
             });
             stream.Close();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void UploadHeaderImage(string name, ImageType imageType, byte[] file)
@@ -497,9 +484,6 @@ namespace RedditSharp.Things
             });
             formData.AddFile("file", "foo.png", file, imageType == ImageType.PNG ? "image/png" : "image/jpeg");
             formData.Finish();
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // TODO: Detect errors
         }
 
         public void AddModerator(string user)
@@ -513,8 +497,6 @@ namespace RedditSharp.Things
                 type = "moderator",
                 name = user
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void AcceptModeratorInvite()
@@ -526,8 +508,6 @@ namespace RedditSharp.Things
                 uh = Reddit.User.Modhash,
                 r = Name
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void RemoveModerator(string id)
@@ -541,8 +521,6 @@ namespace RedditSharp.Things
                 type = "moderator",
                 id
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public override string ToString()
@@ -561,8 +539,6 @@ namespace RedditSharp.Things
                 type = "contributor",
                 name = user
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void RemoveContributor(string id)
@@ -576,8 +552,6 @@ namespace RedditSharp.Things
                 type = "contributor",
                 id
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         public void BanUser(string user, string reason)
@@ -595,8 +569,6 @@ namespace RedditSharp.Things
                 action = "add",
                 container = FullName
             });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
         }
 
         private Post Submit(SubmitData data)
@@ -728,7 +700,7 @@ namespace RedditSharp.Things
         }
 
         [Obsolete("Use ModQueue property instead")]
-        public Listing<VotableThing> GetModQueue()
+        public Listing<VotableModel> GetModQueue()
         {
             return ModQueue;
         }

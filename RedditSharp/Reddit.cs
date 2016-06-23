@@ -1,10 +1,10 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RedditSharp.Models;
+using RedditSharp.Workers;
 using System;
 using System.Linq;
 using System.Net;
-using System.Security.Authentication;
-using RedditSharp.Things;
 using System.Threading.Tasks;
 using DefaultWebAgent = RedditSharp.WebAgent;
 
@@ -16,17 +16,8 @@ namespace RedditSharp
     public class Reddit
     {
         #region Constant Urls
-
-        private const string SslLoginUrl = "https://ssl.reddit.com/api/login";
-        private const string LoginUrl = "/api/login/username";
-        private const string UserInfoUrl = "/user/{0}/about.json";
-        private const string MeUrl = "/api/me.json";
-        private const string OAuthMeUrl = "/api/v1/me.json";
-        private const string SubredditAboutUrl = "/r/{0}/about.json";
-        private const string ComposeMessageUrl = "/api/compose";
-        private const string RegisterAccountUrl = "/api/register";
-        private const string GetThingUrl = "/api/info.json?id={0}";
-        private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
+        
+        private const string GetModelUrl = "/api/info.json?id={0}";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
         private const string OAuthDomainUrl = "oauth.reddit.com";
@@ -127,7 +118,8 @@ namespace RedditSharp
         {
             DefaultWebAgent.RootDomain = OAuthDomainUrl;
             WebAgent.AccessToken = accessToken;
-            InitOrUpdateUser();
+            UserWorker userWorker = new UserWorker(this);
+            userWorker.InitOrUpdateUser();
         }
         /// <summary>
         /// Creates a Reddit instance with the given WebAgent implementation
@@ -157,7 +149,11 @@ namespace RedditSharp
                 DefaultValueHandling = DefaultValueHandling.Ignore
             };
             CaptchaSolver = new ConsoleCaptchaSolver();
-            if(initUser) InitOrUpdateUser();
+            if(initUser)
+            {
+                UserWorker userWorker = new UserWorker(this);
+                userWorker.InitOrUpdateUser();
+            }
         }
 
         /// <summary>
@@ -169,67 +165,14 @@ namespace RedditSharp
         /// <returns></returns>
         public AuthenticatedUser LogIn(string username, string password, bool useSsl = true)
         {
-            if (Type.GetType("Mono.Runtime") != null)
-                ServicePointManager.ServerCertificateValidationCallback = (s, c, ch, ssl) => true;
-            WebAgent.Cookies = new CookieContainer();
-            HttpWebRequest request;
-            if (useSsl)
-                request = WebAgent.CreatePost(SslLoginUrl);
-            else
-                request = WebAgent.CreatePost(LoginUrl);
-            var stream = request.GetRequestStream();
-            if (useSsl)
-            {
-                WebAgent.WritePostBody(stream, new
-                {
-                    user = username,
-                    passwd = password,
-                    api_type = "json"
-                });
-            }
-            else
-            {
-                WebAgent.WritePostBody(stream, new
-                {
-                    user = username,
-                    passwd = password,
-                    api_type = "json",
-                    op = "login"
-                });
-            }
-            stream.Close();
-            var response = (HttpWebResponse)request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result)["json"];
-            if (json["errors"].Count() != 0)
-                throw new AuthenticationException("Incorrect login.");
-
-            InitOrUpdateUser();
-
-            return User;
+            UserWorker userWorker = new UserWorker(this);
+            return userWorker.LogIn(username, password, useSsl);
         }
 
         public RedditUser GetUser(string name)
         {
-            var request = WebAgent.CreateGet(string.Format(UserInfoUrl, name));
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            return new RedditUser().Init(this, json, WebAgent);
-        }
-
-        /// <summary>
-        /// Initializes the User property if it's null,
-        /// otherwise replaces the existing user object
-        /// with a new one fetched from reddit servers.
-        /// </summary>
-        public void InitOrUpdateUser()
-        {
-            var request = WebAgent.CreateGet(string.IsNullOrEmpty(WebAgent.AccessToken) ? MeUrl : OAuthMeUrl);
-            var response = (HttpWebResponse)request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            User = new AuthenticatedUser().Init(this, json, WebAgent);
+            UserWorker userWorker = new UserWorker(this);
+            return userWorker.GetUser(name);
         }
 
         #region Obsolete Getter Methods
@@ -244,12 +187,8 @@ namespace RedditSharp
 
         public Subreddit GetSubreddit(string name)
         {
-            if (name.StartsWith("r/"))
-                name = name.Substring(2);
-            if (name.StartsWith("/r/"))
-                name = name.Substring(3);
-            name = name.TrimEnd('/');
-            return GetThing<Subreddit>(string.Format(SubredditAboutUrl, name));
+            SubredditWorker subredditWorker = new SubredditWorker(this);
+            return subredditWorker.GetSubreddit(name);
         }
 
         /// <summary>
@@ -259,12 +198,8 @@ namespace RedditSharp
         /// <returns>The Subreddit by given name</returns>
         public async Task<Subreddit> GetSubredditAsync(string name)
         {
-            if (name.StartsWith("r/"))
-                name = name.Substring(2);
-            if (name.StartsWith("/r/"))
-                name = name.Substring(3);
-            name = name.TrimEnd('/');
-            return await GetThingAsync<Subreddit>(string.Format(SubredditAboutUrl, name));
+            SubredditWorker subredditWorker = new SubredditWorker(this);
+            return subredditWorker.GetSubreddit(name);
         }
 
         public Domain GetDomain(string domain)
@@ -297,33 +232,8 @@ namespace RedditSharp
 
         public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
         {
-            if (User == null)
-                throw new Exception("User can not be null.");
-            var request = WebAgent.CreatePost(ComposeMessageUrl);
-            WebAgent.WritePostBody(request.GetRequestStream(), new
-            {
-                api_type = "json",
-                subject,
-                text = body,
-                to,
-                uh = User.Modhash,
-                iden = captchaId,
-                captcha = captchaAnswer
-            });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-
-            ICaptchaSolver solver = CaptchaSolver; // Prevent race condition
-
-            if (json["json"]["errors"].Any() && json["json"]["errors"][0][0].ToString() == "BAD_CAPTCHA" && solver != null)
-            {
-                captchaId = json["json"]["captcha"].ToString();
-                CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(captchaId));
-
-                if (!captchaResponse.Cancel) // Keep trying until we are told to cancel
-                    ComposePrivateMessage(subject, body, to, captchaId, captchaResponse.Answer);
-            }
+            PrivateMessageWorker privateMessageWorker = new PrivateMessageWorker(this);
+            privateMessageWorker.ComposePrivateMessage(subject, body, to, captchaId, captchaAnswer);
         }
 
         /// <summary>
@@ -335,68 +245,38 @@ namespace RedditSharp
         /// <returns>The newly created user account</returns>
         public AuthenticatedUser RegisterAccount(string userName, string passwd, string email = "")
         {
-            var request = WebAgent.CreatePost(RegisterAccountUrl);
-            WebAgent.WritePostBody(request.GetRequestStream(), new
-            {
-                api_type = "json",
-                email = email,
-                passwd = passwd,
-                passwd2 = passwd,
-                user = userName
-            });
-            var response = request.GetResponse();
-            var result = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JObject.Parse(result);
-            return new AuthenticatedUser().Init(this, json, WebAgent);
-            // TODO: Error
+            UserWorker userWorker = new UserWorker(this);
+            return userWorker.RegisterAccount(userName, passwd, email);
         }
 
-        public Thing GetThingByFullname(string fullname)
+        public Model GetModelByFullname(string fullname)
         {
-            var request = WebAgent.CreateGet(string.Format(GetThingUrl, fullname));
+            var request = WebAgent.CreateGet(string.Format(GetModelUrl, fullname));
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return Thing.Parse(this, json["data"]["children"][0], WebAgent);
+            return Model.Parse(this, json["data"]["children"][0], WebAgent);
         }
 
         public Comment GetComment(string subreddit, string name, string linkName)
         {
-            try
-            {
-                if (linkName.StartsWith("t3_"))
-                    linkName = linkName.Substring(3);
-                if (name.StartsWith("t1_"))
-                    name = name.Substring(3);
-
-                var url = string.Format(GetCommentUrl, subreddit, linkName, name);
-                return GetComment(new Uri(url));
-            }
-            catch (WebException)
-            {
-                return null;
-            }
+            CommentWorker commentWorker = new CommentWorker(this);
+            return commentWorker.GetComment(subreddit, name, linkName);
         }
 
         public Comment GetComment(Uri uri)
         {
-            var url = string.Format(GetPostUrl, uri.AbsoluteUri);
-            var request = WebAgent.CreateGet(url);
-            var response = request.GetResponse();
-            var data = WebAgent.GetResponseString(response.GetResponseStream());
-            var json = JToken.Parse(data);
-
-            var sender = new Post().Init(this, json[0]["data"]["children"][0], WebAgent);
-            return new Comment().Init(this, json[1]["data"]["children"][0], WebAgent, sender);
+            CommentWorker commentWorker = new CommentWorker(this);
+            return commentWorker.GetComment(uri);
         }
 
-        public Listing<T> SearchByUrl<T>(string url) where T : Thing
+        public Listing<T> SearchByUrl<T>(string url) where T : Model
         {
             var urlSearchQuery = string.Format(UrlSearchPattern, url);
             return Search<T>(urlSearchQuery);
         }
 
-        public Listing<T> Search<T>(string query, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All) where T : Thing
+        public Listing<T> Search<T>(string query, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All) where T : Model
         {
             string sort = sortE.ToString().ToLower();
             string time = timeE.ToString().ToLower();
@@ -436,7 +316,7 @@ namespace RedditSharp
         }
 
         /// <summary>
-        /// Returns a Listing of Gold-only subreddits. This endpoint will not return anything if the authenticated Reddit account does not currently have gold.
+        /// Returns a Listing of Gold-only subreddits. This endpoint will not return anyModel if the authenticated Reddit account does not currently have gold.
         /// </summary>
         /// <returns></returns>
         public Listing<Subreddit> GetGoldSubreddits()
@@ -466,23 +346,23 @@ namespace RedditSharp
 
         #region Helpers
 
-        protected async internal Task<T> GetThingAsync<T>(string url) where T : Thing
+        protected async internal Task<T> GetModelAsync<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            var ret = await Thing.ParseAsync(this, json, WebAgent);
+            var ret = await Model.ParseAsync(this, json, WebAgent);
             return (T)ret;
         }
 
-        protected internal T GetThing<T>(string url) where T : Thing
+        protected internal T GetModel<T>(string url) where T : Model
         {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return (T)Thing.Parse(this, json, WebAgent);
+            return (T)Model.Parse(this, json, WebAgent);
         }
 
         #endregion

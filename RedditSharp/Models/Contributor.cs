@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace RedditSharp.Things 
+namespace RedditSharp.Models 
 {
-    public class Contributor : Thing 
+    public class Contributor : Model 
     {
         [JsonProperty("name")]
         public string Name { get; set; }

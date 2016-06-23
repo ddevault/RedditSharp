@@ -1,9 +1,8 @@
 ﻿using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RedditSharp.Things;
 
-namespace RedditSharp
+namespace RedditSharp.Models
 {
     public class SubredditSettings
     {
