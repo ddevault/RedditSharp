@@ -403,7 +403,17 @@ namespace RedditSharp
             return new Listing<T>(this, string.Format(SearchUrl, query, sort, time), WebAgent);
         }
 
+        public Listing<T> SearchByTimestamp<T>(DateTime from, DateTime to, string query = "", string subreddit = "", Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All) where T : Thing
+        {
+            string sort = sortE.ToString().ToLower();
+            string time = timeE.ToString().ToLower();
 
+            var fromUnix = (from - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            var toUnix = (to - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+
+            string searchQuery = "(and+timestamp:" + fromUnix + ".." + toUnix + "+'" + query + "'+" + "subreddit:'" + subreddit + "')&syntax=cloudsearch";
+            return new Listing<T>(this, string.Format(SearchUrl, searchQuery, sort, time), WebAgent);
+        }
 
         #region SubredditSearching
 
