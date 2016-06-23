@@ -1,7 +1,5 @@
 # RedditSharp
 
-This library is **unmaintained**. Someone should fork it.
-
 A partial implementation of the [Reddit](http://reddit.com) API. Includes support for many API endpoints, as well as
 LINQ-style paging of results.
 
