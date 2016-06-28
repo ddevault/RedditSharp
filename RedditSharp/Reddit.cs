@@ -295,10 +295,35 @@ namespace RedditSharp
             return new Post().Init(this, GetToken(uri), WebAgent);
         }
 
-        public void ComposePrivateMessage(string subject, string body, string to, string captchaId = "", string captchaAnswer = "")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="to"></param>
+        /// <param name="fromSubReddit">The subreddit to send the message as (optional).</param>
+        /// <param name="captchaId"></param>
+        /// <param name="captchaAnswer"></param>
+        /// <remarks>If <paramref name="fromSubReddit"/> is passed in then the message is sent from the subreddit. the sender must be a mod of the specified subreddit.</remarks>
+        /// <exception cref="AuthenticationException">Thrown when a subreddit is passed in and the user is not a mod of that sub.</exception>
+        public void ComposePrivateMessage(string subject, string body, string to, string fromSubReddit = "", string captchaId = "", string captchaAnswer = "")
         {
             if (User == null)
                 throw new Exception("User can not be null.");
+
+            if (!String.IsNullOrWhiteSpace(fromSubReddit))
+            {
+                var subReddit = this.GetSubreddit(fromSubReddit);
+                var modNameList = subReddit.Moderators.Select(b => b.Name).ToList();
+
+                if (!modNameList.Contains(User.Name))
+                    throw new AuthenticationException(
+                        String.Format(
+                            @"User {0} is not a moderator of subreddit {1}.",
+                            User.Name,
+                            subReddit.Name));
+            }
+
             var request = WebAgent.CreatePost(ComposeMessageUrl);
             WebAgent.WritePostBody(request.GetRequestStream(), new
             {
@@ -306,6 +331,7 @@ namespace RedditSharp
                 subject,
                 text = body,
                 to,
+                from_sr = fromSubReddit,
                 uh = User.Modhash,
                 iden = captchaId,
                 captcha = captchaAnswer
@@ -414,6 +440,7 @@ namespace RedditSharp
             string searchQuery = "(and+timestamp:" + fromUnix + ".." + toUnix + "+'" + query + "'+" + "subreddit:'" + subreddit + "')&syntax=cloudsearch";
             return new Listing<T>(this, string.Format(SearchUrl, searchQuery, sort, time), WebAgent);
         }
+
 
         #region SubredditSearching
 
