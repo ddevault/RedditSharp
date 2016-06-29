@@ -1,11 +1,11 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
-using RedditSharp.Things;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RedditSharp.Things;
 using DefaultWebAgent = RedditSharp.WebAgent;
 
 namespace RedditSharp
@@ -27,6 +27,7 @@ namespace RedditSharp
         private const string RegisterAccountUrl = "/api/register";
         private const string GetThingUrl = "/api/info.json?id={0}";
         private const string GetCommentUrl = "/r/{0}/comments/{1}/foo/{2}";
+        private const string GetPostUrlBase = "/r/{0}/comments/{1}/foo";
         private const string GetPostUrl = "{0}.json";
         private const string DomainUrl = "www.reddit.com";
         private const string OAuthDomainUrl = "oauth.reddit.com";
@@ -277,8 +278,11 @@ namespace RedditSharp
 
         public JToken GetToken(Uri uri)
         {
-            var url = uri.AbsoluteUri;
+            return GetToken(uri.AbsoluteUri);
+        }
 
+        public JToken GetToken(string url)
+        {
             if (url.EndsWith("/"))
                 url = url.Remove(url.Length - 1);
 
@@ -290,9 +294,25 @@ namespace RedditSharp
             return json[0]["data"]["children"].First;
         }
 
+        public Post GetPost(string subreddit, string linkId)
+        {
+            if (linkId.IndexOf("_", StringComparison.Ordinal) > 0)
+            {
+                linkId = linkId.Substring(3, linkId.Length - 3);
+            }
+            var basePostUrl = string.Format(GetPostUrlBase, subreddit, linkId);
+            var url = string.Format(GetPostUrl, basePostUrl);
+            return GetPost(url);
+        }
+
         public Post GetPost(Uri uri)
         {
-            return new Post().Init(this, GetToken(uri), WebAgent);
+            return GetPost(uri.AbsoluteUri);
+        }
+
+        public Post GetPost(string url)
+        {
+            return new Post().Init(this, GetToken(url), WebAgent);
         }
 
         /// <summary>
@@ -396,7 +416,8 @@ namespace RedditSharp
                     name = name.Substring(3);
 
                 var url = string.Format(GetCommentUrl, subreddit, linkName, name);
-                return GetComment(new Uri(url));
+                var fullUrl = string.Format(GetPostUrl, url);
+                return GetComment(fullUrl);
             }
             catch (WebException)
             {
@@ -406,7 +427,11 @@ namespace RedditSharp
 
         public Comment GetComment(Uri uri)
         {
-            var url = string.Format(GetPostUrl, uri.AbsoluteUri);
+            return GetComment(uri.AbsoluteUri);
+        }
+
+        public Comment GetComment(string url)
+        {
             var request = WebAgent.CreateGet(url);
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
