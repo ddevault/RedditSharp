@@ -205,7 +205,7 @@ namespace RedditSharp
                 CurrentPage = new Thing[children.Count];
                 
                 for (int i = 0; i < CurrentPage.Length; i++)
-                    CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent);
+                    CurrentPage[i] = Thing.Parse<T>(Listing.Reddit, children[i], Listing.WebAgent).Result;
 
                 // Increase the total count of items returned
                 Count += CurrentPage.Length;

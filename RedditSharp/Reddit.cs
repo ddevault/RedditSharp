@@ -215,7 +215,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            return new RedditUser().Init(this, json, WebAgent);
+            return new RedditUser().Init(this, json, WebAgent).Result;
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace RedditSharp
             var response = (HttpWebResponse)request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            User = new AuthenticatedUser().Init(this, json, WebAgent);
+            User = new AuthenticatedUser().Init(this, json, WebAgent).Result;
         }
 
         #region Obsolete Getter Methods
@@ -292,7 +292,7 @@ namespace RedditSharp
 
         public Post GetPost(Uri uri)
         {
-            return new Post().Init(this, GetToken(uri), WebAgent);
+            return new Post().Init(this, GetToken(uri), WebAgent).Result;
         }
 
         /// <summary>
@@ -373,7 +373,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JObject.Parse(result);
-            return new AuthenticatedUser().Init(this, json, WebAgent);
+            return new AuthenticatedUser().Init(this, json, WebAgent).Result;
             // TODO: Error
         }
 
@@ -383,7 +383,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return Thing.Parse(this, json["data"]["children"][0], WebAgent);
+            return Thing.Parse(this, json["data"]["children"][0], WebAgent).Result;
         }
 
         public Comment GetComment(string subreddit, string name, string linkName)
@@ -413,7 +413,7 @@ namespace RedditSharp
             var json = JToken.Parse(data);
 
             var sender = new Post().Init(this, json[0]["data"]["children"][0], WebAgent);
-            return new Comment().Init(this, json[1]["data"]["children"][0], WebAgent, sender);
+            return new Comment().Init(this, json[1]["data"]["children"][0], WebAgent, sender.Result).Result;
         }
 
         public Listing<T> SearchByUrl<T>(string url) where T : Thing
@@ -499,7 +499,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            var ret = await Thing.ParseAsync(this, json, WebAgent);
+            var ret = await Thing.Parse(this, json, WebAgent);
             return (T)ret;
         }
 
@@ -509,7 +509,7 @@ namespace RedditSharp
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             var json = JToken.Parse(data);
-            return (T)Thing.Parse(this, json, WebAgent);
+            return (T)Thing.Parse(this, json, WebAgent).Result;
         }
 
         #endregion

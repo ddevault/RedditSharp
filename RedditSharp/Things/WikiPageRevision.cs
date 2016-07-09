@@ -25,14 +25,7 @@ namespace RedditSharp.Things
 
         protected internal WikiPageRevision() { }
 
-        internal WikiPageRevision Init(Reddit reddit, JToken json, IWebAgent webAgent)
-        {
-            CommonInit(reddit, json, webAgent);
-            JsonConvert.PopulateObject(json.ToString(), this, reddit.JsonSerializerSettings);
-            return this;
-        }        
-
-        internal async Task<WikiPageRevision> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        internal async Task<WikiPageRevision> Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await Task.Factory.StartNew(() => JsonConvert.PopulateObject(json.ToString(), this, reddit.JsonSerializerSettings));
@@ -42,7 +35,7 @@ namespace RedditSharp.Things
         private void CommonInit(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             base.Init(json);
-            Author = new RedditUser().Init(reddit, json["author"], webAgent);
+            Author = new RedditUser().Init(reddit, json["author"], webAgent).Result;
         }
     }
 }

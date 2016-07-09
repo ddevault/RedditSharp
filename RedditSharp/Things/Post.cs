@@ -30,14 +30,15 @@ namespace RedditSharp.Things
 
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
-
-        public Post Init(Reddit reddit, JToken post, IWebAgent webAgent)
-        {
-            CommonInit(reddit, post, webAgent);
-            JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings);
-            return this;
-        }
-        public async Task<Post> InitAsync(Reddit reddit, JToken post, IWebAgent webAgent)
+        // AWAITABLES DON'T HAVE TO BE CALLED ASYNCRONOUSLY
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="reddit"></param>
+        /// <param name="post"></param>
+        /// <param name="webAgent"></param>
+        /// <returns></returns>
+        public async Task<Post> Init(Reddit reddit, JToken post, IWebAgent webAgent)
         {
             CommonInit(reddit, post, webAgent);
             await Task.Factory.StartNew(() => JsonConvert.PopulateObject(post["data"].ToString(), this, reddit.JsonSerializerSettings));
@@ -162,7 +163,7 @@ namespace RedditSharp.Things
             var json = JObject.Parse(data);
             if (json["json"]["ratelimit"] != null)
                 throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-            return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
+            return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this).Result;
         }
 
         private string SimpleAction(string endpoint)
@@ -317,7 +318,11 @@ namespace RedditSharp.Things
             JToken post = Reddit.GetToken(this.Url);
             JsonConvert.PopulateObject(post["data"].ToString(), this, Reddit.JsonSerializerSettings);
         }
-
+        /// <summary>
+        /// Sets your claim
+        /// </summary>
+        /// <param name="flairText">Text to set your flair</param>
+        /// <param name="flairClass">class of the flair</param>
         public void SetFlair(string flairText, string flairClass)
         {
             if (Reddit.User == null)
@@ -359,7 +364,7 @@ namespace RedditSharp.Things
             var comments = new List<Comment>();
             foreach (var comment in postJson)
             {
-                comments.Add(new Comment().Init(Reddit, comment, WebAgent, this));
+                comments.Add(new Comment().Init(Reddit, comment, WebAgent, this).Result);
             }
 
             return comments;
