@@ -203,7 +203,7 @@ namespace RedditSharp
             var result = _webAgent.GetResponseString(response.GetResponseStream());
             var thingjson = "{\"kind\": \"t2\", \"data\": " + result + "}";
             var json = JObject.Parse(thingjson);
-            return new AuthenticatedUser().Init(new Reddit(), json, _webAgent);
+            return new AuthenticatedUser().Init(new Reddit(), json, _webAgent).Result;
         }
     }
 }

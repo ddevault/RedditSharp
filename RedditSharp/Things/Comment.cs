@@ -23,14 +23,7 @@ namespace RedditSharp.Things
         [JsonIgnore]
         private IWebAgent WebAgent { get; set; }
 
-        public Comment Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
-        {
-            var data = CommonInit(reddit, json, webAgent, sender);
-            ParseComments(reddit, json, webAgent, sender);
-            JsonConvert.PopulateObject(data.ToString(), this, reddit.JsonSerializerSettings);
-            return this;
-        }
-        public async Task<Comment> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
+        public async Task<Comment> Init(Reddit reddit, JToken json, IWebAgent webAgent, Thing sender)
         {
             var data = CommonInit(reddit, json, webAgent, sender);
             await ParseCommentsAsync(reddit, json, webAgent, sender);
@@ -64,7 +57,7 @@ namespace RedditSharp.Things
             if (replies != null && replies.Count() > 0)
             {
                 foreach (var comment in replies["data"]["children"])
-                    subComments.Add(new Comment().Init(reddit, comment, webAgent, sender));
+                    subComments.Add(new Comment().Init(reddit, comment, webAgent, sender).Result);
             }
             Comments = subComments.ToArray();
         }
@@ -77,7 +70,7 @@ namespace RedditSharp.Things
             if (replies != null && replies.Count() > 0)
             {
                 foreach (var comment in replies["data"]["children"])
-                    subComments.Add(await new Comment().InitAsync(reddit, comment, webAgent, sender));
+                    subComments.Add(await new Comment().Init(reddit, comment, webAgent, sender));
             }
             Comments = subComments.ToArray();            
         }
@@ -155,7 +148,7 @@ namespace RedditSharp.Things
                 var json = JObject.Parse(data);
                 if (json["json"]["ratelimit"] != null)
                     throw new RateLimitException(TimeSpan.FromSeconds(json["json"]["ratelimit"].ValueOrDefault<double>()));
-                return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this);
+                return new Comment().Init(Reddit, json["json"]["data"]["things"][0], WebAgent, this).Result;
             }
             catch (WebException ex)
             {

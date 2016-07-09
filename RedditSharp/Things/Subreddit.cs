@@ -111,7 +111,11 @@ namespace RedditSharp.Things
 
         [JsonIgnore]
         public string Name { get; set; }
-
+        /// <summary>
+        /// Top of the subreddit at a timeperiod
+        /// </summary>
+        /// <param name="timePeriod">Timeperiod you want to start at <seealso cref="FromTime"/></param>
+        /// <returns>The top of the subreddit from a specific time</returns>
         public Listing<Post> GetTop(FromTime timePeriod)
         {
             if (Name == "/")
@@ -120,7 +124,9 @@ namespace RedditSharp.Things
             }
             return new Listing<Post>(Reddit, string.Format(SubredditTopUrl, Name, Enum.GetName(typeof(FromTime), timePeriod)).ToLower(), WebAgent);
         }
-
+        /// <summary>
+        /// All posts on a subredit
+        /// </summary>
         public Listing<Post> Posts
         {
             get
@@ -130,7 +136,9 @@ namespace RedditSharp.Things
                 return new Listing<Post>(Reddit, string.Format(SubredditPostUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// Comments for a subreddit, all of them, irrespective of replies and what it is replying to
+        /// </summary>
         public Listing<Comment> Comments
         {
             get
@@ -140,7 +148,9 @@ namespace RedditSharp.Things
                 return new Listing<Comment>(Reddit, string.Format(CommentsUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// Posts on the subreddit/new
+        /// </summary>
         public Listing<Post> New
         {
             get
@@ -150,7 +160,9 @@ namespace RedditSharp.Things
                 return new Listing<Post>(Reddit, string.Format(SubredditNewUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// Posts on the front page of the subreddits
+        /// </summary>
         public Listing<Post> Hot
         {
             get
@@ -160,6 +172,9 @@ namespace RedditSharp.Things
                 return new Listing<Post>(Reddit, string.Format(SubredditHotUrl, Name), WebAgent);
             }
         }
+        /// <summary>
+        /// List of rising posts
+        /// </summary>
         public Listing<Post> Rising 
         {
             get 
@@ -169,7 +184,9 @@ namespace RedditSharp.Things
                 return new Listing<Post>(Reddit, string.Format(SubredditRisingUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// List of items in the mod queue
+        /// </summary>
         public Listing<VotableThing> ModQueue
         {
             get
@@ -177,7 +194,9 @@ namespace RedditSharp.Things
                 return new Listing<VotableThing>(Reddit, string.Format(ModqueueUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// Links a moderator hasn't checked
+        /// </summary>
         public Listing<Post> UnmoderatedLinks
         {
             get
@@ -185,7 +204,13 @@ namespace RedditSharp.Things
                 return new Listing<Post>(Reddit, string.Format(UnmoderatedUrl, Name), WebAgent);
             }
         }
-
+        /// <summary>
+        /// Search using specific terms from a specified time to now
+        /// </summary>
+        /// <param name="terms">Terms you want to search for</param>
+        /// <param name="sortE">Sort the way you want to, see <see cref="Sorting"/></param>
+        /// <param name="timeE">Time sorting you want to see</param>
+        /// <returns>A list of posts</returns>
         public Listing<Post> Search(string terms, Sorting sortE = Sorting.Relevance, TimeSorting timeE = TimeSorting.All)
         {
             string sort = sortE.ToString().ToLower();
@@ -193,14 +218,22 @@ namespace RedditSharp.Things
 
             return new Listing<Post>(Reddit, string.Format(SearchUrl, Name, Uri.EscapeUriString(terms), sort, time), WebAgent);
         }
-
+        /// <summary>
+        /// Search for a list of posts from a specific time to another time
+        /// </summary>
+        /// <param name="from">Time to begin search</param>
+        /// <param name="to">Time to end search at</param>
+        /// <param name="sortE">Sort of the objects you want to have it in</param>
+        /// <returns>A list of posts in the range of time/dates in a specific order</returns>
         public Listing<Post> Search(DateTime from, DateTime to, Sorting sortE = Sorting.New)
         {
             string sort = sortE.ToString().ToLower();
 
             return new Listing<Post>(Reddit, string.Format(SearchUrlDate, Name, from.DateTimeToUnixTimestamp(), to.DateTimeToUnixTimestamp(), sort), WebAgent);
         }
-        
+        /// <summary>
+        /// Settings of the subreddit, as best as possible
+        /// </summary>
         public SubredditSettings Settings
         {
             get
@@ -226,7 +259,9 @@ namespace RedditSharp.Things
                 }
             }
         }
-
+        /// <summary>
+        /// Hacky way to obtain flair templates
+        /// </summary>
         public UserFlairTemplate[] UserFlairTemplates // Hacky, there isn't a proper endpoint for this
         {
             get
@@ -311,16 +346,8 @@ namespace RedditSharp.Things
             }
         }
 
-        public Subreddit Init(Reddit reddit, JToken json, IWebAgent webAgent)
-        {
-            CommonInit(reddit, json, webAgent);
-            JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings);
-            SetName();
 
-            return this;
-        }
-
-        public async Task<Subreddit> InitAsync(Reddit reddit, JToken json, IWebAgent webAgent)
+        public async Task<Subreddit> Init(Reddit reddit, JToken json, IWebAgent webAgent)
         {
             CommonInit(reddit, json, webAgent);
             await Task.Factory.StartNew(() => JsonConvert.PopulateObject(json["data"].ToString(), this, reddit.JsonSerializerSettings));
@@ -346,7 +373,11 @@ namespace RedditSharp.Things
             WebAgent = webAgent;
             Wiki = new Wiki(reddit, this, webAgent);
         }
-
+        /// <summary>
+        /// http://www.reddit.com/r/all
+        /// </summary>
+        /// <param name="reddit">reddit, to help personalization</param>
+        /// <returns>http://www.reddit.com/r/all</returns>
         public static Subreddit GetRSlashAll(Reddit reddit)
         {
             var rSlashAll = new Subreddit
@@ -360,7 +391,11 @@ namespace RedditSharp.Things
             };
             return rSlashAll;
         }
-
+        /// <summary>
+        /// Gets the frontpage of the user
+        /// </summary>
+        /// <param name="reddit">Reddit you're logged into</param>
+        /// <returns>the frontpage of reddit</returns>
         public static Subreddit GetFrontPage(Reddit reddit)
         {
             var frontPage = new Subreddit
@@ -374,7 +409,9 @@ namespace RedditSharp.Things
             };
             return frontPage;
         }
-
+        /// <summary>
+        /// Subscribe to a subreddit
+        /// </summary>
         public void Subscribe()
         {
             if (Reddit.User == null)
@@ -390,9 +427,11 @@ namespace RedditSharp.Things
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // Discard results
+            //Disposes and discards
         }
-
+        /// <summary>
+        /// Unsubscribes from a subreddit
+        /// </summary>
         public void Unsubscribe()
         {
             if (Reddit.User == null)
@@ -408,7 +447,7 @@ namespace RedditSharp.Things
             stream.Close();
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
-            // Discard results
+            //Dispose and discard
         }
 
         public void ClearFlairTemplates(FlairType flairType)
@@ -501,7 +540,10 @@ namespace RedditSharp.Things
             var data = WebAgent.GetResponseString(response.GetResponseStream());
             // TODO: Detect errors
         }
-
+        /// <summary>
+        /// Adds a moderator
+        /// </summary>
+        /// <param name="user">User to add, by username</param>
         public void AddModerator(string user)
         {
             var request = WebAgent.CreatePost(AddModeratorUrl);
@@ -512,6 +554,20 @@ namespace RedditSharp.Things
                 r = Name,
                 type = "moderator",
                 name = user
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+        public void AddModerator(RedditUser user)
+        {
+            var request = WebAgent.CreatePost(AddModeratorUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "moderator",
+                name = user.Name
             });
             var response = request.GetResponse();
             var result = WebAgent.GetResponseString(response.GetResponseStream());
@@ -631,7 +687,7 @@ namespace RedditSharp.Things
                 throw new DuplicateLinkException(String.Format("Post failed when submitting.  The following link has already been submitted: {0}", SubmitLinkUrl));
             }
 
-            return new Post().Init(Reddit, json["json"], WebAgent);
+            return new Post().Init(Reddit, json["json"], WebAgent).Result;
         }
 
         /// <summary>

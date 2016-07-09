@@ -1,5 +1,5 @@
+using Newtonsoft.Json.Linq;
 using System;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Web;
-using Newtonsoft.Json.Linq;
 
 namespace RedditSharp
 {
