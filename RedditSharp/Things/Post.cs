@@ -107,9 +107,6 @@ namespace RedditSharp.Things
         [JsonConverter(typeof(UrlParser))]
         public Uri Permalink { get; set; }
 
-        [JsonProperty("score")]
-        public new int Score { get; set; }
-
         [JsonProperty("selftext")]
         public string SelfText { get; set; }
 
