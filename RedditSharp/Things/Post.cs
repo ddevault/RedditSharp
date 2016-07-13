@@ -23,6 +23,7 @@ namespace RedditSharp.Things
         private const string MarkNSFWUrl = "/api/marknsfw";
         private const string UnmarkNSFWUrl = "/api/unmarknsfw";
         private const string ContestModeUrl = "/api/set_contest_mode";
+        private const string StickyModeUrl = "/api/set_subreddit_sticky";
 
         [JsonIgnore]
         private Reddit Reddit { get; set; }
@@ -178,10 +179,20 @@ namespace RedditSharp.Things
             return data;
         }
 
-        private string SimpleActionToggle(string endpoint, bool value)
+        private string SimpleActionToggle(string endpoint, bool value, bool requiresModAction = false)
         {
             if (Reddit.User == null)
                 throw new AuthenticationException("No user logged in.");
+
+            var modNameList = this.Subreddit.Moderators.Select(b => b.Name).ToList();
+
+            if (requiresModAction && !modNameList.Contains(Reddit.User.Name))
+                throw new AuthenticationException(
+                    String.Format(
+                        @"User {0} is not a moderator of subreddit {1}.", 
+                        Reddit.User.Name,
+                        this.Subreddit.Name));
+
             var request = WebAgent.CreatePost(endpoint);
             var stream = request.GetRequestStream();
             WebAgent.WritePostBody(stream, new
@@ -254,6 +265,11 @@ namespace RedditSharp.Things
         public void ContestMode(bool state)
         {
             var data = SimpleActionToggle(ContestModeUrl, state);
+        }
+
+        public void StickyMode(bool state)
+        {
+            var data = SimpleActionToggle(StickyModeUrl, state, true);
         }
 
         #region Obsolete Getter Methods
