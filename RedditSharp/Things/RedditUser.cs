@@ -13,6 +13,7 @@ namespace RedditSharp.Things
         private const string SubscribedSubredditsUrl = "/subreddits/mine.json";
         private const string LikedUrl = "/user/{0}/liked.json";
         private const string DislikedUrl = "/user/{0}/disliked.json";
+        private const string SavedUrl = "/user/{0}/saved.json";
 
         private const int MAX_LIMIT = 100;
 
@@ -163,6 +164,24 @@ namespace RedditSharp.Things
             linksUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
 
             return new Listing<Post>(Reddit, linksUrl, WebAgent);
+        }
+
+        /// <summary>
+        /// Get a listing of comments and posts saved by the user sorted by <paramref name="sorting"/>, from time <paramref name="fromTime"/>
+        /// and limited to <paramref name="limit"/>.
+        /// </summary>
+        /// <param name="sorting">How to sort the comments (hot, new, top, controversial).</param>
+        /// <param name="limit">How many comments to fetch per request. Max is 100.</param>
+        /// <param name="fromTime">What time frame of comments to show (hour, day, week, month, year, all).</param>
+        /// <returns>The listing of posts and/or comments requested that the user saved.</returns>
+        public Listing<VotableThing> GetSaved(Sort sorting = Sort.New, int limit = 25, FromTime fromTime = FromTime.All)
+        {
+            if ((limit < 1) || (limit > MAX_LIMIT))
+                throw new ArgumentOutOfRangeException("limit", "Valid range: [1," + MAX_LIMIT + "]");
+            string savedUrl = string.Format(SavedUrl, Name);
+            savedUrl += string.Format("?sort={0}&limit={1}&t={2}", Enum.GetName(typeof(Sort), sorting), limit, Enum.GetName(typeof(FromTime), fromTime));
+
+            return new Listing<VotableThing>(Reddit, savedUrl, WebAgent);
         }
 
         public override string ToString()
