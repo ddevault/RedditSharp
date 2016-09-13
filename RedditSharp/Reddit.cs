@@ -348,7 +348,7 @@ namespace RedditSharp
                 CaptchaResponse captchaResponse = solver.HandleCaptcha(new Captcha(captchaId));
 
                 if (!captchaResponse.Cancel) // Keep trying until we are told to cancel
-                    ComposePrivateMessage(subject, body, to, captchaId, captchaResponse.Answer);
+                    ComposePrivateMessage(subject, body, to, fromSubReddit, captchaId, captchaResponse.Answer);
             }
         }
 
