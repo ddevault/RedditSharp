@@ -249,5 +249,11 @@ namespace RedditSharp.Things
             var response = request.GetResponse();
             var data = WebAgent.GetResponseString(response.GetResponseStream());
         }
+
+        public void Update()
+        {
+            JToken comment = Reddit.GetToken(new Uri(this.Shortlink));
+            JsonConvert.PopulateObject(comment["data"].ToString(), this, Reddit.JsonSerializerSettings);
+        }
     }
 }
