@@ -240,6 +240,7 @@ namespace RedditSharp
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
+            request.Headers.Add(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.8");
             return request;
         }
 
@@ -259,6 +260,7 @@ namespace RedditSharp
             }
             request.Method = method;
             request.UserAgent = UserAgent + " - with RedditSharp by /u/sircmpwn";
+            request.Headers.Add(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.8");
             return request;
         }
 
