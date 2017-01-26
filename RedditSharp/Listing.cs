@@ -165,15 +165,19 @@ namespace RedditSharp
                 {
                     int limit = LimitPerRequest;
 
-                    if (limit > MaximumLimit)
+                    if (MaximumLimit > 0)
                     {
-                        // If the limit is more than the maximum number of listings, adjust
-                        limit = MaximumLimit;
-                    }
-                    else if (Count + limit > MaximumLimit)
-                    {
-                        // If a smaller subset of listings are needed, adjust the limit
-                        limit = MaximumLimit - Count;
+                        //we have a cap on the number we can return
+                        if (limit > MaximumLimit)
+                        {
+                            // If the limit is more than the maximum number of listings, adjust
+                            limit = MaximumLimit;
+                        }
+                        else if (Count + limit > MaximumLimit)
+                        {
+                            // If a smaller subset of listings are needed, adjust the limit
+                            limit = MaximumLimit - Count;
+                        }
                     }
 
                     if (limit > 0)
@@ -235,7 +239,7 @@ namespace RedditSharp
                         return false;
                     }
 
-                    if (MaximumLimit != -1 && Count >= MaximumLimit)
+                    if (MaximumLimit > 0 && Count >= MaximumLimit)
                     {
                         // Maximum listing count returned
                         return false;
