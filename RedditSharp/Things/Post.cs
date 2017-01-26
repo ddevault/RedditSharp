@@ -54,6 +54,10 @@ namespace RedditSharp.Things
         [JsonProperty("author")]
         public string AuthorName { get; set; }
 
+        /// <summary>
+        /// Retrieves the full author user object.
+        /// If you just need the name, use <see cref="AuthorName"/>
+        /// </summary>
         [JsonIgnore]
         public RedditUser Author
         {

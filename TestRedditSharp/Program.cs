@@ -9,9 +9,84 @@ namespace TestRedditSharp
 {
     class Program
     {
+        static Reddit reddit = null;
+
         static void Main(string[] args)
         {
-            Reddit reddit = null;
+            Authenticate();
+            Menu();
+        }
+
+        private static void Menu()
+        {
+            var choice = string.Empty;
+            while (choice != "x")
+            {
+                WriteMenu();
+                choice = Console.In.ReadLine();
+                switch ((choice ?? string.Empty).ToLower())
+                {
+                    case ("a"):
+                        ShowTop10();
+                        break;
+
+                    case ("b"):
+                        GetRandom();
+                        break;
+                }
+            }
+        }
+
+        //choice a
+        private static void ShowTop10()
+        {
+            Console.Write("subreddit name >> ");
+            var subname = Console.ReadLine();
+            var sub = reddit.GetSubreddit(subname);
+            var top10 = sub.GetTop(FromTime.Week).Take(10);
+            int postNumber = 0;
+            foreach (var post in top10)
+            {
+                Console.WriteLine($"{++postNumber}) \"{post.Title}\" \n by {post.AuthorName}\n");
+            }
+        }
+
+        //choice b
+        private static void GetRandom()
+        {
+            Console.Write("subreddit name >> ");
+            var subname = Console.ReadLine();
+            var sub = reddit.GetSubreddit(subname);
+            var randomPost = sub.Random.FirstOrDefault();
+            DisplayPost(randomPost);
+        }
+
+        private static void DisplayPost(Post p)
+        {
+            if (p == null)
+            {
+                Console.WriteLine("(no post returned)");
+                return;
+            }
+
+            Console.WriteLine($"\"{p.Title}\"");
+            Console.WriteLine($"\tby {p.AuthorName}\"");
+            Console.WriteLine($"▲{p.Upvotes} ▼{p.Downvotes}");
+            if(!p.IsSelfPost) 
+                Console.WriteLine($"Link: {p.Url}");
+        }
+
+        private static void WriteMenu()
+        {
+            Console.WriteLine(string.Empty);
+            Console.WriteLine($"[a] get top 10");
+            Console.WriteLine($"[b] get random post");
+            Console.WriteLine(string.Empty);
+            Console.Out.Write("choose >> ");
+        }
+
+        private static void Authenticate()
+        {
             var authenticated = false;
             while (!authenticated)
             {
@@ -46,33 +121,6 @@ namespace TestRedditSharp
                     }
                 }
             }
-            /*Console.Write("Create post? (y/n) [n]: ");
-            var choice = Console.ReadLine();
-            if (!string.IsNullOrEmpty(choice) && choice.ToLower()[0] == 'y')
-            {
-                Console.Write("Type a subreddit name: ");
-                var subname = Console.ReadLine();
-                var sub = reddit.GetSubreddit(subname);
-                Console.WriteLine("Making test post");
-                var post = sub.SubmitTextPost("RedditSharp test", "This is a test post sent from RedditSharp");
-                Console.WriteLine("Submitted: {0}", post.Url);
-            }
-            else
-            {
-                Console.Write("Type a subreddit name: ");
-                var subname = Console.ReadLine();
-                var sub = reddit.GetSubreddit(subname);
-                foreach (var post in sub.GetTop(FromTime.Week).Take(10))
-                    Console.WriteLine("\"{0}\" by {1}", post.Title, post.Author);
-            }*/
-            Comment comment = (Comment)reddit.GetThingByFullname("t1_ciif2g7");
-            Post post = (Post)reddit.GetThingByFullname("t3_298g7j");
-            PrivateMessage pm = (PrivateMessage)reddit.GetThingByFullname("t4_20oi3a"); // Use your own PM here, as you don't have permission to view this one
-            Console.WriteLine(comment.Body);
-            Console.WriteLine(post.Title);
-            Console.WriteLine(pm.Body);
-            Console.WriteLine(post.Comment("test").FullName);
-            Console.ReadKey(true);
         }
 
         public static string ReadPassword()

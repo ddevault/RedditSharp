@@ -170,6 +170,16 @@ namespace RedditSharp.Things
             }
         }
 
+        public Listing<Post> Random
+        {
+            get
+            {
+                if (Name == "/")
+                    return new Listing<Post>(Reddit, "/random.json", WebAgent);
+                return new Listing<Post>(Reddit, string.Format(SubredditRisingUrl, Name), WebAgent);
+            }
+        }
+
         public Listing<VotableThing> ModQueue
         {
             get
