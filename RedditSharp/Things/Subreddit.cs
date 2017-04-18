@@ -31,6 +31,7 @@ namespace RedditSharp.Things
         private const string AcceptModeratorInviteUrl = "/api/accept_moderator_invite";
         private const string LeaveModerationUrl = "/api/unfriend";
         private const string BanUserUrl = "/api/friend";
+        private const string MuteUserUrl = "/api/friend";
         private const string AddModeratorUrl = "/api/friend";
         private const string AddContributorUrl = "/api/friend";
         private const string ModeratorsUrl = "/r/{0}/about/moderators.json";
@@ -590,6 +591,25 @@ namespace RedditSharp.Things
                 r = Name,
                 type = "banned",
                 id = "#banned",
+                name = user,
+                note = reason,
+                action = "add",
+                container = FullName
+            });
+            var response = request.GetResponse();
+            var result = WebAgent.GetResponseString(response.GetResponseStream());
+        }
+        
+        public void MuteUser(string user, string reason)
+        {
+            var request = WebAgent.CreatePost(MuteUserUrl);
+            WebAgent.WritePostBody(request.GetRequestStream(), new
+            {
+                api_type = "json",
+                uh = Reddit.User.Modhash,
+                r = Name,
+                type = "muted",
+                id = "#muted",
                 name = user,
                 note = reason,
                 action = "add",
